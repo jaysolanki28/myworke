@@ -1,9 +1,3 @@
-Please read each line of this code very carefully, if you see any syntax error then fix it and provide me the complete code.
-Uncaught SyntaxError: missing ) after argument list
-Line: 153
-, Uncaught ReferenceError: validateStep is not defined
-Line: 51
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -51,7 +45,7 @@ Line: 51
         <option value="hearing">Hearing Disability</option>
     </select><br>
 
-    <button onclick="validateStep(1)">Next</button>
+    <button onclick="validateStep1()">Next</button>
 </div>
 
 <!-- Step 2: Student Contact Information -->
@@ -126,42 +120,50 @@ Line: 51
 <p id="errorStatus" role="alert"></p>
 
 <script>
-    let currentStep = 1;
+let currentStep = 1;
 
-    function validateStep(step) {
-        let isValid = false;
-        let errorMessage = "";
+function validateStep(step) {
+    let isValid = false;
+    let errorMessage = "";
 
-        switch (step) {
-            case 1:
-                isValid = validateStep1();
-                errorMessage = "Please fill in all fields.";
-                break;
-            case 2:
-                isValid = validateStep2();
-                errorMessage = "Please fill in all fields.";
-                break;
-            case 3:
-                isValid = validateStep3();
-                errorMessage = "Please fill in all fields.";
-                break;
-            case 4:
-                isValid = validateStep4();
-                errorMessage = "Please fill in all fields.";
-                break;
-            default:
-                break;
-        }
-    if (isValid) {
-document.getElementById(step${step}).style.display = "none";
-        currentStep++;
-        if (currentStep <= 4) {
-            document.getElementById(step${currentStep}).style.display = "block";
-        } else {
-            submitForm();
-        }
+    switch (step) {
+        case 1:
+            isValid = validateStep1();
+            errorMessage = "Please fill in all fields.";
+            break;
+        case 2:
+            isValid = validateStep2();
+            errorMessage = "Please fill in all fields.";
+            break;
+        case 3:
+            isValid = validateStep3();
+            errorMessage = "Please fill in all fields.";
+            break;
+        case 4:
+            isValid = validateStep4();
+            errorMessage = "Please fill in all fields.";
+            break;
+        default:
+            break;
     }
 
+if (isValid) {
+    document.getElementById(`step${step}`).style.display = "none";
+    currentStep++;
+    if (currentStep <= 4) {
+        document.getElementById(`step${currentStep}`).style.display = "block";
+    } else {
+        submitForm();
+    }
+}
+function status(message) {   
+document.getElementById("errorStatus").style.display="block";
+document.getElementById("errorStatus").innerHTML = message;
+setTimeout(function(){
+document.getElementById("errorStatus").style.display="none";
+    document.getElementById("errorStatus").innerHTML = "";
+}, 3000);
+}
 function validateStep1() {
     let isValid = true;
     const firstName = document.getElementById("firstName").value;
@@ -290,26 +292,20 @@ function validateStep4() {
 
     return isValid;
 }
-function status(message) {   
-document.getElementById("errorStatus").style.display="block";
-document.getElementById("errorStatus").innerHTML = message;
-setTimeout(function(){
-document.getElementById("errorStatus").style.display="none";
-}, 3000);
+
+
+function hideWhatsAppNumber() {
+    const whatsappNumber = document.getElementById("whatsappNumber");
+    const hideCheckbox = document.getElementById("sameNumber");
+
+    if (hideCheckbox.checked) {
+        whatsappNumber.disabled = true;
+        whatsappNumber.value = "";
+        // Optionally display a message or change styling to indicate WhatsApp number is hidden
+    } else {
+        whatsappNumber.disabled = false;
+    }
 }
-
-
-    function hideWhatsAppNumber() {
-        const whatsappNumber = document.getElementById("whatsappNumber");
-        const hideCheckbox = document.getElementById("sameNumber");
-
-        if (hideCheckbox.checked) {
-            whatsappNumber.disabled = true;
-            whatsappNumber.value = "";
-        } else {
-            whatsappNumber.disabled = false;
-        }
-    }
 
     function submitForm() {
         const formData = {
