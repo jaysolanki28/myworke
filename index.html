@@ -1,0 +1,344 @@
+Please read each line of this code very carefully, if you see any syntax error then fix it and provide me the complete code.
+Uncaught SyntaxError: missing ) after argument list
+Line: 153
+, Uncaught ReferenceError: validateStep is not defined
+Line: 51
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admission Form</title>
+    <style>
+        .step {
+            display: none;
+        }
+        #step1 {
+            display: block;
+        }
+    </style>
+</head>
+<body>
+
+<h1>Admission Form</h1>
+
+<!-- Step 1: Student Information -->
+<div class="step" id="step1">
+    <h2>Step 1: Student Information</h2>
+    <label for="firstName">First Name:</label>
+    <input type="text" id="firstName" required><br>
+
+    <label for="lastName">Last Name:</label>
+    <input type="text" id="lastName" required><br>
+
+    <label for="dob">Date of Birth:</label>
+    <input type="date" id="dob" required><br>
+
+    <label for="gender">Gender:</label>
+    <select id="gender" required>
+        <option value="">Select Gender</option>
+        <option value="male">Male</option>
+        <option value="female">Female</option>
+        <option value="other">Other</option>
+    </select><br>
+
+    <label for="disability">Disability Type:</label>
+    <select id="disability" required>
+        <option value="">Select Disability Type</option>
+        <option value="physical">Physical Disability</option>
+        <option value="visual">Visual Disability</option>
+        <option value="hearing">Hearing Disability</option>
+    </select><br>
+
+    <button onclick="validateStep(1)">Next</button>
+</div>
+
+<!-- Step 2: Student Contact Information -->
+<div class="step" id="step2">
+    <h2>Step 2: Student Contact Information</h2>
+    <label for="mobileNumber">Mobile Number:</label>
+    <input type="tel" id="mobileNumber" required pattern="[0-9]{10}"><br>
+
+    <label for="whatsappNumber">WhatsApp Number:</label>
+    <input type="tel" id="whatsappNumber" required pattern="[0-9]{10}">
+    <input type="checkbox" id="sameNumber" onclick="hideWhatsAppNumber()"> Hide WhatsApp Number<br>
+
+    <label for="email">Email Address:</label>
+    <input type="email" id="email" required><br>
+
+    <label for="city">City, State:</label>
+    <select id="city" required>
+        <option value="">Select City, State</option>
+        <!-- Add options as needed -->
+    </select><br>
+
+    <button onclick="validateStep(2)">Next</button>
+</div>
+
+<!-- Step 3: Parent/Guardian Information -->
+<div class="step" id="step3">
+    <h2>Step 3: Parent/Guardian Information</h2>
+    <label for="parentFirstName">First Name of Parent/Guardian:</label>
+    <input type="text" id="parentFirstName" required><br>
+    <label for="parentLastName">Last Name of Parent/Guardian:</label>
+    <input type="text" id="parentLastName" required><br>
+
+    <label for="relationship">Relationship to the Student:</label>
+    <select id="relationship" required>
+        <option value="">Select Relationship</option>
+        <!-- Add options as needed -->
+    </select><br>
+
+    <label for="parentMobile">Mobile Number:</label>
+    <input type="tel" id="parentMobile" required pattern="[0-9]{10}"><br>
+
+    <label for="parentWhatsApp">WhatsApp Number:</label>
+    <input type="tel" id="parentWhatsApp" required pattern="[0-9]{10}"><br>
+
+    <button onclick="validateStep(3)">Next</button>
+</div>
+
+<!-- Step 4: Additional Information -->
+<div class="step" id="step4">
+    <h2>Step 4: Additional Information</h2>
+    <label for="disabilityPercentage">Percentage of Disability:</label>
+    <select id="disabilityPercentage" required>
+        <option value="">Select Percentage</option>
+        <!-- Add options as needed -->
+    </select><br>
+
+    <label for="udidNumber">UDID Number:</label>
+    <input type="text" id="udidNumber"><br>
+
+    <label for="aadhaarNumber">Aadhaar Number:</label>
+    <input type="text" id="aadhaarNumber"><br>
+
+    <input type="checkbox" id="termsConditions" required>
+    <label for="termsConditions">Terms and Conditions of Enrollment</label><br>
+
+    <input type="checkbox" id="acknowledgment" required>
+    <label for="acknowledgment">Declaration of Accuracy of Information Provided</label><br>
+
+    <button onclick="validateStep(4)">Submit</button>
+</div>
+
+<p id="errorStatus" role="alert"></p>
+
+<script>
+    let currentStep = 1;
+
+    function validateStep(step) {
+        let isValid = false;
+        let errorMessage = "";
+
+        switch (step) {
+            case 1:
+                isValid = validateStep1();
+                errorMessage = "Please fill in all fields.";
+                break;
+            case 2:
+                isValid = validateStep2();
+                errorMessage = "Please fill in all fields.";
+                break;
+            case 3:
+                isValid = validateStep3();
+                errorMessage = "Please fill in all fields.";
+                break;
+            case 4:
+                isValid = validateStep4();
+                errorMessage = "Please fill in all fields.";
+                break;
+            default:
+                break;
+        }
+    if (isValid) {
+document.getElementById(step${step}).style.display = "none";
+        currentStep++;
+        if (currentStep <= 4) {
+            document.getElementById(step${currentStep}).style.display = "block";
+        } else {
+            submitForm();
+        }
+    }
+
+function validateStep1() {
+    let isValid = true;
+    const firstName = document.getElementById("firstName").value;
+    const lastName = document.getElementById("lastName").value;
+    const dob = document.getElementById("dob").value;
+    const gender = document.getElementById("gender").value;
+    const disability = document.getElementById("disability").value;
+
+    if (firstName.length < 3) {
+        status("Please enter a valid First Name.");
+        isValid = false;
+    }
+    if (lastName.length < 3) {
+        status("Please enter a valid last Name.");
+        isValid = false;
+    }
+    if (dob === "") {
+         status("Please select a valid date of birth.");
+        isValid = false;
+    }
+
+    if (gender === "") {
+        status("Please select a Gender.");
+        isValid = false;
+    }
+    if ( disability === "") {
+        status("Please select a disability type.");
+        isValid = false;
+    }
+
+    return isValid;
+}
+
+function validateStep2() {
+    let isValid = true;
+    const mobileNumber = document.getElementById("mobileNumber").value;
+    const whatsappNumber = document.getElementById("whatsappNumber").value;
+        const email = document.getElementById("email").value;
+        const state = document.getElementById("state").value;
+        const city = document.getElementById("city").value;
+
+    if (mobileNumber.length < 10) {
+        status("Please enter a valid Mobile Number.");
+        isValid = false;
+    }
+
+    if (whatsappNumber.length < 10) {
+        status("Please enter a valid WhatsApp Number.");
+        isValid = false;
+    }
+    if (email.length < 15) {
+        status("Please enter a valid Email ID.");
+        isValid = false;
+    }
+    if (state === "") {
+        status("Please select a State.");
+        isValid = false;
+    }
+    if ( city === "") {
+        status("Please select a City.");
+        isValid = false;
+    }
+
+    return isValid;
+}
+
+function validateStep3() {
+    let isValid = true;
+        const parentFirstName = document.getElementById("parentFirstName").value;
+        const parentLastName = document.getElementById("parentLastName").value;
+        const relationship = document.getElementById("relationship").value;
+        const parentMobile = document.getElementById("parentMobile").value;
+        const parentWhatsApp = document.getElementById("parentWhatsApp").value;
+    if (parentFirstName.length < 3) {
+        status("Please enter a valid First Name.");
+        isValid = false;
+    }
+    if (parentLastName.length < 3) {
+        status("Please enter a valid last Name.");
+        isValid = false;
+    }
+    if (  relationship === "") {
+        status("Please select a relationship.");
+        isValid = false;
+    }
+
+    if (parentMobile.length < 10) {
+        status("Please enter a valid Parent's Mobile Number.");
+        isValid = false;
+    }
+
+    if (parentWhatsApp.length < 10) {
+        status("Please enter a valid Parent's WhatsApp Number.");
+        isValid = false;
+    }
+
+    return isValid;
+}
+
+function validateStep4() {
+    let isValid = true;
+        const disabilityPercentage = document.getElementById("disabilityPercentage").value;
+        const udidNumber = document.getElementById("udidNumber").value;
+        const aadhaarNumber = document.getElementById("aadhaarNumber").value;
+        const termsConditions = document.getElementById("termsConditions").checked;
+        const acknowledgment = document.getElementById("acknowledgment").checked;
+    if ( disabilityPercentage === "") {
+        status("Please select a Disability Percentage.");
+        isValid = false;
+    }
+
+    if (udidNumber === "") {
+        status("Please enter a valid UDID Number.");
+        isValid = false;
+    }
+
+    if (aadhaarNumber.length < 12) {
+        status("Please enter a valid Aadhaar Number (12 digits).");
+        isValid = false;
+    }
+
+    if (!termsConditions || !acknowledgment) {
+        status("Please accept the Terms and Conditions and the Accuracy Declaration.");
+        isValid = false;
+    }
+
+    return isValid;
+}
+function status(message) {   
+document.getElementById("errorStatus").style.display="block";
+document.getElementById("errorStatus").innerHTML = message;
+setTimeout(function(){
+document.getElementById("errorStatus").style.display="none";
+}, 3000);
+}
+
+
+    function hideWhatsAppNumber() {
+        const whatsappNumber = document.getElementById("whatsappNumber");
+        const hideCheckbox = document.getElementById("sameNumber");
+
+        if (hideCheckbox.checked) {
+            whatsappNumber.disabled = true;
+            whatsappNumber.value = "";
+        } else {
+            whatsappNumber.disabled = false;
+        }
+    }
+
+    function submitForm() {
+        const formData = {
+            firstName: document.getElementById("firstName").value,
+            lastName: document.getElementById("lastName").value,
+            dob: document.getElementById("dob").value,
+            gender: document.getElementById("gender").value,
+            disability: document.getElementById("disability").value,
+            mobileNumber: document.getElementById("mobileNumber").value,
+            whatsappNumber: document.getElementById("whatsappNumber").value,
+            email: document.getElementById("email").value,
+            state: document.getElementById("state").value,
+            city: document.getElementById("city").value,
+            parentFirstName: document.getElementById("parentFirstName").value,
+            parentLastName: document.getElementById("parentLastName").value,
+            relationship: document.getElementById("relationship").value,
+            parentMobile: document.getElementById("parentMobile").value,
+            parentWhatsApp: document.getElementById("parentWhatsApp").value,
+            disabilityPercentage: document.getElementById("disabilityPercentage").value,
+            udidNumber: document.getElementById("udidNumber").value,
+            aadhaarNumber: document.getElementById("aadhaarNumber").value
+        };
+
+        const WhatsAppMessage = Admission Form%0A%0AStudent Information:%0A${formData.firstName} ${formData.lastName}%0ADOB: ${formData.dob}%0AGender: ${formData.gender}%0ADisability: ${formData.disability}%0A%0AContact Information:%0AMobile: ${formData.mobileNumber}%0AEmail: ${formData.email}%0AState: ${formData.state}%0ACity: ${formData.city}%0A%0AParent/Guardian Information:%0A${formData.parentFirstName} (Relation: ${formData.relationship})%0AParent Mobile: ${formData.parentMobile}%0AParent WhatsApp: ${formData.parentWhatsApp}%0A%0AAdditional Information:%0ADisability Percentage: ${formData.disabilityPercentage}%0AUDID: ${formData.udidNumber}%0AAadhaar: ${formData.aadhaarNumber};
+
+const whatsappURL = https://wa.me/YOUR_PHONE_NUMBER_HERE?text=${WhatsAppMessage};
+        window.open(whatsappURL);
+    }
+</script>
+
+</body>
+</html>
