@@ -1,43 +1,32 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Dropbox Access Token Display</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dropbox Auth Example</title>
+  <script src="https://www.dropbox.com/static/api/2/dropins.js" id="dropboxjs" data-app-key="7u6mvcyvv6szugw"></script>
 </head>
 <body>
-    <p>Click the button to authorize Dropbox:</p>
-    <button id="authorizeButton">Authorize Dropbox</button>
-    <p>Access Token:</p>
-    <p id="tokenDisplay" role="alert"></p>
+  <button id="authorizeBtn">Authorize Dropbox</button>
+  <p id="accessToken"></p>
+  <script>
+document.getElementById('authorizeBtn').addEventListener('click', function() {
+  Dropbox.appKey = '7u6mvcyvv6szugw';
+  Dropbox.authDriver(new Dropbox.AuthDriver.Popup({ receiverUrl: 'https://www.yourwebsite.com' }));
 
-    <script>
-const CLIENT_ID = '7u6mvcyvv6szugw';
-const AUTH_URL = https://www.dropbox.com/oauth2/authorize?client_id=${CLIENT_ID}&response_type=token;
-
-function displayAccessToken(accessToken) {
-    const tokenDisplay = document.getElementById('tokenDisplay');
-    tokenDisplay.innerText = accessToken;
-}
-
-function handleAuthorizationCallback() {
-    const urlParams = new URLSearchParams(window.location.hash.substring(1));
-    const accessToken = urlParams.get('access_token');
-    const tokenType = urlParams.get('token_type');
-
-    if (accessToken && tokenType === 'bearer') {
-        // Access token is valid, display it in the paragraph tag
-        displayAccessToken(accessToken);
+  Dropbox.authenticate({ interactive: true }, function(error, client) {
+    if (error) {
+      console.error('Authentication error:', error);
     } else {
-        console.error('Error: Access token not found in the URL');
+      const accessToken = client.credentials().token;
+      const refreshToken = client.credentials().refreshToken;
+
+      document.getElementById('accessToken').textContent = `Access Token: ${accessToken}`;
+      console.log('Access token:', accessToken);
+      console.log('Refresh token:', refreshToken);
     }
-}
-
-function authorizeDropbox() {
-    const authUrl = AUTH_URL;
-    window.location.href = authUrl;
-}
-
-const authorizeButton = document.getElementById('authorizeButton');
-authorizeButton.addEventListener('click', authorizeDropbox);
+  });
+});
 </script>
 </body>
 </html>
