@@ -1,32 +1,61 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Dropbox Auth Example</title>
-  <script src="https://www.dropbox.com/static/api/2/dropins.js" id="dropboxjs" data-app-key="7u6mvcyvv6szugw"></script>
+    <title>Dropbox Access Token Display</title>
 </head>
 <body>
-  <button id="authorizeBtn">Authorize Dropbox</button>
-  <p id="accessToken"></p>
-  <script>
-document.getElementById('authorizeBtn').addEventListener('click', function() {
-  Dropbox.appKey = '7u6mvcyvv6szugw';
-  Dropbox.authDriver(new Dropbox.AuthDriver.Popup({ receiverUrl: 'https://www.yourwebsite.com' }));
+    <p>Click the button to authorize Dropbox:</p>
+    <button id="authorizeButton">Authorize Dropbox</button>
+    <p>Access Token:</p>
+    <p id="tokenDisplay" role="alert"></p>
 
-  Dropbox.authenticate({ interactive: true }, function(error, client) {
-    if (error) {
-      console.error('Authentication error:', error);
-    } else {
-      const accessToken = client.credentials().token;
-      const refreshToken = client.credentials().refreshToken;
+    <script>
+        const CLIENT_ID = '7u6mvcyvv6szugw';
+        const REDIRECT_URI = 'https://techfreedom.in/';
+        const AUTH_URL = https://www.dropbox.com/oauth2/authorize?client_id=${CLIENT_ID}&response_type=code&redirect_uri=${REDIRECT_URI};
 
-      document.getElementById('accessToken').textContent = `Access Token: ${accessToken}`;
-      console.log('Access token:', accessToken);
-      console.log('Refresh token:', refreshToken);
-    }
-  });
-});
-</script>
+        function displayAccessToken(accessToken) {
+            const tokenDisplay = document.getElementById('tokenDisplay');
+            tokenDisplay.innerText = accessToken;
+        }
+
+        function handleAuthorizationCallback() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const code = urlParams.get('code');
+
+            if (code) {
+                fetch('https://api.dropboxapi.com/oauth2/token', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: code=${code}&grant_type=authorization_code&client_id=${CLIENT_ID}
+                })
+                .then(response => response.json())
+                .then(data => {
+                    const accessToken = data.access_token;
+                    const refreshToken = data.refresh_token;
+
+                    // Display the initial access token in the paragraph tag
+                    displayAccessToken(accessToken);
+                })
+                .catch(error => console.error('Error fetching access token:', error));
+            } else {
+                console.error('Authorization code not found in the URL');
+            }
+        }
+
+        function authorizeDropbox() {
+            window.location.href = AUTH_URL;
+        }
+
+        const authorizeButton = document.getElementById('authorizeButton');
+        authorizeButton.addEventListener('click', authorizeDropbox);
+
+        // Call handleAuthorizationCallback only after clicking the button
+        authorizeButton.addEventListener('click', handleAuthorizationCallback);
+    </script>
 </body>
 </html>
+
+
