@@ -1,61 +1,36 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>Dropbox Access Token Display</title>
+<meta charset="UTF-8">
+<title>Backblaze B2 Authorization Token</title>
 </head>
 <body>
-    <p>Click the button to authorize Dropbox:</p>
-    <button id="authorizeButton">Authorize Dropbox</button>
-    <p>Access Token:</p>
-    <p id="tokenDisplay" role="alert"></p>
+<h1>Backblaze B2 Authorization Token</h1>
+<p id="authTokenParagraph"></p>
+<button onclick="getAuthorizationToken()">Get Authorization Token</button>
 
-    <script>
-        const CLIENT_ID = '7u6mvcyvv6szugw';
-        const REDIRECT_URI = 'https://techfreedom.in/';
-const AUTH_URL = 'https://www.dropbox.com/oauth2/authorize?client_id=${CLIENT_ID}&response_type=code&redirect_uri=${REDIRECT_URI}';
+<script>
+function getAuthorizationToken() {
+  // Replace 'YOUR_APPLICATION_KEY_ID' and 'YOUR_APPLICATION_KEY' with your actual values
+  const applicationKeyId = '4e89e61038ed';
+  const applicationKey = '0057caea6f109340b33da1cf15d472f99ef5de243b';
 
-        function displayAccessToken(accessToken) {
-            const tokenDisplay = document.getElementById('tokenDisplay');
-            tokenDisplay.innerText = accessToken;
-        }
-
-        function handleAuthorizationCallback() {
-            const urlParams = new URLSearchParams(window.location.search);
-            const code = urlParams.get('code');
-
-            if (code) {
-                fetch('https://api.dropboxapi.com/oauth2/token', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/x-www-form-urlencoded',
-                    },
-                    body: code=${code}&grant_type=authorization_code&client_id=${CLIENT_ID}
-                })
-                .then(response => response.json())
-                .then(data => {
-                    const accessToken = data.access_token;
-                    const refreshToken = data.refresh_token;
-
-                    // Display the initial access token in the paragraph tag
-                    displayAccessToken(accessToken);
-                })
-                .catch(error => console.error('Error fetching access token:', error));
-            } else {
-                console.error('Authorization code not found in the URL');
-            }
-        }
-
-        function authorizeDropbox() {
-            window.location.href = AUTH_URL;
-        }
-
-        const authorizeButton = document.getElementById('authorizeButton');
-        authorizeButton.addEventListener('click', authorizeDropbox);
-
-        // Call handleAuthorizationCallback only after clicking the button
-        authorizeButton.addEventListener('click', handleAuthorizationCallback);
-    </script>
+  // Make a request to authorize the account and get the authorization token
+  fetch('https://api.backblazeb2.com/b2api/v2/b2_authorize_account', {
+    method: 'GET',
+    headers: {
+      'Authorization': 'Basic ' + btoa(applicationKeyId + ':' + applicationKey)
+    }
+  })
+  .then(response => response.json())
+  .then(data => {
+    const authToken = data.authorizationToken;
+    document.getElementById('authTokenParagraph').innerText = Authorization Token: ${authToken};
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  });
+}
+</script>
 </body>
 </html>
-
-
