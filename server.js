@@ -1,21 +1,19 @@
-      const express = require('express');
-   const app = express();
-   const bodyParser = require('body-parser');
+const express = require('express');
+const app = express();
+const port = process.env.PORT || 3000;
 
-   app.use(bodyParser.json());
+let messages = [];
 
-   let messages = [];
+app.get('/messages', (req, res) => {
+  const callback = req.query.callback;
+  
+  if (callback) {
+    res.send(${callback}(${JSON.stringify(messages)}););
+  } else {
+    res.json(messages);
+  }
+});
 
-   app.post('/messages', (req, res) => {
-     const message = req.body.message;
-     messages.push(message);
-     res.sendStatus(200);
-   });
-
-   app.get('/messages', (req, res) => {
-     res.json(messages);
-   });
-
-   app.listen(process.env.PORT || 3000, () => {
-     console.log('Server is running');
-   });
+app.listen(port, () => {
+  console.log(Server running on port ${port});
+});
