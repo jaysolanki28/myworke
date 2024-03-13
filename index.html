@@ -1,27 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Post Message</title>
-</head>
-<body>
+      <p id="messages"></p>
 
-<input id="messageInput" type="text" placeholder="Type your message">
-<button onclick="postMessage()">Post Message</button>
-
-<script>
-function postMessage() {
-    const message = document.getElementById('messageInput').value;
-    
-    fetch('https://ritzy-jazzy-alpaca.glitch.me/post-message', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: message=${message}
-    });
-}
-</script>
-
-</body>
-</html>
+   <script>
+     fetch('https://heliotrope-sour-citrine.glitch.me/messages')
+       .then(response => response.json())
+       .then(data => {
+         const messagesElement = document.getElementById('messages');
+         data.forEach(message => {
+           messagesElement.innerHTML += ${message}<br>;
+         });
+       });
+   </script>
