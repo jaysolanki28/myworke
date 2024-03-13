@@ -1,28 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Contact Form</title>
-<style>
-    .hidden {
-        display: none;
-    }
-</style>
+    <meta charset="UTF-8">
+    <title>Messages</title>
 </head>
 <body>
-<h1>Contact Form</h1>
-<form id="contactForm">
-    <label for="name">Name:</label>
-    <input type="text" id="name" required aria-label="Name">
-    <label for="email">Email:</label>
-    <input type="email" id="email" required aria-label="Email">
-    <label for="message">Message:</label>
-    <textarea id="message" required aria-label="Message"></textarea>
-    <button type="submit">Submit</button>
-</form>
-<p id="validationMessages" class="hidden"></p>
+    <h1>All Messages</h1>
+    <p id="allMessages"></p>
 
-<script src="https://github.com/jaysolanki28/myworke/blob/main/script.js"></script>
+<script>
+// Fetch all messages from the server and display them
+fetch('https://ritzy-jazzy-alpaca.glitch.me/get-messages')
+    .then(response => response.json())
+    .then(data => {
+        const messagesContainer = document.getElementById('allMessages');
+        messagesContainer.innerHTML = data.join('<br>');
+    });
+</script>
+
 </body>
 </html>
