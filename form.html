@@ -6,10 +6,20 @@
 <title>Admission Form</title>
 <link rel="stylesheet" href="styles.css">
 <style>
+html, body {
+padding: 0; margin: 0; width: 100%; height: 100%; font-family: Arial;background-color: #808080; webkit-user-select: none;       -webkit-touch-callout: none;       -moz-user-select: none;       -ms-user-select: none;       user-select: none; }
 .form-container {
-    max-width: 600px;
+    max-width: 70%;
     margin: 0 auto;
     padding: 20px;
+    border: 10px solid gold;
+    border-radius: 20px;
+    background-color: #550000;
+    text-align: center; /* Center the input fields */
+position: fixed;     
+top: 15%;
+float: left;
+margin-left: 7.5%;
 }
 
 .form-step {
@@ -19,30 +29,119 @@
 .form-step:first-child {
     display: block;
 }
+
+.headingText {
+color: #87CEEB;
+font-weight: bold;    
+    font-size: 15px;
+    text-align: center;
+    margin-top: 10px;
+    margin-bottom: 15px;
+}
+
+label {
+float: left;
+    text-align: left;
+    color: #8B8000;
+    font-size: 14px; /* Adjust label font size for better visibility */
+   margin-bottom: 2px; /* Add some space below the labels */
+}
+
+input, select {
+    width: 100%;
+    color: #000;
+    padding: 10px;
+    margin-bottom: 10px;
+    border: 3px solid #8B8000;
+    border-radius: 5px;
+    box-sizing: border-box;
+}
+
+.prevBtn {
+    position: fixed;
+    bottom: 10%;
+    left: 7.5%;
+    width: 40%; /* Adjust width for better appearance */
+    height: 50px;
+    background-color: #ff6347;
+    color: #fff;
+    padding: 10px 20px;
+    border: 2px solid #550000;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.nextBtn {
+    position: fixed;
+    bottom: 10%;
+    right: 7.5%; /* Adjust right position for spacing */
+    width: 40%;
+    height: 50px;
+    background-color: #008000;
+    color: #fff;
+    padding: 10px 20px;
+    border: 2px solid #550000;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+#submitBtn {
+    position: fixed;
+    bottom: 10%;
+    right: 7.5%;
+    width: 40%;
+    height: 50px;
+    background-color: #007bff;
+    color: #fff;
+    padding: 10px 20px;
+    border: 2px solid #550000;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+#submitBtn:hover {
+    background-color: #2980b9;
+}
+
+#alertBox {
+    height: 40px;
+    position: fixed;
+    bottom: 5%;
+    width: 100%;
+    background-color: #555500;
+    opacity: 1;
+    color: yellow;
+    font-size: 10px;
+    text-align: center;
+    display: none;
+}
+
+
+
+
 </style>
 </head>
 <body>
 <div class="form-container">
-<h1>Admission Form</h1>
-    <form id="admissionForm" onsubmit="submitForm()">
+    <form target="secret-frame" method="post" id="admissionForm" onsubmit="submitForm()">
         <div class="form-step" id="step1">
-    <div id="div1" tabindex="-1">Student Information: Step 1 of 5.</div>
-  <label for="firstName" tabindex="-1">First Name:</label>
-  <input type="text" id="firstName"><br>
+    <div class="headingText" id="div1" tabindex="-1">Student Information: Step 1 of 5.</div>
+  <label for="" id="firstNamel" tabindex="-1">Student First Name: *</label>
+  <input type="text" id="firstName"><br>
 
-  <label for="lastName" tabindex="-1">Last Name:</label>
-  <input type="text" id="lastName"><br>
+  <label for="" id="lastNamel" tabindex="-1">Student Last Name: *</label>
+  <input type="text" id="lastName"><br>
 
-  <label for="dob" tabindex="-1">Date of Birth:</label>
-  <input type="date" id="dob"><br>
+  <label for="" id="dobl" tabindex="-1">Student Date of Birth: *</label>
+  <input type="date" id="dob"><br>
 
-  <label for="gender" tabindex="-1">Gender:</label>
-  <select id="gender">
-    <option disabled selected value="">Select Gender</option>
-    <option value="male">Male</option>
-    <option value="female">Female</option>
-  </select><br>
-  <label for="education" tabindex="-1">Your highest Level of Education:</label>
+  <label for="" id="genderl" tabindex="-1">Student Gender: *</label>
+  <select id="gender">
+    <option disabled selected value="">Select Gender</option>
+    <option value="male">Male</option>
+    <option value="female">Female</option>
+  </select><br>
+  <label for="" id="educationl" tabindex="-1">Your highest Level of Education: *</label>
         <select id="education">
             <option disabled selected value="">Select option</option>
             <option value="10th Standard">10th Standard</option>
@@ -52,93 +151,97 @@
             <option value="Postgraduate">Postgraduate</option>
         </select><br>
 
-            <button id="next1" type="button">Next</button>
+            <button class="nextBtn" id="next1" type="button">Next</button>
         </div>
         <div class="form-step" id="step2">
-    <div id="div2" tabindex="-1">Student Contact Information: Step 2 of 5.</div>
-    <label for="mobileNumber" tabindex="-1">Mobile Number:</label>
+    <div class="headingText" id="div2" tabindex="-1">Student Contact Information: Step 2 of 5.</div>
+    <label for="" id="mobileNumberl" tabindex="-1">Student Mobile Number: *</label>
     <input type="tel" id="mobileNumber"><br>
+    <label><input type="checkbox" id="sameMobile"> Same as Mobile Number</label><br>
 
-    <label for="whatsappNumber" tabindex="-1">WhatsApp Number:</label>
+    <label for="" id="whatsappNumberl" tabindex="-1">Student WhatsApp Number: *</label>
     <input type="tel" id="whatsappNumber"><br>
-    <label for="email" tabindex="-1">Email Address:</label>
+    <label for="" id="emaill" tabindex="-1">Student Email ID: *</label>
     <input type="email" id="email"><br>
 
-    <label for="state" tabindex="-1">State:</label>
+    <label for="" id="statel" tabindex="-1">Student State: *</label>
     <select id="state">
         <option disable selected value="">Select State</option>
         <option value="ok">ok</option>
     </select><br>
-    <label for="city" tabindex="-1">City:</label>
+    <label for="" id="cityl" tabindex="-1">Student City: *</label>
     <select id="city">
         <option disabled selected value="">Select City</option>
         <option value="ok">ok</option>
     </select><br>
-            <button id="prev2" type="button">Previous</button>
-            <button id="next2" type="button">Next</button>
+            <button class="prevBtn" id="prev2" type="button">Previous</button>
+            <button class="nextBtn" id="next2" type="button">Next</button>
         </div>
         <div class="form-step" id="step3">
-    <div id="div3" tabindex="-1">Parent/Guardian Information: Step 3 of 5.</div>
-    <label for="parentFirstName" tabindex="-1">First Name of Parent/Guardian:</label>
+    <div class="headingText" id="div3" tabindex="-1">Parent Information: Step 3 of 5.</div>
+    <label for="" id="parentFirstNamel" tabindex="-1">First Name of Student's Parent: *</label>
     <input type="text" id="parentFirstName"><br>
-    <label for="parentLastName" tabindex="-1">Last Name of Parent/Guardian:</label>
+    <label for="" id="parentLastNamel" tabindex="-1">Last Name of Student's Parent: *</label>
     <input type="text" id="parentLastName"><br>
 
-    <label for="relationship" tabindex="-1">Relationship to the Student:</label>
+    <label for="" id="relationshipl" tabindex="-1">Relationship to the Student: *</label>
     <select id="relationship">
-        <option disabled value="">Select Relationship</option>
+        <option disabled selected value="">Select Relationship</option>
         <option value="ok">ok</option>
     </select><br>
 
-    <label for="parentMobile" tabindex="-1">Mobile Number:</label>
+    <label for="" id="parentMobilel" tabindex="-1">Student's Parent Mobile Number: *</label>
     <input type="tel" id="parentMobile"><br>
+<label><input type="checkbox" id="sameParentMobile"> Same as Mobile Number</label><br>
 
-    <label for="parentWhatsApp" tabindex="-1">WhatsApp Number:</label>
+    <label for="" id="parentWhatsAppl" tabindex="-1">Student's Parent WhatsApp Number:</label>
     <input type="tel" id="parentWhatsApp"><br>
-            <button id="prev3" type="button">Previous</button>
-            <button id="next3" type="button">Next</button>
+            <button class="prevBtn" id="prev3" type="button">Previous</button>
+            <button class="nextBtn" id="next3" type="button">Next</button>
         </div>
         <div class="form-step" id="step4">
-    <div id="div4" tabindex="-1">Additional Information: Step 4 of 5.</div>
-    <label for="disabilityQuestion">Do you have a disability?</label><br>
-    <label><input type="radio" name="disability" value="I am a disable person." id="yesRadio" onclick="showDisabilityType()">Yes</label>
+    <div class="headingText" id="div4" tabindex="-1">Additional Information: Step 4 of 5.</div>
+    <label for="disabilityQuestion" tabindex="-1">Do you have a disability?</label><br>
+    <label><input type="radio" checked name="disability" value="I am a disable person." id="yesRadio" onclick="showDisabilityType()">Yes</label>
     <label><input type="radio" name="disability" value="I am a sighted person." id="noRadio" onclick="hideDisabilityType()">No</label><br>
-    <div id="disability" style="display: none;">
-  <label for="disabilityType" tabindex="-1" aria-live="polite">Disability Type:</label>
+    <div id="disability" style="display: block;">
+  <label for="" id="disabilityTypel" tabindex="-1">Disability Type: *</label>
   <select id="disabilityType">
-    <option disabled selected value="">Select Disability Type</option>
-    <option value="physical">Physical</option>
-    <option value="mental">Mental</option>
+    <option disabled selected value="">Select Disability Type</option>    <option value="Visually Impaired">Visually Impaired</option>    <option value="Physically Handicap">Physically Handicapped</option>
   </select><br>
-    <label for="disabilityPercentage" tabindex="-1">Percentage of Disability:</label>
+    <label for="" id="disabilityPercentagel" tabindex="-1">Percentage of Disability: *</label>
+  <select id="disabilityPercentage">    <option disabled selected value="">Select Disability Percentage</option>    <option value="40%">40%</option>    <option value="50%">50%</option>    <option value="60%">60%</option>    <option value="70%">70%</option>    <option value="80%">80%</option>    <option value="90%">90%</option>    <option value="100%">100%</option>
+  </select><br>
     <input type="tel" id="disabilityPercentage"><br>
-    <label for="udidNumber" tabindex="-1">UDID Number:</label>
+    <label for="" id="udidNumberl" tabindex="-1">UDID Number: *</label>
     <input type="text" id="udidNumber"><br>
 </div>
-    <div id="noDisability" style="display: none;">
+    <div id="noDisability" style="display: block;">
 
-    <label for="aadhaarNumber" tabindex="-1">Aadhaar Number:</label>
+    <label for="" id="aadhaarNumberl" tabindex="-1">Aadhaar Number (Last 4 Digits): *</label>
     <input type="tel" id="aadhaarNumber"><br>
 
-    <label for="termsConditions" tabindex="-1">Terms and Conditions of Enrollment</label><br>
-    <input type="checkbox" id="termsConditions">
-
-    <label for="acknowledgment" tabindex="-1">Declaration of Accuracy of Information Provided</label><br>
-    <input type="checkbox" id="acknowledgment">
 </div>
-            <button id="prev4" type="button">Previous</button>
-            <button id="next4" type="button">Next</button>
+            <button class="prevBtn" id="prev4" type="button">Previous</button>
+            <button class="nextBtn" id="next4" type="button">Next</button>
         </div>
         <div class="form-step" id="step5">
-    <div id="div5" tabindex="-1">Review your Information: Step 5 of 5.</div>
+    <div class="headingText" id="div5" tabindex="-1">Review your Information: Step 5 of 5.</div>
     <div id="reviewInfo"></div>
-            <button id="prev5" type="button">Previous</button>
+    <label><input type="checkbox" value="[ ] I have agreed to the terms and conditions." id="termsConditions">[ ] I have agree to the terms and conditions.</label><br>
+<label>    <input type="checkbox" value="[ ] I acknowledged that the information provided in this form is true and accurate to the best of my knowledge" id="acknowledgment">[ ] I acknowledge that the information provided in this form is true and accurate to the best of my knowledge.</label><br>
+<label id="noteMessage">By checking the boxes above, you confirm that you have agreed our terms and conditions and that the information you have provided is correct. Thank you for your submission.</label><br>
+            <button class="prevBtn" id="prev5" type="button">Previous</button>
         <button id="submitBtn" type="submit">Submit</button>
         </div>
 
     </form>
-</div>
+<div id="alertBox">
 <p id="errorStatus" role="alert"></p>
+</div>
+
+</div>
+<iframe name="secret-frame" width="0" height="0" border="0" style="display: none;"></iframe>
 <script>
 function showDisabilityType() {
     document.getElementById("disability").style.display = "block";
@@ -152,10 +255,10 @@ function hideDisabilityType() {
     validateStep(currentStep);
 }
 function alertMessage(message) {   
-document.getElementById("errorStatus").style.display="block";
+document.getElementById("alertBox").style.display="block";
 document.getElementById("errorStatus").innerHTML = message;
 setTimeout(function(){
-document.getElementById("errorStatus").style.display="none";
+document.getElementById("alertBox").style.display="none";
     document.getElementById("errorStatus").innerHTML = "";
 }, 3000);
 }
@@ -172,35 +275,59 @@ function validateStep(step) {
         let dob = document.getElementById("dob").value;
         let gender = document.getElementById("gender").value;
         let education = document.getElementById("education").value;
+if (!validateAlphabetsInput(firstName) && !alertShown) {
+    document.getElementById("firstNamel").focus();
+    alertMessage("Please enter a valid First Name of the Student using alphabets only.");
+    isValid = false;
+    alertShown = true;
+}
 
         if (firstName.length < 3 && !alertShown) {
             document.getElementById("firstNamel").focus();
-            alertMessage("Please enter a valid first name.");
+            alertMessage("Please enter a valid First Name of the Student.");
             isValid = false;
             alertShown = true;
         }
+        if (firstName.length > 15 && !alertShown) {
+            document.getElementById("firstNamel").focus();
+            alertMessage("Please enter a valid First Name of the Student.");
+            isValid = false;
+            alertShown = true;
+        }
+if (!validateAlphabetsInput(lastName) && !alertShown) {
+    document.getElementById("lastNamel").focus();
+    alertMessage("Please enter a valid Last Name of the Student using alphabets only.");
+    isValid = false;
+    alertShown = true;
+}
         if (lastName.length < 3 && !alertShown) {
             document.getElementById("lastNamel").focus();
-            alertMessage("Please enter a valid last name.");
+            alertMessage("Please enter a valid Last Name of the Student.");
+            isValid = false;
+            alertShown = true;
+        }
+        if (lastName.length > 15 && !alertShown) {
+            document.getElementById("lastNamel").focus();
+            alertMessage("Please enter a valid Last Name of the Student.");
             isValid = false;
             alertShown = true;
         }
         if (dob === "" && !alertShown) {
             document.getElementById("dobl").focus();
-            alertMessage("Please select your date of birth.");
+            alertMessage("Please select date of birth of the Student.");
             isValid = false;
             alertShown = true;
         }
 
         if (gender === "" && !alertShown) {
             document.getElementById("genderl").focus();
-            alertMessage("Please select your gender.");
+            alertMessage("Please select gender of the Student.");
             isValid = false;
             alertShown = true;
         }
         if ( education === "" && !alertShown) {
             document.getElementById("educationl").focus();
-            alertMessage("Please select your education.");
+            alertMessage("Please select highest education of the Student from the dropdown list.");
             isValid = false;
             alertShown = true;
         }
@@ -211,45 +338,63 @@ function validateStep(step) {
         let email = document.getElementById("email").value;
         let state = document.getElementById("state").value;
         let city = document.getElementById("city").value;
+if (!validateNumberInput(mobileNumber) && !alertShown) {
+    document.getElementById("mobileNumberl").focus();
+    alertMessage("Please enter a valid mobile number of the Student with digits only.");
+    isValid = false;
+    alertShown = true;
+}
         if (mobileNumber.length < 10 && !alertShown) {
             document.getElementById("mobileNumberl").focus();
-            alertMessage("Please enter a valid mobile number.");
+            alertMessage("Please enter a valid Mobile Number of the Student.");
             isValid = false;
             alertShown = true;
         }
         if (mobileNumber.length > 10 && !alertShown) {
             document.getElementById("mobileNumberl").focus();
-            alertMessage("Please enter a valid mobile number.");
+            alertMessage("Please enter a valid Mobile Number of the Student.");
             isValid = false;
             alertShown = true;
         }
+if (!validateNumberInput(whatsappNumber) && !alertShown) {
+    document.getElementById("whatsappNumberl").focus();
+    alertMessage("Please enter a valid WhatsApp Number of the Student with digits only.");
+    isValid = false;
+    alertShown = true;
+}
         if (whatsappNumber.length < 10 && !alertShown) {
             document.getElementById("whatsappNumberl").focus();
-            alertMessage("Please enter a valid WhatsApp Number.");
+            alertMessage("Please enter a valid WhatsApp Number of the Student.");
             isValid = false;
             alertShown = true;
         }
         if (whatsappNumber.length > 10 && !alertShown) {
             document.getElementById("whatsappNumberl").focus();
-            alertMessage("Please enter a valid WhatsApp Number.");
+            alertMessage("Please enter a valid WhatsApp Number of the Student.");
             isValid = false;
             alertShown = true;
         }
+if (!validateEmail(email) && !alertShown) {
+    document.getElementById("emaill").focus();
+    alertMessage("Please enter a valid Email Address of the Student.");
+    isValid = false;
+    alertShown = true;
+}
         if (email.length < 15 && !alertShown) {
             document.getElementById("emaill").focus();
-            alertMessage("Please enter a valid Email ID.");
+            alertMessage("Please enter a valid Email Address of the Student.");
             isValid = false;
             alertShown = true;
         }
         if (state === "" && !alertShown) {
             document.getElementById("statel").focus();
-            alertMessage("Please select your State.");
+            alertMessage("Please select State of the Student from the dropdown list.");
             isValid = false;
             alertShown = true;
         }
         if ( city === "" && !alertShown) {
             document.getElementById("cityl").focus();
-            alertMessage("Please select your City.");
+            alertMessage("Please select City of the Student from the dropdown list.");
             isValid = false;
             alertShown = true;
         }
@@ -260,45 +405,75 @@ function validateStep(step) {
         let relationship = document.getElementById("relationship").value;
         let parentMobile = document.getElementById("parentMobile").value;
         let parentWhatsApp = document.getElementById("parentWhatsApp").value;
+if (!validateAlphabetsInput(parentFirstName) && !alertShown) {
+    document.getElementById("parentFirstNamel").focus();
+    alertMessage("Please enter a valid First Name of the Parent/Guardian using alphabets only.");
+    isValid = false;
+    alertShown = true;
+}
         if ( parentFirstName.length < 3 && !alertShown) {
             document.getElementById("parentFirstNamel").focus();
-            alertMessage("Please enter a valid  Parent First Name.");
+            alertMessage("Please enter a valid First Name of the Parent/Guardian.");
+            isValid = false;
+            alertShown = true;
+        }
+        if ( parentFirstName.length > 15 && !alertShown) {
+            document.getElementById("parentFirstNamel").focus();
+            alertMessage("Please enter a valid First Name of the Parent/Guardian.");
             isValid = false;
             alertShown = true;
         }
         if ( parentLastName.length < 3 && !alertShown) {
             document.getElementById("parentLastNamel").focus();
-            alertMessage("Please enter a valid  Parents Last Name.");
+            alertMessage("Please enter a valid Last Name of the Parent/Guardian.");
+            isValid = false;
+            alertShown = true;
+        }
+        if ( parentLastName.length > 15 && !alertShown) {
+            document.getElementById("parentLastNamel").focus();
+            alertMessage("Please enter a valid Last Name of the Parent/Guardian.");
             isValid = false;
             alertShown = true;
         }
         if ( relationship === "" && !alertShown) {
             document.getElementById("relationshipl").focus();
-            alertMessage("Please select  Relationship.");
+            alertMessage("Please select  Relationship from the dropdown list.");
             isValid = false;
             alertShown = true;
         }
+if (!validateNumberInput(parentMobile) && !alertShown) {
+    document.getElementById("parentMobilel").focus();
+    alertMessage("Please enter a valid Mobile Number of the Parent/Guardian with digits only.");
+    isValid = false;
+    alertShown = true;
+}
         if ( parentMobile.length < 10 && !alertShown) {
             document.getElementById("parentMobilel").focus();
-            alertMessage("Please enter a valid  Parent Mobile Number.");
+            alertMessage("Please enter a valid Mobile Number of the Parent/Guardian.");
             isValid = false;
             alertShown = true;
         }
         if ( parentMobile.length > 10 && !alertShown) {
             document.getElementById("parentMobilel").focus();
-            alertMessage("Please enter a valid  Parent Mobile Number.");
+            alertMessage("Please enter a valid Mobile Number of the Parent/Guardian.");
             isValid = false;
             alertShown = true;
         }
+if (!validateNumberInput(parentWhatsApp) && !alertShown) {
+    document.getElementById("parentWhatsAppl").focus();
+    alertMessage("Please enter a valid WhatsApp Number of the Parent/Guardian with digits only.");
+    isValid = false;
+    alertShown = true;
+}
         if ( parentWhatsApp.length < 10 && !alertShown) {
             document.getElementById("parentWhatsAppl").focus();
-            alertMessage("Please enter a valid Parent WhatsApp Number.");
+            alertMessage("Please enter a valid WhatsApp Number of the Parent/Guardian.");
             isValid = false;
             alertShown = true;
         }
         if ( parentWhatsApp.length > 10 && !alertShown) {
             document.getElementById("parentWhatsAppl").focus();
-            alertMessage("Please enter a valid Parent WhatsApp Number.");
+            alertMessage("Please enter a valid WhatsApp Number of the Parent/Guardian.");
             isValid = false;
             alertShown = true;
         }
@@ -310,48 +485,141 @@ function validateStep(step) {
             let disabilityType = document.getElementById("disabilityType").value;
             let disabilityPercentage = document.getElementById("disabilityPercentage").value;
             let udidNumber = document.getElementById("udidNumber").value;
-            if (disabilityType === "") {
-            document.getElementById("disabilityTypel").focus();
-                alertMessage("Select your disability type.");
-                isValid = false;
-                alertShown = true;
-            }
-            if (disabilityPercentage.length < 2 || disabilityPercentage.length > 3) {
-//            document.getElementById("l").focus();
-                alertMessage("Please enter a valid Disability Percentage.");
-                isValid = false;
-                alertShown = true;
-            }
-            if (udidNumber === "") {
-                alertMessage("Please enter your UDID Number.");
-                isValid = false;
-                alertShown = true;
-            }
-        } else {
             let aadhaarNumber = document.getElementById("aadhaarNumber").value;
-            if (aadhaarNumber === "") {
-                alertMessage("Please enter your Aadhaar Number.");
-                isValid = false;
-                alertShown = true;
-            }
+        if (  disabilityType === "" && !alertShown) {
+document.getElementById("disabilityTypel").focus();
+            alertMessage("Please select Disability Type of the Student from the dropdown list.");
+            isValid = false;
+            alertShown = true;
+}
+        if (  disabilityPercentage === "" && !alertShown) {
+document.getElementById("disabilityPercentagel").focus();
+            alertMessage("Please select Disability Percentage of the Student from the dropdown list.");
+            isValid = false;
+            alertShown = true;
+}
+        if ( udidNumber === "" && !alertShown) {
+document.getElementById("udidNumberl").focus();
+            alertMessage("Please enter a valid UDID Number of the Student.");
+            isValid = false;
+            alertShown = true;
+}
+if (!validateUdidFormat(udidNumber) && !alertShown) {
+    document.getElementById("udidNumberl").focus();
+    alertMessage("Please enter a valid UDID Number of the Student (2 letters in alphabetical and capital format followed by numbers without symbols).");
+    isValid = false;
+    alertShown = true;
+}
+if (!validateNumberInput(aadhaarNumber) && !alertShown) {
+    document.getElementById("aadhaarNumberl").focus();
+    alertMessage("Please enter last four digits of the student Aadhaar Number (With digits only).");
+    isValid = false;
+    alertShown = true;
+}
+        if (  aadhaarNumber.length < 4 && !alertShown) {
+document.getElementById("aadhaarNumberl").focus();
+            alertMessage("Please enter last four digits of the student Aadhaar Number.");
+            isValid = false;
+            alertShown = true;
+}
+        if (  aadhaarNumber.length > 4 && !alertShown) {
+document.getElementById("aadhaarNumberl").focus();
+            alertMessage("Please enter last four digits of the student Aadhaar Number.");
+            isValid = false;
+            alertShown = true;
+}
+       } else {
+            let aadhaarNumber = document.getElementById("aadhaarNumber").value;
+if (!validateNumberInput(aadhaarNumber) && !alertShown) {
+    document.getElementById("aadhaarNumberl").focus();
+    alertMessage("Please enter last four digits of the student Aadhaar Number (With digits only).");
+    isValid = false;
+    alertShown = true;
+}
+        if (  aadhaarNumber.length < 4 && !alertShown) {
+document.getElementById("aadhaarNumberl").focus();
+            alertMessage("Please enter last four digits of the student Aadhaar Number.");
+            isValid = false;
+            alertShown = true;
+}
+        if (  aadhaarNumber.length > 4 && !alertShown) {
+document.getElementById("aadhaarNumberl").focus();
+            alertMessage("Please enter last four digits of the student Aadhaar Number.");
+            isValid = false;
+            alertShown = true;
+}
         }
     }
     if (step === 5) {
             let termsConditions = document.getElementById("termsConditions").checked;
             let acknowledgment = document.getElementById("acknowledgment").checked;
-            if (!termsConditions == false) {
-                alertMessage("Please accept the Terms and Conditions.");
-                isValid = false;
-                alertShown = true;
-            }
-            if (!acknowledgment == false) {
-                alertMessage("Please acknowledge the Declaration of Accuracy.");
-                isValid = false;
-                alertShown = true;
-            }
+        if (termsConditions == false && !alertShown) {
+document.getElementById("termsConditions").focus();
+            alertMessage("Please agree to the terms and conditions before submitting.");
+            isValid = false;
+            alertShown = true;
+        }
+        if (acknowledgment == false && !alertShown) {
+document.getElementById("acknowledgment").focus();
+            alertMessage("Please acknowledge the information before submitting.");
+            isValid = false;
+            alertShown = true;
+        }
+}
 
 
     return isValid;
+}else {
+    alertMessage("Now you are all set to submit this form, click submit button to continue!");
+}
+    document.getElementById('sameMobile').addEventListener('change', function() {
+        if (this.checked) {
+            document.getElementById('whatsappNumber').value = document.getElementById('mobileNumber').value;
+    validateStep(currentStep);
+        } else {
+            document.getElementById('whatsappNumber').value = '';
+    validateStep(currentStep);
+        }
+    });
+    document.getElementById('sameParentMobile').addEventListener('change', function() {
+        if (this.checked) {
+            document.getElementById('parentWhatsApp').value = document.getElementById('parentMobile').value;
+    validateStep(currentStep);
+        } else {
+            document.getElementById('parentWhatsApp').value = '';
+    validateStep(currentStep);
+        }
+    });
+if (document.getElementById('termsConditions').checked) {
+    alertMessage("You have agreed to the terms and conditions. Thank you!");
+} else {
+    validateStep(currentStep);
+}
+
+
+
+if (document.getElementById('acknowledgment').checked) {
+    alertMessage("Your information is acknowledged. Thank you!");
+} else {
+    validateStep(currentStep);
+}
+// Function to validate input as alphabets only
+function validateAlphabetsInput(input) {
+    return /^[a-zA-Z]+$/.test(input);
+}
+// Function to validate input as numbers only
+function validateNumberInput(input) {
+    return /^\d+$/.test(input);
+}
+// Function to validate email format
+function validateEmail(email) {
+    const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    return emailPattern.test(email);
+}
+// Function to validate the custom format of input (2 letters in alphabetical and capital format followed by numbers without symbols)
+function validateCustomFormat(input) {
+    const customPattern = /^[A-Z]{2}\d+$/;
+    return customPattern.test(input);
 }
 
 
@@ -379,20 +647,20 @@ document.getElementById('prev5').addEventListener('click', () => {
 
 document.getElementById('next1').addEventListener('click', () => {
     if (validateStep(1)) {
-        goToStep(2);
+goToStep(2);
   document.getElementById("div2").focus();
     }
 });
 
 document.getElementById('next2').addEventListener('click', () => {
     if (validateStep(2)) {
-        goToStep(3);
+goToStep(3);
   document.getElementById("div3").focus();
     }
 });
 document.getElementById('next3').addEventListener('click', () => {
     if (validateStep(3)) {
-        goToStep(4);
+goToStep(4);
   document.getElementById("div4").focus();
     }
 });
