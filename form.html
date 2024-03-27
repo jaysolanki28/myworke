@@ -201,10 +201,10 @@ float: left;
             <button class="nextBtn" id="next2" type="button">Next</button>
         </div>
         <div class="form-step" id="step3">
-    <div class="headingText" id="div3" tabindex="-1">Parent Information: Step 3 of 5.</div>
-    <label for="" id="parentFirstNamel" tabindex="-1">First Name of the Student's Parent/Guardian: *</label>
+    <div class="headingText" id="div3" tabindex="-1">Parent/Guardian Information: Step 3 of 5.</div>
+    <label for="" id="parentFirstNamel" tabindex="-1">First Name of the Parent/Guardian: *</label>
     <input type="text" id="parentFirstName"><br>
-    <label for="" id="parentLastNamel" tabindex="-1">Last Name of the Student's Parent/Guardian: *</label>
+    <label for="" id="parentLastNamel" tabindex="-1">Last Name of the Parent/Guardian: *</label>
     <input type="text" id="parentLastName"><br>
 
     <label for="" id="relationshipl" tabindex="-1">Relationship with Parent/Guardian: *</label>
@@ -212,10 +212,10 @@ float: left;
         <option disabled selected value="">Select Relationship with Parent/Guardian</option>        <option value="Mother">Mother</option>        <option value="Father">Father</option>        <option value="Stepparent">Stepparent</option>        <option value="Grandparent">Grandparent</option>        <option value="Legal Guardian">Legal Guardian</option>
     </select><br>
 
-    <label for="" id="parentMobilel" tabindex="-1">Mobile Number of the Student's Parent/Guardian: *</label>
+    <label for="" id="parentMobilel" tabindex="-1">Mobile Number of the Parent/Guardian: *</label>
     <input type="tel" id="parentMobile"><br>
 
-    <label for="" id="parentWhatsAppl" tabindex="-1">WhatsApp Number of the Student's Parent/Guardian:</label>
+    <label for="" id="parentWhatsAppl" tabindex="-1">WhatsApp Number of the Parent/Guardian:</label>
 <label class="checkBox"><input type="checkbox" id="sameParentMobile"> Same as Mobile Number</label><br>
     <input type="tel" id="parentWhatsApp"><br>
             <button class="prevBtn" id="prev3" type="button">Previous</button>
@@ -297,7 +297,13 @@ function validateStep(step) {
         let age = calculateAge(dob);
         let gender = document.getElementById("gender").value;
         let education = document.getElementById("education").value;
-        if (firstName.length < 3 || firstName.length > 15 && !alertShown) {
+        if (firstName.length < 3 && !alertShown) {
+            document.getElementById("firstNamel").focus();
+            alertMessage("Please enter a valid First Name of the Student.");
+            isValid = false;
+            alertShown = true;
+        }
+        if (firstName.length > 15 && !alertShown) {
             document.getElementById("firstNamel").focus();
             alertMessage("Please enter a valid First Name of the Student.");
             isValid = false;
@@ -309,8 +315,13 @@ if (!validateAlphabetsInput(firstName) && !alertShown) {
     isValid = false;
     alertShown = true;
 }
-
-        if (lastName.length < 3 || lastName.length > 15 && !alertShown) {
+        if (lastName.length < 3 && !alertShown) {
+            document.getElementById("lastNamel").focus();
+            alertMessage("Please enter a valid Last Name of the Student.");
+            isValid = false;
+            alertShown = true;
+        }
+        if (lastName.length > 15 && !alertShown) {
             document.getElementById("lastNamel").focus();
             alertMessage("Please enter a valid Last Name of the Student.");
             isValid = false;
@@ -352,7 +363,13 @@ if (!validateAlphabetsInput(lastName) && !alertShown) {
         let email = document.getElementById("email").value;
         let state = document.getElementById("state").value;
         let city = document.getElementById("city").value;
-        if (mobileNumber.length < 10 || mobileNumber.length > 10 && !alertShown) {
+        if (mobileNumber.length < 10 && !alertShown) {
+            document.getElementById("mobileNumberl").focus();
+            alertMessage("Please enter a valid Mobile Number of the Student.");
+            isValid = false;
+            alertShown = true;
+        }
+        if (mobileNumber.length > 10 && !alertShown) {
             document.getElementById("mobileNumberl").focus();
             alertMessage("Please enter a valid Mobile Number of the Student.");
             isValid = false;
@@ -364,7 +381,13 @@ if (!validateAlphabetsInput(lastName) && !alertShown) {
             isValid = false;
             alertShown = true;
         }
-        if (whatsappNumber.length < 10 || whatsappNumber.length > 10 && !alertShown) {
+        if (whatsappNumber.length < 10 && !alertShown) {
+            document.getElementById("whatsappNumberl").focus();
+            alertMessage("Please enter a valid WhatsApp Number of the Student.");
+            isValid = false;
+            alertShown = true;
+        }
+        if (whatsappNumber.length > 10 && !alertShown) {
             document.getElementById("whatsappNumberl").focus();
             alertMessage("Please enter a valid WhatsApp Number of the Student.");
             isValid = false;
@@ -376,7 +399,13 @@ if (!validateAlphabetsInput(lastName) && !alertShown) {
             isValid = false;
             alertShown = true;
         }
-        if (email.length < 15 || email.length 42 && !alertShown) {
+        if (email.length < 15 && !alertShown) {
+            document.getElementById("emaill").focus();
+            alertMessage("Please enter a valid Email Address of the Student.");
+            isValid = false;
+            alertShown = true;
+        }
+        if (email.length > 42 && !alertShown) {
             document.getElementById("emaill").focus();
             alertMessage("Please enter a valid Email Address of the Student.");
             isValid = false;
@@ -407,7 +436,13 @@ if (!validateAlphabetsInput(lastName) && !alertShown) {
         let relationship = document.getElementById("relationship").value;
         let parentMobile = document.getElementById("parentMobile").value;
         let parentWhatsApp = document.getElementById("parentWhatsApp").value;
-        if (parentFirstName.length < 3 || parentFirstName.length >15 && !alertShown) {
+        if (parentFirstName.length < 3 && !alertShown) {
+            document.getElementById("parentFirstNamel").focus();
+            alertMessage("Please enter a valid First Name of the Parent/Guardian.");
+            isValid = false;
+            alertShown = true;
+        }
+        if (parentFirstName.length >15 && !alertShown) {
             document.getElementById("parentFirstNamel").focus();
             alertMessage("Please enter a valid First Name of the Parent/Guardian.");
             isValid = false;
@@ -419,7 +454,13 @@ if (!validateAlphabetsInput(parentFirstName) && !alertShown) {
     isValid = false;
     alertShown = true;
 }
-        if (parentLastName.length < 3 parentLastName.length >15 && !alertShown) {
+        if (parentLastName.length < 3 && !alertShown) {
+            document.getElementById("parentLastNamel").focus();
+            alertMessage("Please enter a valid Last Name of the Parent/Guardian.");
+            isValid = false;
+            alertShown = true;
+        }
+        if (parentLastName.length > 15 && !alertShown) {
             document.getElementById("parentLastNamel").focus();
             alertMessage("Please enter a valid Last Name of the Parent/Guardian.");
             isValid = false;
@@ -437,7 +478,13 @@ if (!validateAlphabetsInput(parentLastName) && !alertShown) {
             isValid = false;
             alertShown = true;
         }
-        if (parentMobile.length < 10 || parentMobile.length > 10 && !alertShown) {
+        if (parentMobile.length < 10 && !alertShown) {
+            document.getElementById("parentMobilel").focus();
+            alertMessage("Please enter a valid Mobile Number of the Parent/Guardian.");
+            isValid = false;
+            alertShown = true;
+        }
+        if (parentMobile.length > 10 && !alertShown) {
             document.getElementById("parentMobilel").focus();
             alertMessage("Please enter a valid Mobile Number of the Parent/Guardian.");
             isValid = false;
@@ -449,7 +496,13 @@ if (!validateAlphabetsInput(parentLastName) && !alertShown) {
             isValid = false;
             alertShown = true;
         }
-        if (parentWhatsApp.length < 10 || parentWhatsApp.length > 10 && !alertShown) {
+        if (parentWhatsApp.length < 10 && !alertShown) {
+            document.getElementById("parentWhatsAppl").focus();
+            alertMessage("Please enter a valid WhatsApp Number of the Parent/Guardian.");
+            isValid = false;
+            alertShown = true;
+        }
+        if (parentWhatsApp.length > 10 && !alertShown) {
             document.getElementById("parentWhatsAppl").focus();
             alertMessage("Please enter a valid WhatsApp Number of the Parent/Guardian.");
             isValid = false;
@@ -482,7 +535,13 @@ document.getElementById("disabilityPercentagel").focus();
             isValid = false;
             alertShown = true;
 }
-        if (udidNumber.length < 18 || udidNumber.length > 18 && !alertShown) {
+        if (udidNumber.length < 18 && !alertShown) {
+document.getElementById("udidNumberl").focus();
+            alertMessage("Please enter a valid UDID Number of the Student.");
+            isValid = false;
+            alertShown = true;
+}
+        if (udidNumber.length > 18 && !alertShown) {
 document.getElementById("udidNumberl").focus();
             alertMessage("Please enter a valid UDID Number of the Student.");
             isValid = false;
@@ -494,13 +553,19 @@ if (!validateUdidFormat(udidNumber) && !alertShown) {
     isValid = false;
     alertShown = true;
 }
-        if (aadhaarNumber.length < 4 || aadhaarNumber.length > 4 && !alertShown) {
+        if (aadhaarNumber.length < 4 && !alertShown) {
 document.getElementById("aadhaarNumberl").focus();
             alertMessage("Please enter last four digits of the student Aadhaar Number.");
             isValid = false;
             alertShown = true;
 }
-if (!validateNumberInput(aadhaarNumber) && !alertShown) {
+        if (aadhaarNumber.length > 4 && !alertShown) {
+document.getElementById("aadhaarNumberl").focus();
+            alertMessage("Please enter last four digits of the student Aadhaar Number.");
+            isValid = false;
+            alertShown = true;
+}
+if (!validateMobileNumber(aadhaarNumber) && !alertShown) {
     document.getElementById("aadhaarNumberl").focus();
     alertMessage("Please enter last four digits of the student Aadhaar Number (With digits only).");
     isValid = false;
@@ -508,13 +573,19 @@ if (!validateNumberInput(aadhaarNumber) && !alertShown) {
 }
        } else {
             let aadhaarNumber = document.getElementById("aadhaarNumber").value;
-        if (aadhaarNumber.length < 4 || aadhaarNumber.length > 4 && !alertShown) {
+        if (aadhaarNumber.length < 4 && !alertShown) {
 document.getElementById("aadhaarNumberl").focus();
             alertMessage("Please enter last four digits of the student Aadhaar Number.");
             isValid = false;
             alertShown = true;
 }
-if (!validateNumberInput(aadhaarNumber) && !alertShown) {
+        if (aadhaarNumber.length > 4 && !alertShown) {
+document.getElementById("aadhaarNumberl").focus();
+            alertMessage("Please enter last four digits of the student Aadhaar Number.");
+            isValid = false;
+            alertShown = true;
+}
+if (!validateMobileNumber(aadhaarNumber) && !alertShown) {
     document.getElementById("aadhaarNumberl").focus();
     alertMessage("Please enter last four digits of the student Aadhaar Number (With digits only).");
     isValid = false;
@@ -542,34 +613,41 @@ document.getElementById("acknowledgment").focus();
 
     return isValid;
 }
-const checkbox = document.getElementById('sameMobile');
+const studentCheckbox = document.getElementById('sameMobile');
 
-    document.getElementById('sameMobile').addEventListener('change', function() {
-        if (mobileNumber.length < 10 || mobileNumber.length > 10) {
-    validateStep(currentStep);
-checkbox.checked = false;
-        } else if (!validateMobileNumber(mobileNumber)) {
-    validateStep(currentStep);
-checkbox.checked = false;
-        } else if (this.checked) {
-            document.getElementById('whatsappNumber').value = document.getElementById('mobileNumber').value;
-            alertMessage("Success.");
-    validateStep(currentStep);
-        } else {
-            document.getElementById('whatsappNumber').value = '';
-//            alertMessage("Pleas enter a valid WhatsApp Number of the Student.");
-    validateStep(currentStep);
-        }
-    });
-    document.getElementById('sameParentMobile').addEventListener('change', function() {
-        if (this.checked) {
-            document.getElementById('parentWhatsApp').value = document.getElementById('parentMobile').value;
-            alertMessage("Success.");
-        } else {
-            document.getElementById('parentWhatsApp').value = '';
-            alertMessage("Pleas enter a valid WhatsApp Number of the Parent/Guardian.");
-        }
-    });
+document.getElementById('sameMobile').addEventListener('change', function() {
+    const mobileNumber = document.getElementById('mobileNumber').value;
+
+    if (mobileNumber.length < 10 || mobileNumber.length > 10 || !validateMobileNumber(mobileNumber)) {
+        alertMessage("Please enter a valid 10-digit Mobile Number of the Student.");
+  document.getElementById("mobileNumberl").focus();
+        studentCheckbox.checked = false;
+    } else if (this.checked) {
+        document.getElementById('whatsappNumber').value = mobileNumber;
+        alertMessage("Applied successfully!");
+
+    } else {
+        document.getElementById('whatsappNumber').value = '';
+validateStep(currentStep);
+}
+});
+const parentCheckbox = document.getElementById('sameParentMobile');
+
+document.getElementById('sameParentMobile').addEventListener('change', function() {
+    const parentMobile = document.getElementById('parentMobile').value;
+
+    if (parentMobile.length < 10 || parentMobile.length > 10 || !validateMobileNumber(parentMobile)) {
+        alertMessage("Please enter a valid 10-digit Parent/Guardian Mobile Number.");
+  document.getElementById("parentMobilel").focus();
+        parentCheckbox.checked = false;
+    } else if (this.checked) {
+        document.getElementById('parentWhatsApp').value = parentMobile;
+        alertMessage("Applied successfully!");
+    } else {
+        document.getElementById('parentWhatsApp').value = '';
+validateStep(currentStep);
+}
+});
     document.getElementById('termsConditions').addEventListener('change', function() {
         if (this.checked) {
     alertMessage("You have agreed to the terms and conditions. Thank you!");
@@ -602,12 +680,77 @@ document.getElementById("lastName").addEventListener('input', function () {
     }
 });
 document.getElementById("dob").addEventListener('change', function () {
-    let dob = this.value;
-    let age = calculateAge(dob);
+    let dob = this.value;
+    let age = calculateAge(dob);
 
-    if (age < 16 || age > 50) {
-        alertMessage("Sorry, only individuals aged between 16 and 50 are eligible to fill this form.");
-}
+    if (age < 16 || age > 40) {
+        alertMessage(Sorry, only individuals aged between 16 and 40 are eligible to fill this form. Your age is ${age} years.);
+    } else {
+        alertMessage(Congratulations! You are eligible to proceed. Your age is ${age} years.);
+    }
+});
+document.getElementById("mobileNumber").addEventListener('input', function () {
+    let mobileNumber = this.value;
+
+    if (!validateMobileNumber(mobileNumber)) {
+        alertMessage("Please enter a valid Mobile Number of the Student that consists only of digits, does not contain any symbols or alphabets, does not start with 0-5, and does not have any single digit repeated more than 10 times consecutively.");
+    }
+});
+document.getElementById("whatsappNumber").addEventListener('input', function () {
+    let whatsappNumber = this.value;
+
+    if (!validateMobileNumber(whatsappNumber)) {
+        alertMessage("Please enter a valid WhatsApp Number of the Student that consists only of digits, does not contain any symbols or alphabets, does not start with 0-5, and does not have any single digit repeated more than 10 times consecutively.");
+    }
+});
+document.getElementById("email").addEventListener('input', function () {
+    let email = this.value;
+
+    if (!validateEmailAddress(email)) {
+            alertMessage("Please enter a valid email address from the allowed domains: @gmail.com, @outlook.com, @hotmail.com, @yahoo.com");
+    }
+});
+document.getElementById("parentFirstName").addEventListener('input', function () {
+    let parentFirstName = this.value;
+
+    if (!validateAlphabetsInput(parentFirstName)) {
+        alertMessage("Please enter a valid First Name of the Parent/Guardian using alphabets only.");
+    }
+});
+document.getElementById("parentLastName").addEventListener('input', function () {
+    let parentLastName = this.value;
+
+    if (!validateAlphabetsInput(parentLastName)) {
+        alertMessage("Please enter a valid Last Name of the Parent/Guardian using alphabets only.");
+    }
+});
+document.getElementById("parentMobile").addEventListener('input', function () {
+    let parentMobile = this.value;
+
+    if (!validateMobileNumber(parentMobile)) {
+        alertMessage("Please enter a valid Mobile Number of the Parent/Guardian that consists only of digits, does not contain any symbols or alphabets, does not start with 0-5, and does not have any single digit repeated more than 10 times consecutively.");
+    }
+});
+document.getElementById("parentWhatsApp").addEventListener('input', function () {
+    let parentWhatsApp = this.value;
+
+    if (!validateMobileNumber(parentWhatsApp)) {
+        alertMessage("Please enter a valid WhatsApp Number of the Parent/Guardian that consists only of digits, does not contain any symbols or alphabets, does not start with 0-5, and does not have any single digit repeated more than 10 times consecutively.");
+    }
+});
+document.getElementById("udidNumber").addEventListener('input', function () {
+    let udidNumber = this.value;
+
+    if (!validateUdidFormat(udidNumber)) {
+    alertMessage("Please enter a valid UDID Number of the Student (First 2 letters in alphabetical and capital format followed by numbers without symbols).");
+    }
+});
+document.getElementById("aadhaarNumber").addEventListener('input', function () {
+    let aadhaarNumber = this.value;
+
+    if (!validateMobileNumber(aadhaarNumber)) {
+    alertMessage("Please enter last four digits of the student Aadhaar Number (With digits only).");
+    }
 });
 // Function to validate input as alphabets only
 function validateAlphabetsInput(input) {
@@ -618,10 +761,13 @@ function calculateAge(dateString) {
     let today = new Date();
     let birthDate = new Date(dateString);
     let age = today.getFullYear() - birthDate.getFullYear();
-    let m = today.getMonth() - birthDate.getMonth();
-    if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+    
+    // Adjust age based on birth month and day in the current year
+    if (today.getMonth() < birthDate.getMonth() || 
+        (today.getMonth() === birthDate.getMonth() && today.getDate() < birthDate.getDate())) {
         age--;
     }
+    
     return age;
 }
 // Function to validate input as numbers only
@@ -741,10 +887,10 @@ alertMessage("Something when wrong, please try again later.");
 });
 function displayFormDataInReviewStep() {
     // Retrieve data from each form field in all steps
-/*    const firstName = document.getElementById("firstName").value;
+    const firstName = document.getElementById("firstName").value;
     const lastName = document.getElementById("lastName").value;
     const dob = document.getElementById("dob").value;
-    const gender = document.getElementById("gender").value;*/
+    const gender = document.getElementById("gender").value;
     // Add more fields as needed
 
     // Construct a summary of the entered information
