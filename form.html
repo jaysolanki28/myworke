@@ -565,7 +565,7 @@ document.getElementById("aadhaarNumberl").focus();
             isValid = false;
             alertShown = true;
 }
-if (!validateMobileNumber(aadhaarNumber) && !alertShown) {
+if (!validateAadhaarNumber(aadhaarNumber) && !alertShown) {
     document.getElementById("aadhaarNumberl").focus();
     alertMessage("Please enter last four digits of the student Aadhaar Number (With digits only).");
     isValid = false;
@@ -683,10 +683,25 @@ document.getElementById("dob").addEventListener('change', function () {
     let dob = this.value;
     let age = calculateAge(dob);
 
+    let years = age > 1 ? ${age} years : ${age} year;
+    let months = today.getMonth() - birthDate.getMonth();
+    let days = today.getDate() - birthDate.getDate();
+
+    if (months < 0 || (months === 0 && days < 0)) {
+        years--;
+        months += 12;
+    }
+    if (days < 0) {
+        months--;
+        days += new Date(today.getFullYear(), today.getMonth(), 0).getDate();
+    }
+
+    let ageMessage = Your age is ${years}, ${months} months, and ${days} days.;
+
     if (age < 16 || age > 40) {
-        alertMessage(Sorry, only individuals aged between 16 and 40 are eligible to fill this form. Your age is ${age} years.);
+        alertMessage("Sorry, only individuals aged between 16 and 40 are eligible to fill this form. " + ageMessage);
     } else {
-        alertMessage(Congratulations! You are eligible to proceed. Your age is ${age} years.);
+        alertMessage("Congratulations! You are eligible to proceed. " + ageMessage);
     }
 });
 document.getElementById("mobileNumber").addEventListener('input', function () {
@@ -748,7 +763,7 @@ document.getElementById("udidNumber").addEventListener('input', function () {
 document.getElementById("aadhaarNumber").addEventListener('input', function () {
     let aadhaarNumber = this.value;
 
-    if (!validateMobileNumber(aadhaarNumber)) {
+    if (!validateAadhaarNumber(aadhaarNumber)) {
     alertMessage("Please enter last four digits of the student Aadhaar Number (With digits only).");
     }
 });
@@ -761,13 +776,11 @@ function calculateAge(dateString) {
     let today = new Date();
     let birthDate = new Date(dateString);
     let age = today.getFullYear() - birthDate.getFullYear();
-    
     // Adjust age based on birth month and day in the current year
     if (today.getMonth() < birthDate.getMonth() || 
         (today.getMonth() === birthDate.getMonth() && today.getDate() < birthDate.getDate())) {
         age--;
     }
-    
     return age;
 }
 // Function to validate input as numbers only
@@ -813,6 +826,20 @@ function validateEmailAddress(email) {
 function validateUdidFormat(input) {
     const customPattern = /^[A-Z]{2}\d+$/;
     return customPattern.test(input);
+}
+// Function to validate input as numbers only
+function validateAadhaarNumber(number) {
+    // Check if the number contains symbols
+    if (/[^0-9]/.test(number)) {
+        return false;
+    }
+
+    // Check if the number contains alphabets
+    if (/[a-zA-Z]/.test(number)) {
+        return false;
+}
+
+    return true;
 }
 function validation() {   
 setTimeout(function(){
