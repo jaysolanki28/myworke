@@ -679,22 +679,25 @@ document.getElementById("lastName").addEventListener('input', function () {
         alertMessage("Please enter a valid Last Name of the Student using alphabets only.");
     }
 });
+let today; // Define today in the global scope
+
 document.getElementById("dob").addEventListener('change', function () {
     let dob = this.value;
     let age = calculateAge(dob);
 
     let years = age > 1 ? `${age} years` : `${age} year`;
+    today = new Date(); // Assign the current date to today
     let months = today.getMonth() - birthDate.getMonth();
     let days = today.getDate() - birthDate.getDate();
 
     if (months < 0 || (months === 0 && days < 0)) {
         years--;
         months += 12;
-    }
+}
     if (days < 0) {
         months--;
         days += new Date(today.getFullYear(), today.getMonth(), 0).getDate();
-    }
+}
 
     let ageMessage = `Your age is ${years}, ${months} months, and ${days} days.`;
 
@@ -702,7 +705,7 @@ document.getElementById("dob").addEventListener('change', function () {
         alertMessage("Sorry, only individuals aged between 16 and 40 are eligible to fill this form. " + ageMessage);
     } else {
         alertMessage("Congratulations! You are eligible to proceed. " + ageMessage);
-    }
+}
 });
 document.getElementById("mobileNumber").addEventListener('input', function () {
     let mobileNumber = this.value;
@@ -773,14 +776,15 @@ function validateAlphabetsInput(input) {
 }
 // Function to calculate age based on date of birth
 function calculateAge(dateString) {
-    let today = new Date();
     let birthDate = new Date(dateString);
     let age = today.getFullYear() - birthDate.getFullYear();
+
     // Adjust age based on birth month and day in the current year
     if (today.getMonth() < birthDate.getMonth() || 
         (today.getMonth() === birthDate.getMonth() && today.getDate() < birthDate.getDate())) {
         age--;
 }
+
     return age;
 }
 // Function to validate input as numbers only
