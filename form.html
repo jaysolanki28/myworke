@@ -5,6 +5,12 @@
 <script>
 let today; // Define today in the global scope
 
+// Function to convert month number to month name
+const getMonthName = (month) => {
+    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+    return monthNames[month];
+};
+
 // Make an API call to fetch the current date of India
 fetch('http://worldtimeapi.org/api/timezone/Asia/Kolkata')
     .then(response => response.json())
@@ -36,8 +42,12 @@ document.getElementById("dob").addEventListener('change', function() {
         return;
     }
 
-    let birthDate = new Date(dob);
+    // Formatting the selected date to (Day Month Date Year)
+    const formattedDate = ${selectedDate.toLocaleString('en-us', { weekday: 'long' })} ${selectedDate.getDate()} ${getMonthName(selectedDate.getMonth())} ${selectedDate.getFullYear()};
 
+    document.getElementById('selectedDate').textContent = formattedDate;
+
+    let birthDate = new Date(dob);
     let months = today.getMonth() - birthDate.getMonth();
     let days = today.getDate() - birthDate.getDate();
 
@@ -54,7 +64,7 @@ document.getElementById("dob").addEventListener('change', function() {
     let monthsLabel = months === 1 ? 'month' : 'months';
     let daysLabel = days === 1 ? 'day' : 'days';
 
-    let ageMessage = Your age is ${age} ${yearsLabel}, ${months} ${monthsLabel}, and ${days} ${daysLabel}.
+    let ageMessage = `Your age is ${age} ${yearsLabel}, ${months} ${monthsLabel}, and ${days} ${daysLabel}.`;
 
     if (age < 16 || age > 40) {
         document.getElementById('message').innerHTML = "Sorry, only individuals aged between 16 and 40 are eligible to fill this form." + "<br>" + ageMessage;
@@ -63,15 +73,7 @@ document.getElementById("dob").addEventListener('change', function() {
         document.getElementById('message').innerHTML = "Congratulations! You are eligible to proceed." + "<br>" + ageMessage;
         document.getElementById("dateButton").style.display = "none";
     }
-
-    displayFormattedDate(selectedDate); // Call the function to display formatted date
 });
-
-function displayFormattedDate(date) {
-    const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
-    const formattedDate = date.toLocaleDateString('en-US', options);
-    document.getElementById('selectedDate').textContent = formattedDate;
-}
 
 function calculateAge(dateString) {
     let birthDate = new Date(dateString);
