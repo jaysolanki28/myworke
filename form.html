@@ -1,7 +1,16 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Date of Birth Display</title>
+</head>
+<body>
 <p id="date">Selected Date: <strong id="selectedDate"></strong></p>
 <strong id="message" aria-live="polite"></strong>
 <button class="continue-button" id="dateButton">Select date of birth of applicant</button>
 <input type="date" id="dob" aria-hidden="true" style="visibility: hidden;">
+
 <script>
 let today; // Define today in the global scope
 
@@ -64,7 +73,7 @@ document.getElementById("dob").addEventListener('change', function() {
     let monthsLabel = months === 1 ? 'month' : 'months';
     let daysLabel = days === 1 ? 'day' : 'days';
 
-    let ageMessage = `Your age is ${age} ${yearsLabel}, ${months} ${monthsLabel}, and ${days} ${daysLabel}.`;
+    let ageMessage = Your age is ${age} ${yearsLabel}, ${months} ${monthsLabel}, and ${days} ${daysLabel}.;
 
     if (age < 16 || age > 40) {
         document.getElementById('message').innerHTML = "Sorry, only individuals aged between 16 and 40 are eligible to fill this form." + "<br>" + ageMessage;
@@ -95,3 +104,5 @@ document.getElementById('dateButton').addEventListener('click', function() {
     document.getElementById('dob').click();
 });
 </script>
+</body>
+</html>
