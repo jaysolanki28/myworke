@@ -1,108 +1,90 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Date of Birth Display</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Contact Form</title>
 </head>
 <body>
-<p id="date">Selected Date: <strong id="selectedDate"></strong></p>
-<strong id="message" aria-live="polite"></strong>
-<button class="continue-button" id="dateButton">Select date of birth of applicant</button>
-<input type="date" id="dob" aria-hidden="true" style="visibility: hidden;">
+    <h1>Contact Form</h1>
+    <form target="secret-frame" id="contactForm">
+        <label for="name">Name:</label>
+        <input type="text" id="name" required><br><br>
+        
+        <label for="email">Email:</label>
+        <input type="email" id="email" required><br><br>
+        
+        <label for="message">Message:</label>
+        <textarea id="message" rows="4" required></textarea><br><br>
+        
+        <button type="submit">Submit</button>
+    </form>
+<iframe name="secret-frame" width="0" height="0" border="0" style="display: none;"></iframe>
 
-<script>
-let today; // Define today in the global scope
+    <script>
+        document.getElementById('contactForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+            
+            let name = document.getElementById('name').value;
+            let email = document.getElementById('email').value;
+            let message = document.getElementById('message').value;
+            
+            if (!name || !email || !message) {
+                alert('Please fill in all fields.');
+                return;
+            }
+            
+            // GitHub API URL for getting and uploading the data to a file in the repository
+            let apiUrl = 'https://api.github.com/repos/jaysolanki28/message/contents/files/form.txt';
+            let token = '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';
+            
+            // Fetch request to get existing data from form.txt
+            fetch(apiUrl, {
+                headers: {
+                    Authorization: token ${token},
+                    Accept: 'application/vnd.github.v3+json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                let oldData = JSON.parse(atob(data.content));
+                oldData.push({ name: name, email: email, message: message });
+                
+                // Data to be uploaded (combination of old and new data)
+                let formData = {
+                    message: 'Updating form data',
+                    content: btoa(JSON.stringify(oldData)),
+                    branch: 'main',
+                    sha: data.sha // Required for updating file
+                };
 
-// Function to convert month number to month name
-const getMonthName = (month) => {
-    const monthNames = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
-    return monthNames[month];
-};
-
-// Make an API call to fetch the current date of India
-fetch('http://worldtimeapi.org/api/timezone/Asia/Kolkata')
-    .then(response => response.json())
-    .then(data => {
-        today = new Date(data.datetime);
-    });
-
-document.getElementById("dob").addEventListener('change', function() {
-    let dob = this.value;
-    let selectedDate = new Date(dob);
-
-    if (!today) {
-        alertMessage("Fetching current date. Please try again in a moment.");
-        this.value = '';
-        return;
-    }
-
-    if (selectedDate > today) {
-        alertMessage("Please enter a valid date of birth (not a future date).");
-        this.value = ''; // Clear the input field if a future date is selected
-        return;
-    }
-
-    let age = calculateAge(dob);
-
-    if (isNaN(age)) {
-        alertMessage("Please enter a valid date of birth.");
-        this.value = '';
-        return;
-    }
-
-    // Formatting the selected date to (Day Month Date Year)
-    const formattedDate = ${selectedDate.toLocaleString('en-us', { weekday: 'long' })} ${selectedDate.getDate()} ${getMonthName(selectedDate.getMonth())} ${selectedDate.getFullYear()};
-
-    document.getElementById('selectedDate').textContent = formattedDate;
-
-    let birthDate = new Date(dob);
-    let months = today.getMonth() - birthDate.getMonth();
-    let days = today.getDate() - birthDate.getDate();
-
-    if (months < 0 || (months === 0 && days < 0)) {
-        age--;
-        months += 12;
-    }
-    if (days < 0) {
-        months--;
-        days += new Date(today.getFullYear(), today.getMonth(), 0).getDate();
-    }
-
-    let yearsLabel = age === 1 ? 'year' : 'years';
-    let monthsLabel = months === 1 ? 'month' : 'months';
-    let daysLabel = days === 1 ? 'day' : 'days';
-
-    let ageMessage = Your age is ${age} ${yearsLabel}, ${months} ${monthsLabel}, and ${days} ${daysLabel}.;
-
-    if (age < 16 || age > 40) {
-        document.getElementById('message').innerHTML = "Sorry, only individuals aged between 16 and 40 are eligible to fill this form." + "<br>" + ageMessage;
-        document.getElementById("dateButton").style.display = "none";
-    } else {
-        document.getElementById('message').innerHTML = "Congratulations! You are eligible to proceed." + "<br>" + ageMessage;
-        document.getElementById("dateButton").style.display = "none";
-    }
-});
-
-function calculateAge(dateString) {
-    let birthDate = new Date(dateString);
-
-    if (isNaN(birthDate.getTime())) {
-        return NaN;
-    }
-
-    let age = today.getFullYear() - birthDate.getFullYear();
-
-    if (today.getMonth() < birthDate.getMonth() || (today.getMonth() === birthDate.getMonth() && today.getDate() < birthDate.getDate())) {
-        age--;
-    }
-
-    return age;
-}
-
-document.getElementById('dateButton').addEventListener('click', function() {
-    document.getElementById('dob').click();
-});
-</script>
+                // Fetch request to upload data back to form.txt
+                fetch(apiUrl, {
+                    method: 'PUT',
+                    headers: {
+                        Authorization: token ${token},
+                        Accept: 'application/vnd.github.v3+json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(formData)
+                })
+                .then(response => {
+                    if (response.ok) {
+                        alert('Form data uploaded successfully!');
+                    } else {
+                        alert('Failed to upload form data. Please try again.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert('An error occurred. Please try again later.');
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Failed to fetch existing data. Please try again.');
+            });
+        });
+    </script>
 </body>
 </html>
