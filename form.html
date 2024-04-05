@@ -1,26 +1,192 @@
-    <p id="refreshToken">Refresh Token:</p>
-    <script>
-        const postData = {
-            client_id: 'w5s71w5bmeeohti',
-            client_secret: '08kdzrma69qri3e',
-            grant_type: 'authorization_code',
-            code: 'nFRIafMOsqsAAAAAAAAAFgQhVyRZBlrZuba-DseTGxQ&i=1',
-            redirect_uri: 'https://jaysolanki.rf.gd'
-        };
-        fetch('https://api.dropboxapi.com/oauth2/token', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(postData),
-        })
-        .then(response => response.json())
-        .then(data => {
-            const refreshToken = data.refresh_token;
-            document.getElementById('refreshToken').textContent = Refresh Token: ${refreshToken};
-        })
-        .catch(error => {
-            console.error('Error:', error);
-            alert('Failed to fetch the refresh token. Please try again.');
-        });
-    </script>
+/* Sign up1 */
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Create an Account</title>
+</head>
+<body>
+<h2>Create an Account</h2>
+
+<form id="contactForm" name="myForm">
+<label for="firstName">First Name:</label>
+<input type="text" id="firstName">
+
+<label for="lastName">Last Name:</label>
+<input type="text" id="lastName">
+
+<label for="gender">Gender:</label>
+<select id="gender">
+    <option value="male">Male</option>
+    <option value="female">Female</option>
+    <option value="other">Other</option>
+</select>
+
+<label for="email">Email Address:</label>
+<input type="email" id="email">
+
+<label for="password">Password:</label>
+<input type="password" id="password">
+
+<label for="rePassword">Re-enter Password:</label>
+<input type="password" id="rePassword">
+
+<label>
+    <input type="checkbox" id="showPasswordCheckbox">
+    Show Password
+</label>
+
+<button onclick="matchPasswords()">Create Account</button>
+
+<button type="submit">Submit</button>
+</form>
+<p id="validationError" aria-live="assertive" aria-atomic="true" role="alert" style="color: red; display: none;"></p>
+<script>
+    function matchPasswords() {
+        var password = document.getElementById('password').value;
+        var reEnteredPassword = document.getElementById('rePassword').value;
+
+        if (password === reEnteredPassword) {
+            alert('Passwords match!');
+        } else {
+            alert('Passwords do not match. Please re-enter.');
+        }
+    }
+
+    // Show Password functionality
+    var showPasswordCheckbox = document.getElementById('showPasswordCheckbox');
+    var passwordField = document.getElementById('password');
+    var rePasswordField = document.getElementById('rePassword');
+
+    showPasswordCheckbox.addEventListener('change', function() {
+        if (showPasswordCheckbox.checked) {
+            passwordField.type = 'text';
+            rePasswordField.type = 'text';
+        } else {
+            passwordField.type = 'password';
+            rePasswordField.type = 'password';
+        }
+    });
+var fullName, email, message, validationError, dropboxToken;
+document.getElementById('contactForm').addEventListener("submit", (e) => {
+e.preventDefault();
+firstName = document.getElementById('firstName').value;
+lastName = document.getElementById('lastName').value;
+gender = document.getElementById('gender').value;
+email = document.getElementById('email').value;
+password = document.getElementById('password').value;
+validateAndSubmit();
+});
+function validateAndSubmit() {
+showMessage('Please wait while we submit the data...', 'green');
+appendDataAndUpload();
+}
+function showMessage(message, color) {
+validationError = document.getElementById('validationError');
+validationError.innerText = message;
+validationError.style.color = color;
+validationError.style.display = 'block';
+}
+function clearFormFields() {
+document.getElementById('contactForm').reset();
+}
+function appendDataAndUpload() {
+fetch('https://content.dropboxapi.com/2/files/download', {
+method: 'POST',
+headers: {
+'Authorization': 'Bearer ' + dropboxToken,
+'Dropbox-API-Arg': JSON.stringify({
+path: '/user-accounts.txt'
+})
+}
+})
+.then((response) => {
+if (!response.ok) {
+throw new Error('Error while Submiting Data. Please Try Again');
+}
+return response.json();
+})
+.then((existingData) => {
+if (!existingData) {
+existingData = [];
+}
+var newData = {
+First Name: firstName,
+Last Name: lastName,
+Gender: gender,
+Email: email,
+Password: password
+};
+existingData.push(newData);
+var updatedData = JSON.stringify(existingData);
+var updatedBlob = new Blob([updatedData], { type: "text/plain;charset=utf-8" });
+return fetch('https://content.dropboxapi.com/2/files/upload', {
+method: 'POST',
+headers: {
+'Authorization': 'Bearer ' + dropboxToken,
+'Content-Type': 'application/octet-stream',
+'Dropbox-API-Arg': JSON.stringify({
+path: '/user-accounts.txt',
+'mode': 'overwrite',
+autorename: false,
+mute: false
+})
+},
+body: updatedBlob
+});
+})
+.then((uploadResponse) => {
+if (!uploadResponse.ok) {
+throw new Error('Error while Saving your Response to database. Please try again');
+}
+showMessage('Data submitted successfully!', 'green');
+clearFormFields();
+})
+.catch((error) => {
+showMessage(error.message, 'red');
+});
+}
+function generateToken(refreshToken, clientId, clientSecret) {
+const url = 'https://api.dropbox.com/oauth2/token';
+const data = `grant_type=refresh_token&refresh_token=${refreshToken}&client_id=${clientId}&client_secret=${clientSecret}`;
+return fetch(url, {
+method: 'POST',
+headers: {
+'Content-Type': 'application/x-www-form-urlencoded'
+},
+body: data
+})
+.then((response) => {
+if (!response.ok) {
+throw new Error('Failed to get access token: ' + response.statusText);
+}
+return response.json();
+})
+.then((responseData) => {
+return responseData.access_token;
+})
+.catch((error) => {
+throw new Error('Error generating access token: ' + error.message);
+});
+}
+function checkToken() {
+let localToken = JSON.parse(localStorage.getItem("localToken"));
+if (localToken && localToken.expire > new Date().getTime()) {
+dropboxToken = localToken.token;
+} else {
+generateToken('AALu1gsBgjcAAAAAAAAAATLeuJoxd86bwIAnmd9KoDsWC4lRU_SruT9ZUVrfr8hz', '7u6mvcyvv6szugw', 'gka5o3baeaw2lin')
+.then((token) => {
+dropboxToken = token;
+var storeToken = { token: token, expire: new Date().getTime() + (3*60*60*1000)};
+localStorage.setItem("localToken", JSON.stringify(storeToken));
+})
+.catch((error) => {
+showMessage(error.message, 'red');
+});
+}
+}
+window.addEventListener("load", checkToken);
+</script>
+</body>
+</html>
