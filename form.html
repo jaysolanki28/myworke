@@ -1,152 +1,187 @@
-/* Sign up1 */
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Create an Account</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Authentication</title>
 </head>
 <body>
-<h2>Create an Account</h2>
+    <div id="mainDiv">
+        <div id="loginDiv" style="display: block;">
+            <h2>Login</h2>
+            <form id="signInForm">
+                <label for="loginEmail">Email Address:</label>
+                <input type="email" id="loginEmail">
 
-<form id="contactForm" name="myForm">
-<label for="firstName">First Name:</label>
-<input type="text" id="firstName">
+                <label for="loginPassword">Password:</label>
+                <input type="password" id="loginPassword">
 
-<label for="lastName">Last Name:</label>
-<input type="text" id="lastName">
+                <button type="submit" onclick="login()">Login</button>
+            </form>
+            <button onclick="toggleForms('login')">Don't have an account? Sign Up</button>
+        </div>
 
-<label for="gender">Gender:</label>
-<select id="gender">
-    <option value="male">Male</option>
-    <option value="female">Female</option>
-    <option value="other">Other</option>
-</select>
+        <div id="createAccountDiv" style="display: none;">
+            <h2>Create an Account</h2>
+            <form id="signUpForm">
+                <label for="firstName">First Name:</label>
+                <input type="text" id="firstName">
 
-<label for="email">Email Address:</label>
-<input type="email" id="email">
+                <label for="lastName">Last Name:</label>
+                <input type="text" id="lastName">
 
-<label for="password">Password:</label>
-<input type="password" id="password">
+                <label for="gender">Gender:</label>
+                <select id="gender">
+                    <option value="male">Male</option>
+                    <option value="female">Female</option>
+                    <option value="other">Other</option>
+                </select>
 
-<label for="rePassword">Re-enter Password:</label>
-<input type="password" id="rePassword">
+                <label for="email">Email Address:</label>
+                <input type="email" id="email">
 
-<label>
-    <input type="checkbox" id="showPasswordCheckbox">
-    Show Password
-</label>
+                <label for="password">Password:</label>
+                <input type="password" id="password">
 
-<button onclick="matchPasswords()">Create Account</button>
+                <label for="rePassword">Re-enter Password:</label>
+                <input type="password" id="rePassword">
 
-<button type="submit">Submit</button>
-</form>
-<p id="validationError" aria-live="assertive" aria-atomic="true" role="alert" style="color: red; display: none;"></p>
-<script>
-    function matchPasswords() {
-        var password = document.getElementById('password').value;
-        var reEnteredPassword = document.getElementById('rePassword').value;
+                <label>
+                    <input type="checkbox" id="showPasswordCheckbox">
+                    Show Password
+                </label>
 
-        if (password === reEnteredPassword) {
-            alert('Passwords match!');
-        } else {
-            alert('Passwords do not match. Please re-enter.');
+                <button type="submit" onclick="checkEmailAvailability()">Create Account</button>
+            </form>
+            <button onclick="toggleForms('create')">Have an account? Sign In</button>
+        </div>
+            <p id="validationError" aria-live="assertive" aria-atomic="true" role="alert" style="color: red; display: none;"></p>
+    </div>
+
+    <script>
+        function toggleForms(formType) {
+            const loginDiv = document.getElementById('loginDiv');
+            const createAccountDiv = document.getElementById('createAccountDiv');
+
+            if (formType === 'login') {
+                loginDiv.style.display = 'none';
+                createAccountDiv.style.display = 'block';
+            } else if (formType === 'create') {
+                loginDiv.style.display = 'block';
+                createAccountDiv.style.display = 'none';
+            }
         }
-    }
 
-    // Show Password functionality
-    var showPasswordCheckbox = document.getElementById('showPasswordCheckbox');
-    var passwordField = document.getElementById('password');
-    var rePasswordField = document.getElementById('rePassword');
-
-    showPasswordCheckbox.addEventListener('change', function() {
-        if (showPasswordCheckbox.checked) {
-            passwordField.type = 'text';
-            rePasswordField.type = 'text';
-        } else {
-            passwordField.type = 'password';
-            rePasswordField.type = 'password';
-        }
-    });
-var fullName, email, message, validationError, dropboxToken;
-document.getElementById('contactForm').addEventListener("submit", (e) => {
-e.preventDefault();
-firstName = document.getElementById('firstName').value;
-lastName = document.getElementById('lastName').value;
-gender = document.getElementById('gender').value;
-email = document.getElementById('email').value;
-password = document.getElementById('password').value;
-validateAndSubmit();
-});
-function validateAndSubmit() {
-showMessage('Please wait while we submit the data...', 'green');
-appendDataAndUpload();
-}
-function showMessage(message, color) {
-validationError = document.getElementById('validationError');
-validationError.innerText = message;
-validationError.style.color = color;
-validationError.style.display = 'block';
-}
 function clearFormFields() {
-document.getElementById('contactForm').reset();
+document.getElementById('signInForm').reset();
+document.getElementById('signUpForm').reset();
 }
-function appendDataAndUpload() {
-fetch('https://content.dropboxapi.com/2/files/download', {
-method: 'POST',
-headers: {
-'Authorization': 'Bearer ' + dropboxToken,
-'Dropbox-API-Arg': JSON.stringify({
-path: '/user-accounts.txt'
-})
-}
-})
-.then((response) => {
-if (!response.ok) {
-throw new Error('Error while Submiting Data. Please Try Again');
-}
-return response.json();
-})
-.then((existingData) => {
-if (!existingData) {
-existingData = [];
-}
-var newData = {
-First Name: firstName,
-Last Name: lastName,
-Gender: gender,
-Email: email,
-Password: password
-};
-existingData.push(newData);
-var updatedData = JSON.stringify(existingData);
-var updatedBlob = new Blob([updatedData], { type: "text/plain;charset=utf-8" });
-return fetch('https://content.dropboxapi.com/2/files/upload', {
-method: 'POST',
-headers: {
-'Authorization': 'Bearer ' + dropboxToken,
-'Content-Type': 'application/octet-stream',
-'Dropbox-API-Arg': JSON.stringify({
-path: '/user-accounts.txt',
-'mode': 'overwrite',
-autorename: false,
-mute: false
-})
-},
-body: updatedBlob
-});
-})
-.then((uploadResponse) => {
-if (!uploadResponse.ok) {
-throw new Error('Error while Saving your Response to database. Please try again');
-}
-showMessage('Data submitted successfully!', 'green');
-clearFormFields();
-})
-.catch((error) => {
-showMessage(error.message, 'red');
-});
-}
+        function showMessage(message, color) {
+            const validationError = document.getElementById('validationError');
+            validationError.innerText = message;
+            validationError.style.color = color;
+            validationError.style.display = 'block';
+        }
+        async function login() {
+            const loginEmail = document.getElementById('loginEmail').value;
+            const loginPassword = document.getElementById('loginPassword').value;
+
+            // Fetch user data from Dropbox
+            const response = await fetch('https://content.dropboxapi.com/2/files/download', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + dropboxToken,
+                    'Dropbox-API-Arg': JSON.stringify({
+                        path: '/user-accounts.txt'
+                    })
+                }
+            });
+            const userData = await response.json();
+
+            const user = userData.find(user => user.Email === loginEmail && user.Password === loginPassword);
+
+            if (user) {
+                showMessage(Login successful! Welcome, ${user.FirstName} ${user.LastName}!, 'green');
+            } else {
+                showMessage('Invalid email or password. Please try again.', 'red');
+            }
+        }
+        async function checkEmailAvailability() {
+            const email = document.getElementById('email').value;
+
+            // Fetch user data from Dropbox
+            const response = await fetch('https://content.dropboxapi.com/2/files/download', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + dropboxToken,
+                    'Dropbox-API-Arg': JSON.stringify({
+                        path: '/user-accounts.txt'
+                    })
+                }
+            });
+            const userData = await response.json();
+
+            const emailExists = userData.some(user => user.Email === email);
+
+            if (emailExists) {
+                showMessage('Your account is already created. Please login with your email address and password.', 'blue');
+            } else {
+                validateAndSubmit();
+            }
+        }
+
+        async function createAccount() {
+            const firstName = document.getElementById('firstName').value;
+            const lastName = document.getElementById('lastName').value;
+            const gender = document.getElementById('gender').value;
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            const rePassword = document.getElementById('rePassword').value;
+
+            if (password !== rePassword) {
+                showMessage('Passwords dont match. Please re-enter.', 'red');
+return;
+            }
+
+            // Fetch existing user data from Dropbox
+            const response = await fetch('https://content.dropboxapi.com/2/files/download', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + dropboxToken,
+                    'Dropbox-API-Arg': JSON.stringify({
+                        path: '/user-accounts.txt'
+                    })
+                }
+            });
+            let userData = await response.json();
+
+            // Add new user data
+            userData.push({
+                FirstName: firstName,
+                LastName: lastName,
+                Gender: gender,
+                Email: email,
+                Password: password
+            });
+
+            // Save updated user data to Dropbox
+            const updatedResponse = await fetch('https://content.dropboxapi.com/2/files/upload', {
+                method: 'POST',
+                headers: {
+                    'Authorization': 'Bearer ' + dropboxToken,
+                    'Content-Type': 'application/octet-stream',
+                    'Dropbox-API-Arg': JSON.stringify({
+                        path: '/user-accounts.txt',
+                        'mode': 'overwrite',
+                        autorename: false,
+                        mute: false
+                    })
+                },
+                body: JSON.stringify(userData)
+            });
+
+            showMessage('Account created successfully!', 'green');
+        }
 function generateToken(refreshToken, clientId, clientSecret) {
 const url = 'https://api.dropbox.com/oauth2/token';
 const data = `grant_type=refresh_token&refresh_token=${refreshToken}&client_id=${clientId}&client_secret=${clientSecret}`;
@@ -186,7 +221,12 @@ showMessage(error.message, 'red');
 });
 }
 }
+function validateAndSubmit() {
+showMessage('Creating account, please wait...', 'green');
+createAccount();
+}
+
 window.addEventListener("load", checkToken);
-</script>
+    </script>
 </body>
 </html>
