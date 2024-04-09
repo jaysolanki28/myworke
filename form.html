@@ -165,41 +165,36 @@ setTimeout(function(){
             validationError.style.display = 'none';
 }, 10000);
         }
-        async function proceed() {
-            const email = document.getElementById('forgotEmail').value;
+async function proceed() {
+    const email = document.getElementById('forgotEmail').value;
 
-            const userData = await fetchDataFromDropbox('/user-accounts.txt');
+    const userData = await fetchDataFromDropbox('/user-accounts.txt');
 
-            const user = userData.find(user => user.Email === email);
+    const user = userData.find(user => user.Email === email);
 
-            if (user) {
-        localStorage.setItem('resetUser', JSON.stringify(user));
-        showMessage('User data fetched and stored for password reset.', 'blue');
-                document.getElementById('div4').textContent = `Hello, ${user.FirstName} ${user.LastName}! Enter Security Answer.`;
-  document.getElementById("div4").focus();
-                document.getElementById('forgotPasswordForm').innerHTML = `
-            <p>Security Answer: ${user.SecurityAnswer}</p>
-                    <label for="securityQuestion">${user.SecurityQuestion}</label>
-                    <input type="text" id="securityAnswer">
-                    <button type="submit" onclick="verifySecurityAnswer('${user.SecurityAnswer}')">Verify Security Answer</button>
-                `;
-            } else {
-                showMessage('No account found with this email.', 'red');
-            }
-        }
+    if (user) {
+        document.getElementById('div4').textContent = Hello, ${user.FirstName} ${user.LastName}! Enter Security Answer.;
+        document.getElementById("div4").focus();
+        localStorage.setItem('resetUser', JSON.stringify(user));
 
-        async function verifySecurityAnswer(email) {
-            const securityAnswer = document.getElementById('securityAnswer').value;
+        document.getElementById('forgotPasswordForm').innerHTML = `
+            <p>Security Answer: ${user.SecurityAnswer}</p>
+            <label for="securityAnswer">${user.SecurityQuestion}</label>
+            <input type="text" id="securityAnswer">
+            <button type="submit" onclick="verifySecurityAnswer('${user.Email}')">Verify Security Answer</button>
+        `;
+    } else {
+        showMessage('No account found with this email.', 'red');
+    }
+}
 
-    const storedUser = JSON.parse(localStorage.getItem('resetUser'));
+async function verifySecurityAnswer(email) {
+    const securityAnswer = document.getElementById('securityAnswer').value;
 
-    if (storedUser.SecurityAnswer === securityAnswer) {
-        showMessage('Security answer verified. Proceed with password reset.', 'blue');
-//        resetPassword(storedUser.Email);
+    const storedUser = JSON.parse(localStorage.getItem('resetUser'));
 
-            if (user) {
-                document.getElementById('div4').textContent = 'Set your new password';
-  document.getElementById("div4").focus();
+    if (storedUser.SecurityAnswer === securityAnswer) {
+        showMessage('Security answer verified. Proceeding to reset the password.', 'blue');
                 document.getElementById('forgotPasswordForm').innerHTML = `
                     <label for="newPassword">New Password:</label>
                     <input type="password" id="newPassword">
@@ -207,28 +202,28 @@ setTimeout(function(){
                     <input type="password" id="reEnterNewPassword">
                     <button type="submit" onclick="resetPassword('${user.Email}')">Reset Password</button>
                 `;
-            } else {
-                showMessage('Incorrect security answer. Please try again.', 'red');
-            }
+    } else {
+        showMessage('Incorrect security answer. Please try again.', 'red');
+    }
+}
+
+async function resetPassword(email) {
+    const newPassword = document.getElementById('newPassword').value;
+    const reEnterNewPassword = document.getElementById('reEnterNewPassword').value;
+
+    if (newPassword !== reEnterNewPassword) {
+        showMessage('New passwords do not match. Please re-enter.', 'red');
+        return;
+    }
+
+    const userData = await fetchDataFromDropbox('/user-accounts.txt');
+
+    const updatedUserData = userData.map(user => {
+        if (user.Email === email) {
+            user.Password = newPassword;
         }
-
-        async function resetPassword(email) {
-            const newPassword = document.getElementById('newPassword').value;
-            const reEnterNewPassword = document.getElementById('reEnterNewPassword').value;
-
-            if (newPassword !== reEnterNewPassword) {
-                showMessage('New passwords do not match. Please re-enter.', 'red');
-                return;
-            }
-
-            const userData = await fetchDataFromDropbox('/user-accounts.txt');
-
-            const updatedUserData = userData.map(user => {
-                if (user.Email === email) {
-                    user.Password = newPassword;
-                }
-                return user;
-            });
+        return user;
+    });
 
             const updateResponse = await fetch('https://content.dropboxapi.com/2/files/upload', {
                 method: 'POST',
@@ -245,8 +240,10 @@ setTimeout(function(){
                 body: JSON.stringify(updatedUserData)
             });
 
-            showMessage('Password reset successfully!', 'green');
-        }
+    localStorage.removeItem('resetUser');
+
+    showMessage('Password reset successful! User data updated.', 'green');
+}
 async function changePassword() {
     const oldPassword = document.getElementById('oldPassword').value;
     const newPassword = document.getElementById('newPassword').value;
