@@ -82,22 +82,29 @@
 </div>
         <div id="forgetPasswordDiv" style="display: none;">
             <header class="headingText" id="div4" tabindex="-1">Forget Password</header>
-            <label for="forgetEmail">Enter your registered Email Address:</label>
-            <input type="email" id="forgetEmail" disabled>
+<div id="verifyAccountDiv" style="display: block;">
+    <h2>Verify Account</h2>
+    <label for="forgotEmail">Enter your registered email:</label>
+    <input type="email" id="forgotEmail">
+    <button onclick="verifyAccount()">Verify Account</button>
+</div>
 
-            <button onclick="verifyAccount()">Verify Account</button>
+<div id="verifySecurityAnswerDiv" style="display: none;">
+    <h2>Verify Security Answer</h2>
+    <p id="securityQuestion"></p>
+    <label for="securityAnswerInput">Your answer:</label>
+    <input type="text" id="securityAnswerInput">
+    <button onclick="verifySecurityAnswer()">Verify Answer</button>
+</div>
 
-            <p id="userDetails" style="display: none;"></p>
-
-            <label for="securityAnswer">Security Answer:</label>
-            <input type="text" id="securityAnswer" disabled>
-
-            <label for="newPassword">New Password:</label>
-            <input type="password" id="newPassword">
-            <label for="reEnterNewPassword">Re-enter New Password:</label>
-            <input type="password" id="reEnterNewPassword">
-
-            <button onclick="resetPassword()">Reset Password</button>
+<div id="setNewPasswordDiv" style="display: none;">
+    <h2>Set New Password</h2>
+    <label for="newPasswordInput">New Password:</label>
+    <input type="password" id="newPasswordInput">
+    <label for="reenterNewPasswordInput">Re-enter New Password:</label>
+    <input type="password" id="reenterNewPasswordInput">
+    <button onclick="setNewPassword()">Set Password</button>
+</div>
         </div>
     </div>
             <p id="validationError" aria-live="assertive" aria-atomic="true" role="alert" style="color: red; display: none;"></p>
@@ -176,60 +183,71 @@ setTimeout(function(){
             validationError.style.display = 'none';
 }, 10000);
         }
-        async function verifyAccount() {
-            const email = document.getElementById('forgetEmail').value;
+async function verifyAccount() {
+    const email = document.getElementById('forgotEmail').value;
+    const userData = await fetchDataFromDropbox('/user-accounts.txt');
+    const user = userData.find(user => user.Email === email);
 
-            const userData = await fetchDataFromDropbox('/user-accounts.txt');
+    if (user) {
+        document.getElementById('verifyAccountDiv').style.display = 'none';
+        document.getElementById('verifySecurityAnswerDiv').style.display = 'block';
+        document.getElementById('securityQuestion').textContent = `user.SecurityQuestion`;
+    } else {
+        showMessage('No account found with this email. Please try again.', 'red');
+    }
+}
 
-            const user = userData.find(user => user.Email === email);
+function verifySecurityAnswer() {
+    const securityAnswer = document.getElementById('securityAnswerInput').value;
+    const userData = await fetchDataFromDropbox('/user-accounts.txt');
+    const user = userData.find(user => user.Email === email);
 
-            if (!user) {
-                showMessage('No account found with this email. Please try again.', 'red');
-            } else {
-                document.getElementById('userDetails').textContent = Name: ${user.FirstName} ${user.LastName};
-                document.getElementById('userDetails').style.display = 'block';
+    if (securityAnswer === user.SecurityAnswer) {
+        document.getElementById('verifySecurityAnswerDiv').style.display = 'none';
+        document.getElementById('setNewPasswordDiv').style.display = 'block';
+    } else {
+        showMessage('Incorrect security answer. Please try again.', 'red');
+    }
+}
 
-                document.getElementById('securityAnswer').disabled = false;
-            }
+async function setNewPassword() {
+    const newPassword = document.getElementById('newPasswordInput').value;
+    const reenteredPassword = document.getElementById('reenterNewPasswordInput').value;
+    
+    if (newPassword !== reenteredPassword) {
+        showMessage('New passwords do not match. Please re-enter.', 'red');
+        return;
+    }
+
+    const userData = await fetchDataFromDropbox('/user-accounts.txt');
+    const user = userData.find(user => user.Email === email);
+
+    user.Password = newPassword;
+
+    // Update user's password in the Dropbox data
+    userData = userData.map(u => {
+        if (u.Email === user.Email) {
+            u.Password = newPassword;
         }
+        return u;
+    });
 
-        async function resetPassword() {
-            const newPassword = document.getElementById('newPassword').value;
-            const reEnterNewPassword = document.getElementById('reEnterNewPassword').value;
+    // Save updated user data to Dropbox
+    const updateResponse = await fetch('https://content.dropboxapi.com/2/files/upload', {
+        method: 'POST',
+        headers: {
+            'Authorization': 'Bearer ' + dropboxToken,
+            'Content-Type': 'application/json',
+            'Dropbox-API-Arg': JSON.stringify({
+                path: '/user-accounts.txt',
+                'mode': 'overwrite'
+            })
+        },
+        body: JSON.stringify(userData)
+    });
 
-            if (newPassword !== reEnterNewPassword) {
-                showMessage('New passwords do not match. Please re-enter.', 'red');
-                return;
-            }
-
-            const email = document.getElementById('forgetEmail').value;
-
-            let userData = await fetchDataFromDropbox('/user-accounts.txt');
-
-            userData = userData.map(user => {
-                if (user.Email === email) {
-                    user.Password = newPassword;
-                }
-                return user;
-            });
-
-            const updateResponse = await fetch('https://content.dropboxapi.com/2/files/upload', {
-                method: 'POST',
-                headers: {
-                    'Authorization': 'Bearer ' + dropboxToken,
-                    'Content-Type': 'application/octet-stream',
-                    'Dropbox-API-Arg': JSON.stringify({
-                        path: '/user-accounts.txt',
-                        'mode': 'overwrite',
-                        autorename: false,
-                        mute: false
-                    })
-                },
-                body: JSON.stringify(userData)
-            });
-
-            showMessage('Password reset successfully!', 'green');
-        }
+    showMessage('Password changed successfully!', 'green');
+}
 async function changePassword() {
     const oldPassword = document.getElementById('oldPassword').value;
     const newPassword = document.getElementById('newPassword').value;
