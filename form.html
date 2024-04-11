@@ -38,7 +38,7 @@ async function verifyAccount() {
     }
 }
 
-function verifySecurityAnswer() {
+async function verifySecurityAnswer() {
     const securityAnswer = document.getElementById('securityAnswerInput').value;
     const userData = await fetchDataFromDropbox('/user-accounts.txt');
     const user = userData.find(user => user.Email === email);
@@ -101,4 +101,44 @@ async function fetchDataFromDropbox(path) {
     });
     return await response.json();
 }
+function generateToken(refreshToken, clientId, clientSecret) {
+const url = 'https://api.dropbox.com/oauth2/token';
+const data = `grant_type=refresh_token&refresh_token=${refreshToken}&client_id=${clientId}&client_secret=${clientSecret}`;
+return fetch(url, {
+method: 'POST',
+headers: {
+'Content-Type': 'application/x-www-form-urlencoded'
+},
+body: data
+})
+.then((response) => {
+if (!response.ok) {
+throw new Error('Failed to get access token: ' + response.statusText);
+}
+return response.json();
+})
+.then((responseData) => {
+return responseData.access_token;
+})
+.catch((error) => {
+throw new Error('Error generating access token: ' + error.message);
+});
+}
+function checkToken() {
+let localToken = JSON.parse(localStorage.getItem("localToken"));
+if (localToken && localToken.expire > new Date().getTime()) {
+dropboxToken = localToken.token;
+} else {
+generateToken('AALu1gsBgjcAAAAAAAAAATLeuJoxd86bwIAnmd9KoDsWC4lRU_SruT9ZUVrfr8hz', '7u6mvcyvv6szugw', 'gka5o3baeaw2lin')
+.then((token) => {
+dropboxToken = token;
+var storeToken = { token: token, expire: new Date().getTime() + (3*60*60*1000)};
+localStorage.setItem("localToken", JSON.stringify(storeToken));
+})
+.catch((error) => {
+showMessage(error.message, 'red');
+});
+}
+}
+window.addEventListener("load", checkToken);
 </script>
