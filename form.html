@@ -1,203 +1,93 @@
-<div id="createAccountDiv" style="display: block;">
-    <header class="headingText" id="div2" tabindex="-1">Create an Account</header>
-    <form id="signUpForm">
-        <label for="firstName">First Name:</label>
-        <input type="text" id="firstName"><br>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Send Email using Mailjet API</title>
+</head>
+<body>
+    <h1>Send Email using Mailjet API</h1>
 
-        <label for="lastName">Last Name:</label>
-        <input type="text" id="lastName"><br>
+    <button id="sendEmailButton" onclick="sendOtp()">Send Email</button>
+    <div id="otpDiv" style="display: none;">
+        <input type="text" id="otpInput" placeholder="Enter OTP"><br>
+        <button type="button" id="validateOTP" onclick="validateOTP()">Validate OTP</button>
+    </div>
+    <p id="validationError" aria-live="assertive" aria-atomic="true" role="alert" style="color: red; display: none;"></p>
 
-        <label for="gender">Gender:</label>
-        <select id="gender">
-            <option value="male">Male</option>
-            <option value="female">Female</option>
-            <option value="other">Other</option>
-        </select><br>
+    <script>
+        function sendOtp() {
+            const apiKey = '78a013a0125cbdb61327de831d1fdd0b';
+            const apiSecret = '5c2fbbec5443429c0490705941f7c279';
+            const senderEmail = 'jaysolanki060192@gmail.com';
+            const recipientEmail = 'blindtechhindi@gmail.com';
+            const otp = Math.floor(100000 + Math.random() * 900000);
+            const subject = 'One Time Password (OTP) for Account Verification';
+            const body = Your OTP is: ${otp};
 
-        <label for="email">Email Address:</label>
-        <input type="email" id="email"><br>
-        <label for="password">Password:</label>
-        <input type="password" id="password"><br>
+            const emailData = {
+                "Messages": [
+                    {
+                        "From": {
+                            "Email": senderEmail,
+                            "Name": "Your Name"
+                        },
+                        "To": [
+                            {
+                                "Email": recipientEmail,
+                                "Name": "Recipient Name"
+                            }
+                        ],
+                        "Subject": subject,
+                        "TextPart": body
+                    }
+                ]
+            };
 
-        <label for="rePassword">Re-enter Password:</label>
-        <input type="password" id="rePassword"><br>
+            fetch('https://api.mailjet.com/v3.1/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': Basic ${btoa(apiKey + ':' + apiSecret)}
+                },
+                body: JSON.stringify(emailData)
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('otpDiv').style.display = 'block';
+                localStorage.setItem('otp', otp);
+                showMessage('OTP sent successfully!', 'green');
+                console.log(JSON.stringify(data)); // stringify the response object
+            })
+            .catch(error => {
+                showMessage('Error sending OTP. Please try again.', 'red');
+                console.error(error);
+            });
+        }
 
-        <label>
-            <input type="checkbox" id="showPasswordCheckbox">
-            Show Password
-        </label>
+        function validateOTP() {
+            const enteredOTP = document.getElementById('otpInput').value;
+            const storedOTP = localStorage.getItem('otp');
 
-        <label for="securityQuestion">Select a security question:</label>
-        <select id="securityQuestion" name="securityQuestion">
-            <option value="What is your mother's maiden name?">What is your mother's maiden name?</option>
-            <option value="What city were you born in?">What city were you born in?</option>
-            <option value="What is the name of your first pet?">What is the name of your first pet?</option>
-            <option value="What is your favorite movie?">What is your favorite movie?</option>
-            <option value="What is the name of your elementary school?">What is the name of your elementary school?</option>
-        </select><br>
-        <label for="securityAnswer">Your answer:</label>
-        <input type="text" id="securityAnswer" name="securityAnswer"><br>
+            if (enteredOTP === storedOTP) {
+                localStorage.removeItem('otp');
+                signUp();
+            } else {
+                showMessage('Invalid OTP. Please try again.', 'red');
+            }
+        }
 
-        <button type="button" onclick="sendOTP()">Send OTP</button><br>
-        <input type="text" id="otpInput" style="display: none;" placeholder="Enter OTP"><br>
-        <button type="button" onclick="validateOTP()" style="display: none;">Validate OTP</button>
-    </form>
-</div>
-<p id="validationError" aria-live="assertive" aria-atomic="true" role="alert" style="color: red; display: none;"></p>
-
-<script>
-    async function sendOTP() {
-        // Call Elastic Email API to send OTP
-        const apiKey = '6F9D8F439B6A4A0D958C88B7E6DE705BF0069E776648E148DACC963CD99EDE006278F85631F95A45C43B306F465C5590';
-        const senderEmail = 'jaysolanki060192@gmail.com';
-        const recipientEmail = document.getElementById('email').value;
-        const otp = Math.floor(100000 + Math.random() * 900000); // Generate 6-digit OTP
-        const subject = 'One Time Password (OTP) for Account Verification';
-        const body = Your OTP is: ${otp};
-
-        const data = new URLSearchParams();
-        data.append('apiKey', apiKey);
-        data.append('subject', subject);
-        data.append('from', senderEmail);
-        data.append('to', recipientEmail);
-        data.append('body', body);
-
-        fetch('https://api.elasticemail.com/v2/email/send', {
-            method: 'POST',
-            body: data
-        })
-        .then(response => {
-            // Display OTP input field and Validate OTP button
-            document.getElementById('otpInput').style.display = 'block';
-            document.getElementById('validateOTP').style.display = 'block';
-
-            // Store OTP for validation
-            localStorage.setItem('otp', otp);
-
-            showMessage('OTP sent successfully!', 'green');
-        })
-        .catch(error => {
-            console.error(error);
-            showMessage('Error sending OTP. Please try again.', 'red');
-        });
-    }
-
-    function validateOTP() {
-        const enteredOTP = document.getElementById('otpInput').value;
-        const storedOTP = localStorage.getItem('otp');
-
-        if (enteredOTP === storedOTP) {
-            document.getElementById('otpInput').disabled = true;
-            document.getElementById('validateOTP').disabled = true;
-            createAccount();
-        } else {
-            showMessage('Invalid OTP. Please try again.', 'red');
-        }
-    }
-        function showMessage(message, color) {
-            const validationError = document.getElementById('validationError');
-            validationError.innerText = message;
-            validationError.style.color = color;
-            validationError.style.display = 'block';
-setTimeout(function(){
-            validationError.innerText = "";
-            validationError.style.display = 'none';
-}, 5000);
-        }
-        async function createAccount() {
-            const firstName = document.getElementById('firstName').value;
-            const lastName = document.getElementById('lastName').value;
-            const gender = document.getElementById('gender').value;
-            const email = document.getElementById('email').value;
-            const password = document.getElementById('password').value;
-            const rePassword = document.getElementById('rePassword').value;
-            const securityQuestion = document.getElementById('securityQuestion').value;
-            const securityAnswer = document.getElementById('securityAnswer').value;
-
-            if (password !== rePassword) {
-                showMessage('Passwords dont match. Please re-enter.', 'red');
-return;
-            }
-
-            // Fetch existing user data from Dropbox
-            const response = await fetch('https://content.dropboxapi.com/2/files/download', {
-                method: 'POST',
-                headers: {
-                    'Authorization': 'Bearer ' + dropboxToken,
-                    'Dropbox-API-Arg': JSON.stringify({
-                        path: '/user-accounts.txt'
-                    })
-                }
-            });
-            let userData = await response.json();
-
-            // Add new user data
-            userData.push({
-                FirstName: firstName,
-                LastName: lastName,
-                Gender: gender,
-                Email: email,
-                Password: password,
-SecurityQuestion: securityQuestion,
-SecurityAnswer: securityAnswer
-            });
-
-            // Save updated user data to Dropbox
-            const updatedResponse = await fetch('https://content.dropboxapi.com/2/files/upload', {
-                method: 'POST',
-                headers: {
-                    'Authorization': 'Bearer ' + dropboxToken,
-                    'Content-Type': 'application/octet-stream',
-                    'Dropbox-API-Arg': JSON.stringify({
-                        path: '/user-accounts.txt',
-                        'mode': 'overwrite',
-                        autorename: false,
-                        mute: false
-                    })
-                },
-                body: JSON.stringify(userData)
-            });
-
-            showMessage('Account created successfully!', 'green');
-        }
-function generateToken(refreshToken, clientId, clientSecret) {
-const url = 'https://api.dropbox.com/oauth2/token';
-const data = `grant_type=refresh_token&refresh_token=${refreshToken}&client_id=${clientId}&client_secret=${clientSecret}`;
-return fetch(url, {
-method: 'POST',
-headers: {
-'Content-Type': 'application/x-www-form-urlencoded'
-},
-body: data
-})
-.then((response) => {
-if (!response.ok) {
-throw new Error('Failed to get access token: ' + response.statusText);
-}
-return response.json();
-})
-.then((responseData) => {
-return responseData.access_token;
-})
-.catch((error) => {
-throw new Error('Error generating access token: ' + error.message);
-});
-}
-function checkToken() {
-let localToken = JSON.parse(localStorage.getItem("localToken"));
-if (localToken && localToken.expire > new Date().getTime()) {
-dropboxToken = localToken.token;
-} else {
-generateToken('AALu1gsBgjcAAAAAAAAAATLeuJoxd86bwIAnmd9KoDsWC4lRU_SruT9ZUVrfr8hz', '7u6mvcyvv6szugw', 'gka5o3baeaw2lin')
-.then((token) => {
-dropboxToken = token;
-var storeToken = { token: token, expire: new Date().getTime() + (3*60*60*1000)};
-localStorage.setItem("localToken", JSON.stringify(storeToken));
-})
-.catch((error) => {
-showMessage(error.message, 'red');
-});
-}
-}
-window.addEventListener("load", checkToken);
-</script>
+        function showMessage(message, color) {
+            const validationError = document.getElementById('validationError');
+            validationError.innerText = message;
+            validationError.style.color = color;
+            validationError.style.display = 'block';
+            setTimeout(function(){
+                validationError.innerText = "";
+                validationError.style.display = 'none';
+            }, 5000);
+        }
+    </script>
+</body>
+</html>
