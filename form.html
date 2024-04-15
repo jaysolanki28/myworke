@@ -1,93 +1,238 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Send Email using Mailjet API</title>
-</head>
-<body>
-    <h1>Send Email using Mailjet API</h1>
+            <header class="headingText" id="div4" tabindex="-1">Forgot Password</header>
 
-    <button id="sendEmailButton" onclick="sendOtp()">Send Email</button>
-    <div id="otpDiv" style="display: none;">
-        <input type="text" id="otpInput" placeholder="Enter OTP"><br>
-        <button type="button" id="validateOTP" onclick="validateOTP()">Validate OTP</button>
-    </div>
-    <p id="validationError" aria-live="assertive" aria-atomic="true" role="alert" style="color: red; display: none;"></p>
+<div id="verifyAccountDiv" style="display: block;">
 
-    <script>
-        function sendOtp() {
-            const apiKey = '78a013a0125cbdb61327de831d1fdd0b';
-            const apiSecret = '5c2fbbec5443429c0490705941f7c279';
-            const senderEmail = 'jaysolanki060192@gmail.com';
-            const recipientEmail = 'blindtechhindi@gmail.com';
-            const otp = Math.floor(100000 + Math.random() * 900000);
-            const subject = 'One Time Password (OTP) for Account Verification';
-            const body = Your OTP is: ${otp};
+    <label for="forgotEmail">Enter your registered email:</label>
+    <input type="email" id="forgotEmail">
+    <button id="verifyAccount" onclick="verifyAccount()">Verify Account</button>
+</div>
 
-            const emailData = {
-                "Messages": [
-                    {
-                        "From": {
-                            "Email": senderEmail,
-                            "Name": "Your Name"
-                        },
-                        "To": [
-                            {
-                                "Email": recipientEmail,
-                                "Name": "Recipient Name"
-                            }
-                        ],
-                        "Subject": subject,
-                        "TextPart": body
-                    }
-                ]
-            };
+<div id="resetOtpDiv" style="display: none;">
+        <input type="text" id="resetOtpInput" placeholder="Enter OTP"><br>
+        <button type="button" id="validateResetOTP" onclick="validateOTP()">Validate OTP</button>
+<p>Time remaining for OTP expiry: <span id="otpExpiryTimer"></span></p>
+</div>
+<div id="setNewPasswordDiv" style="display: none;">
+    <label for="newPasswordInput">New Password:</label>
+    <input type="password" id="newPasswordInput">
+    <label for="reenterNewPasswordInput">Re-enter New Password:</label>
+    <input type="password" id="reenterNewPasswordInput">
+<button onclick="setNewPassword()">Set Password</button>
+</div>
+            <p id="validationError" aria-live="assertive" aria-atomic="true" role="alert" style="color: red; display: none;"></p>
+<script>
+        function showMessage(message, color) {
+            const validationError = document.getElementById('validationError');
+            validationError.innerText = message;
+            validationError.style.color = color;
+            validationError.style.display = 'block';
+setTimeout(function(){
+            validationError.innerText = "";
+            validationError.style.display = 'none';
+}, 15000);
+        }
 
-            fetch('https://api.mailjet.com/v3.1/send', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': Basic ${btoa(apiKey + ':' + apiSecret)}
-                },
-                body: JSON.stringify(emailData)
+
+async function verifyAccount() {
+    const email = document.getElementById('forgotEmail').value;
+    if (!email) {
+        showMessage('Please enter your email address.', 'red');
+        return;
+    }
+    const userData = await fetchDataFromDropbox('/user-accounts.txt');
+    const user = userData.find(user => user.Email === email);
+
+    if (user) {
+        showMessage('Sending OTP, please wait...', 'blue');
+sendResetOtp();
+    } else {
+        showMessage('No account found with this email. Please try again.', 'red');
+    }
+}
+function sendResetOtp() {
+    const apiKey = '6F9D8F439B6A4A0D958C88B7E6DE705BF0069E776648E148DACC963CD99EDE006278F85631F95A45C43B306F465C5590';
+    const senderEmail = 'jaysolanki060192@gmail.com';
+    const recipientEmail = 'blindtechhindi@gmail.com';
+    const resetotp = Math.floor(100000 + Math.random() * 900000);
+    const subject = 'Password Reset Request for Saint Joseph's Academy';
+    const body = `<h1>Dear user</h1>
+
+<p>We received a request to reset your password for your {{Saint Joseph's Academy}} account. To complete the process, please enter the following One-Time Password (OTP) in the app:</p>
+
+<b>${resetotp}</b>
+<p>This OTP will expire in 5 minutes. If you do not receive the OTP or it expires, please contact our support team.</p>
+
+
+<p>If you did not request a password reset, please ignore this email.</p>
+
+<h2>Important Notes:</h2>
+<p>For security reasons, please do not share this OTP with anyone. Keep it confidential and use it only for the purpose of account verification.</p>
+<p>And do not click on the unsubscribe link below. Doing so may cause problems in recovering your account in the future.</p>
+
+<p>Thank you for your cooperation.</p>
+<p>Sincerely,<br>
+Saint Joseph's Academy</p>`;
+
+    const data = new URLSearchParams();
+    data.append('apiKey', apiKey);
+    data.append('subject', subject);
+    data.append('from', senderEmail);
+    data.append('to', recipientEmail);
+            data.append('bodyHtml', body);
+
+    fetch('https://api.elasticemail.com/v2/email/send', {
+        method: 'POST',
+        body: data
+    })
+    .then(response => response.json())
+    .then(data => {
+        document.getElementById('resetOtpDiv').style.display = 'block';
+        document.getElementById("resetOtpInput").focus();
+        document.getElementById('forgotEmail').disabled = true;
+        document.getElementById('verifyAccount').disabled = true;
+        localStorage.setItem('resetotp', resetotp);
+        startOtpExpiryTimer(); // Start the timer for OTP expiry
+        showMessage('OTP sent successfully!', 'green');
+        console.log(JSON.stringify(data)); // stringify the response object
+    })
+    .catch(error => {
+        showMessage('Error sending OTP. Please try again.', 'red');
+        console.error(error);
+    });
+}
+
+
+function startOtpExpiryTimer() {
+    const expiryTime = new Date().getTime() + 5 * 60 * 1000; // 5 minutes expiry
+    localStorage.setItem('otpExpiry', expiryTime); // Store OTP expiry time
+
+    // Update the remaining time every second
+    const timerInterval = setInterval(function () {
+        const currentTime = new Date().getTime();
+        const remainingTime = parseInt(localStorage.getItem('otpExpiry')) - currentTime;
+
+        if (remainingTime <= 0) {
+            clearInterval(timerInterval); // Stop the timer when OTP expires
+            localStorage.removeItem('resetotp'); // Remove OTP from local storage
+            localStorage.removeItem('otpExpiry'); // Remove OTP expiry time from local storage
+            document.getElementById('otpExpiryTimer').innerText = 'Expired'; // Update HTML to show OTP expired
+            return;
+        }
+
+        // Display remaining time in HTML
+        const minutes = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
+        document.getElementById('otpExpiryTimer').innerText = ${minutes}m ${seconds}s;
+    }, 1000);
+}
+    function validateResetOTP() {
+        const enteredResetOTP = document.getElementById('resetOtpInput').value;
+        const storedResetOTP = localStorage.getItem('resetotp');
+
+        if (enteredResetOTP === storedResetOTP) {
+localStorage.removeItem('resetotp');
+document.getElementById('resetOtpInput').disabled = true;
+document.getElementById('validateResetOTP').disabled = true;
+        document.getElementById('setNewPasswordDiv').style.display = 'block';
+        document.getElementById("newPasswordInput").focus();
+        } else {
+            showMessage('Invalid OTP. Please try again.', 'red');
+        }
+    }
+
+async function setNewPassword() {
+    const newPassword = document.getElementById('newPasswordInput').value;
+    const reenteredPassword = document.getElementById('reenterNewPasswordInput').value;
+    const email = document.getElementById('forgotEmail').value; // Define email variable here
+    if (!newPassword) {
+        showMessage('Please enter new password.', 'red');
+        return;
+    }
+    if (!reenteredPassword) {
+        showMessage('Please re enter new password.', 'red');
+        return;
+    }
+
+    if (newPassword !== reenteredPassword) {
+        showMessage('New passwords do not match. Please re-enter.', 'red');
+        return;
+    }
+
+    const userData = await fetchDataFromDropbox('/user-accounts.txt');
+    const userIndex = userData.findIndex(user => user.Email === email);
+
+    if (userIndex === -1) {
+        return showMessage('User data not found. Please try again.', 'red');
+    }
+
+    userData[userIndex].Password = newPassword;
+
+    // Update user's password in the Dropbox data
+    const updateResponse = await fetch('https://content.dropboxapi.com/2/files/upload', {
+        method: 'POST',
+        headers: {
+            'Authorization': 'Bearer ' + dropboxToken,
+            'Content-Type': 'application/octet-stream',
+            'Dropbox-API-Arg': JSON.stringify({
+                path: '/user-accounts.txt',
+                mode: 'overwrite'
             })
-            .then(response => response.json())
-            .then(data => {
-                document.getElementById('otpDiv').style.display = 'block';
-                localStorage.setItem('otp', otp);
-                showMessage('OTP sent successfully!', 'green');
-                console.log(JSON.stringify(data)); // stringify the response object
-            })
-            .catch(error => {
-                showMessage('Error sending OTP. Please try again.', 'red');
-                console.error(error);
-            });
-        }
+        },
+        body: JSON.stringify(userData)
+    });
 
-        function validateOTP() {
-            const enteredOTP = document.getElementById('otpInput').value;
-            const storedOTP = localStorage.getItem('otp');
-
-            if (enteredOTP === storedOTP) {
-                localStorage.removeItem('otp');
-                signUp();
-            } else {
-                showMessage('Invalid OTP. Please try again.', 'red');
-            }
-        }
-
-        function showMessage(message, color) {
-            const validationError = document.getElementById('validationError');
-            validationError.innerText = message;
-            validationError.style.color = color;
-            validationError.style.display = 'block';
-            setTimeout(function(){
-                validationError.innerText = "";
-                validationError.style.display = 'none';
-            }, 5000);
-        }
-    </script>
-</body>
-</html>
+        showMessage('Password changed successfully!', 'green');
+}
+async function fetchDataFromDropbox(path) {
+    const response = await fetch('https://content.dropboxapi.com/2/files/download', {
+        method: 'POST',
+        headers: {
+            'Authorization': 'Bearer ' + dropboxToken,
+            'Dropbox-API-Arg': JSON.stringify({
+                path: path
+            })
+        }
+    });
+    return await response.json();
+}
+function generateToken(refreshToken, clientId, clientSecret) {
+const url = 'https://api.dropbox.com/oauth2/token';
+const data = `grant_type=refresh_token&refresh_token=${refreshToken}&client_id=${clientId}&client_secret=${clientSecret}`;
+return fetch(url, {
+method: 'POST',
+headers: {
+'Content-Type': 'application/x-www-form-urlencoded'
+},
+body: data
+})
+.then((response) => {
+if (!response.ok) {
+throw new Error('Failed to get access token: ' + response.statusText);
+}
+return response.json();
+})
+.then((responseData) => {
+return responseData.access_token;
+})
+.catch((error) => {
+throw new Error('Error generating access token: ' + error.message);
+});
+}
+function checkToken() {
+let localToken = JSON.parse(localStorage.getItem("localToken"));
+if (localToken && localToken.expire > new Date().getTime()) {
+dropboxToken = localToken.token;
+} else {
+generateToken('AALu1gsBgjcAAAAAAAAAATLeuJoxd86bwIAnmd9KoDsWC4lRU_SruT9ZUVrfr8hz', '7u6mvcyvv6szugw', 'gka5o3baeaw2lin')
+.then((token) => {
+dropboxToken = token;
+var storeToken = { token: token, expire: new Date().getTime() + (3*60*60*1000)};
+localStorage.setItem("localToken", JSON.stringify(storeToken));
+})
+.catch((error) => {
+showMessage(error.message, 'red');
+});
+}
+}
+window.addEventListener("load", checkToken);
+</script>
