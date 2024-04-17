@@ -1,123 +1,180 @@
-please check out this code and tell me what is the problem.
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Accounts</title>
+    <link rel="stylesheet" href="styles.css">
 
-        <label for="firstName">First Name:</label>
-        <input type="text" id="firstName"><br>
-
-        <label for="lastName">Last Name:</label>
-        <input type="text" id="lastName"><br>
-        <input type="email" id="email"><br>
-
-    <button id="sendOtpButton" onclick="sendOtp()">Send Email</button>
-<div id="otpDiv" style="display: none;">
-        <input type="tel" id="otpInput" placeholder="Enter OTP"><br>
-<span id="signupOtpExpiryTimer"></span><br>
-        <button type="button" id="validateOTP" onclick="validateOTP()">Validate OTP</button>
-</div>
-<p id="validationError" aria-live="assertive" aria-atomic="true" role="alert" style="color: red; display: none;"></p>
-
-    <script>
-        function sendOtp() {
-            const apiKey = '6F9D8F439B6A4A0D958C88B7E6DE705BF0069E776648E148DACC963CD99EDE006278F85631F95A45C43B306F465C5590';
-            const senderEmail = 'jaysolanki060192@gmail.com';
-            const recipientEmail = document.getElementById('email').value;
-            const otp = Math.floor(100000 + Math.random() * 900000);
-            const subject = 'One Time Password (OTP) for Account Verification';
-            const firstName = document.getElementById('firstName').value;
-            const lastName = document.getElementById('lastName').value;
-            const body = `<h1>Dear ${firstName} ${lastName},</h1>
-<p>Thank you for initiating an account verification. Your One-Time Password (OTP) is:</p>
-<b>${otp}</b>
-<p>Please enter this OTP in the designated field to complete your verification.</p>
-<p>This OTP will expire in 3 minutes. If you do not receive the OTP or it expires, please contact our support team.</p>
-<p>If you did not request a sign-up, please ignore this email.</p>
-<h2>Important Notes:</h2>
-<p>For security reasons, please do not share this OTP with anyone. Keep it confidential and use it only for the purpose of account verification.</p>
-<p>And do not click on the unsubscribe link below. Doing so may cause problems in recovering your account in the future.</p>
-<p>Thank you for your cooperation.</p>
-<p>Sincerely,<br>
-Saint Joseph's Academy</p>`;
-
-            const data = new URLSearchParams();
-            data.append('apiKey', apiKey);
-            data.append('subject', subject);
-            data.append('from', senderEmail);
-            data.append('to', recipientEmail);
-            data.append('bodyHtml', body); // Use bodyHtml to send HTML content
-
-            fetch('https://api.elasticemail.com/v2/email/send', {
-                method: 'POST',
-                body: data
-            })
-            .then(response => response.json())
-            .then(data => {
-/*document.getElementById('firstName').disabled = true;
-document.getElementById('lastName').disabled = true;
-document.getElementById('gender').disabled = true;
-document.getElementById('email').disabled = true;
-document.getElementById('password').disabled = true;
-document.getElementById('rePassword').disabled = true;
-        document.getElementById('sendOtpButton').style.display = 'none';*/
-        document.getElementById('otpDiv').style.display = 'block';
-        document.getElementById("otpInput").focus();
-        localStorage.setItem('otp', otp);
-startSignupOtpExpiryTimer();
-        showMessage('OTP sent successfully!', 'green');
-                console.log(JSON.stringify(data)); // stringify the response object
-            })
-            .catch(error => {
-        showMessage('Error sending OTP. Please try again.', 'red');
-                console.error(error);
-            });
-        }
-let timerInterval; // Define timerInterval globally
-
-function startSignupOtpExpiryTimer() {
-    const signupExpiryTime = new Date().getTime() + 3 * 60 * 1000; // 3 minutes expiry
-    localStorage.setItem('signupOtpExpiry', signupExpiryTime); // Store OTP signupExpiry time
-
-    // Update the remaining time every second
-    timerInterval = setInterval(function () {
-        const currentTime = new Date().getTime();
-        const remainingTime = parseInt(localStorage.getItem('signupOtpExpiry')) - currentTime;
-
-        if (remainingTime <= 0) {
-            clearInterval(timerInterval); // Stop the timer when OTP expires
-            localStorage.removeItem('otp'); // Remove OTP from local storage
-            localStorage.removeItem('signupOtpExpiry'); // Remove OTP expiry time from local storage
-            document.getElementById('signupOtpExpiryTimer').innerText = 'Expired'; // Update HTML to show OTP expired
-            return;
-        }
-
-        // Display remaining time in HTML
-        const minutes = Math.floor((remainingTime % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((remainingTime % (1000 * 60)) / 1000);
-        document.getElementById('signupOtpExpiryTimer').innerText = ${minutes}m ${seconds}s; // Fixed this line
-    }, 1000);
+<style>
+.user {
+    margin-bottom: 10px;
 }
 
-function validateOTP() {
-    clearInterval(timerInterval); // Clear the timer interval
-    const enteredOTP = document.getElementById('otpInput').value;
-    const storedOTP = localStorage.getItem('otp');
-
-    if (enteredOTP === storedOTP) {
-        localStorage.removeItem('otp');
-        localStorage.removeItem('signupOtpExpiry');
-        document.getElementById('signupOtpExpiryTimer').style.display = 'none';
-signUp();
-        showMessage('Valid OTP.', 'green'); // Changed color to green for success message
-    } else {
-        showMessage('Invalid OTP. Please try again.', 'red');
-    }
+.user button {
+    margin-right: 10px;
 }
-        function showMessage(message, color) {
-            const validationError = document.getElementById('validationError');
-            validationError.innerText = message;
-            validationError.style.color = color;
-            validationError.style.display = 'block';
-            setTimeout(function(){
-                validationError.innerText = "";
-                validationError.style.display = 'none';
-            }, 5000);
+
+.user-data {
+    margin-top: 5px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    background-color: #f9f9f9;
+}
+
+.user-data p {
+    margin: 5px 0;
+}
+</style>
+</head>
+<body>
+    <div id="userList"></div>
+
+    <script>
+document.addEventListener('DOMContentLoaded', async function() {
+    const userData = await fetchDataFromDropbox('/user-accounts.txt');
+    renderUserList(userData);
+});
+
+async function fetchDataFromDropbox(path) {
+    const response = await fetch('https://content.dropboxapi.com/2/files/download', {
+        method: 'POST',
+        headers: {
+            'Authorization': 'Bearer ' + dropboxToken,
+            'Dropbox-API-Arg': JSON.stringify({
+                path: path
+            })
         }
-    </script>
+    });
+    return await response.json();
+}
+
+function renderUserList(userData) {
+    const userListDiv = document.getElementById('userList');
+
+    userData.forEach(user => {
+        const userDiv = document.createElement('div');
+        userDiv.classList.add('user');
+
+        const button = document.createElement('button');
+        button.textContent = `${user.FirstName} ${user.LastName}`;
+        button.addEventListener('click', () => {
+            toggleUserData(userDiv);
+        });
+
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete User';
+        deleteButton.addEventListener('click', () => {
+            const confirmDelete = confirm(Are you sure you want to delete ${user.FirstName} ${user.LastName}?);
+            if (confirmDelete) {
+                deleteUser(user);
+                userDiv.remove();
+                showMessage('Please wait...', 'blue');
+            } else {
+                showMessage('User deletion cancelled.', 'blue');
+            }
+        });
+
+        const userDataDiv = document.createElement('div');
+        userDataDiv.classList.add('user-data');
+        userDataDiv.style.display = 'none'; // Initially hide user data
+
+        const userDataDetails = 
+            <p><strong>Name:</strong> ${user.FirstName} ${user.LastName}</p>
+            <p><strong>Gender:</strong> ${user.Gender}</p>
+            <p><strong>Email:</strong> ${user.Email}</p>
+        ;
+
+        userDataDiv.innerHTML = userDataDetails;
+
+        userDiv.appendChild(button);
+        userDiv.appendChild(userDataDiv);
+        userDiv.appendChild(deleteButton);
+
+        userListDiv.appendChild(userDiv);
+    });
+}
+
+function toggleUserData(userDiv) {
+    const userDataDiv = userDiv.querySelector('.user-data');
+    userDataDiv.style.display = userDataDiv.style.display === 'none' ? 'block' : 'none';
+}
+
+async function deleteUser(user) {
+    let userData = await fetchDataFromDropbox('/user-accounts.txt');
+    userData = userData.filter(u => u.Email !== user.Email);
+
+    const response = await fetch('https://content.dropboxapi.com/2/files/upload', {
+        method: 'POST',
+        headers: {
+            'Authorization': 'Bearer ' + dropboxToken,
+            'Content-Type': 'application/octet-stream',
+            'Dropbox-API-Arg': JSON.stringify({
+                path: '/user-accounts.txt',
+                'mode': 'overwrite',
+                autorename: false,
+                mute: false
+            })
+        },
+        body: JSON.stringify(userData)
+    });
+
+    if (response.ok) {
+        showMessage('User deleted successfully!', 'green');
+    } else {
+        showMessage('Failed to delete user.', 'red');
+    }
+}
+function generateToken(refreshToken, clientId, clientSecret) {
+const url = 'https://api.dropbox.com/oauth2/token';
+const data = `grant_type=refresh_token&refresh_token=${refreshToken}&client_id=${clientId}&client_secret=${clientSecret}`;
+return fetch(url, {
+method: 'POST',
+headers: {
+'Content-Type': 'application/x-www-form-urlencoded'
+},
+body: data
+})
+.then((response) => {
+if (!response.ok) {
+throw new Error('Failed to get access token: ' + response.statusText);
+}
+return response.json();
+})
+.then((responseData) => {
+return responseData.access_token;
+})
+.catch((error) => {
+throw new Error('Error generating access token: ' + error.message);
+});
+}
+function checkToken() {
+let localToken = JSON.parse(localStorage.getItem("localToken"));
+if (localToken && localToken.expire > new Date().getTime()) {
+dropboxToken = localToken.token;
+} else {
+generateToken('AALu1gsBgjcAAAAAAAAAATLeuJoxd86bwIAnmd9KoDsWC4lRU_SruT9ZUVrfr8hz', '7u6mvcyvv6szugw', 'gka5o3baeaw2lin')
+.then((token) => {
+dropboxToken = token;
+var storeToken = { token: token, expire: new Date().getTime() + (3*60*60*1000)};
+localStorage.setItem("localToken", JSON.stringify(storeToken));
+})
+.catch((error) => {
+showMessage(error.message, 'red');
+});
+}
+}
+
+function showMessage(message, color) {
+    const validationError = document.getElementById('validationError');
+    validationError.innerText = message;
+    validationError.style.color = color;
+    validationError.style.display = 'block';
+    setTimeout(function(){
+        validationError.innerText = "";
+        validationError.style.display = 'none';
+    }, 5000);
+}
+</script>
+</body>
+</html>
