@@ -1,30 +1,64 @@
-<!-- Moderators Page -->
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Moderators Page</title>
-  <script src="https://unpkg.com/@daily-co/daily-js"></script>
+  <title>Daily.co Participant</title>
+  <script src="https://unpkg.com/daily-js@latest/dist/daily.js"></script>
 </head>
 <body>
-  <h1>Welcome Moderators!</h1>
-  <button id="createRoomBtn">Create Room</button>
-  <button id="getParticipantsBtn">Get Participants</button>
-
+  <h1>Participant</h1>
+  <video id="local-video"></video>
+  <div id="remote-videos"></div>
+  <input type="text" id="room-name-input" placeholder="Room name">
+  <button id="join-button">Join</button>
+  <button id="leave-button">Leave</button>
   <script>
-    const daily = new DailyIframe({ apiKey: '51de5c8106662156adbbd74d8b753a3a7bf6e6650540bcd4932311e0c5b9a855' });
+    // Get our elements
+    const joinButton = document.getElementById('join-button');
+    const leaveButton = document.getElementById('leave-button');
+    const localVideo = document.getElementById('local-video');
+    const remoteVideos = document.getElementById('remote-videos');
+    const roomNameInput = document.getElementById('room-name-input');
 
-    document.getElementById('createRoomBtn').addEventListener('click', () => {
-      daily.createRoom().then(room => {
-        console.log('Room created:', room.url);
-      });
+    // Set the Daily.co API key
+    Daily.apiKey = '51de5c8106662156adbbd74d8b753a3a7bf6e6650540bcd4932311e0c5b9a855';
+
+    // Create a Daily instance
+    const daily = new Daily({ autoJoin: false });
+
+    // Handle join button click
+    joinButton.addEventListener('click', async () => {
+      // Get the room name
+      const roomName = roomNameInput.value;
+
+      // Generate a room token
+      const token = await daily.createToken({ roomName });
+
+      // Join the room
+      daily.join({ token });
     });
 
-    document.getElementById('getParticipantsBtn').addEventListener('click', () => {
-      daily.getParticipants().then(participants => {
-        console.log('Participants:', participants);
-      });
+    // Handle leave button click
+    leaveButton.addEventListener('click', () => {
+      daily.leave();
+    });
+
+    // Add event listeners for room events
+    daily.on('joined', () => {
+      // Add our local video to the DOM
+      localVideo.srcObject = daily.localStream.videoTracks[0];
+    });
+
+    daily.on('otherParticipant', participant => {
+      // Add the remote video to the DOM
+      const remoteVideo = document.createElement('video');
+      remoteVideo.srcObject = participant.videoTracks[0];
+      remoteVideos.appendChild(remoteVideo);
+    });
+
+    daily.on('participant-left', participant => {
+      // Remove the remote video from the DOM
+      const remoteVideo = document.querySelector(video[src="${participant.videoTracks[0].id}"]);
+      remoteVideos.removeChild(remoteVideo);
     });
   </script>
 </body>
