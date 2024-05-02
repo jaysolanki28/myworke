@@ -1,79 +1,135 @@
-I want to fetch the data of postMessage.txt file stored on dropbox via dropbox api, and run a function named displayData once the data is fetched. 
-I am providing the code of Reference function to fetch the data, and Main code to keep the modified fetchDataFromDropbox function.
+There are a few issues in the provided code. Here's the corrected code.
 
-Reference function:
-function fetchData() {
-            const response = await fetch('https://content.dropboxapi.com/2/files/download', {
-                method: 'POST',
-                headers: {
-                    'Authorization': 'Bearer ' + dropboxToken,
-                    'Dropbox-API-Arg': JSON.stringify({
-                        path: '/postMessage.txt'
-                    })
-                }
-            });
-            const userData = await response.json();
+1. Function Call:
 
-            } else {
-                showMessage('Invalid email or password. Please try again.', 'red');
-            }
-        }
-Main code:
-<!-- postMessage -->
+You need to move the fetchData() function call to the bottom of the checkToken() function so that the data is fetched after the Dropbox token is obtained.
+
+function checkToken() {
+  let localToken = JSON.parse(localStorage.getItem("localToken"));
+  if (localToken && localToken.expire > new Date().getTime()) {
+    dropboxToken = localToken.token;
+  } else {
+    generateToken('AALu1gsBgjcAAAAAAAAAATLeuJoxd86bwIAnmd9KoDsWC4lRU_SruT9ZUVrfr8hz', '7u6mvcyvv6szugw', 'gka5o3baeaw2lin')
+      .then((token) => {
+        dropboxToken = token;
+        var storeToken = { token: token, expire: new Date().getTime() + (3 * 60 * 60 * 1000) };
+        localStorage.setItem("localToken", JSON.stringify(storeToken));
+      })
+      .catch((error) => {
+        showMessage(error.message, 'red');
+      });
+  }
+
+  // Fetch data after obtaining the Dropbox token
+  fetchData();
+}
+
+
+2. Displaying Data:
+
+The code to display the fetched data is missing. Add the displayData() function to display the data after fetching it.
+
+// Function to display data in expandable buttons
+function displayData(data) {
+  var mn = document.getElementById("mn");
+  mn.innerHTML = ""; // Clear previous content
+  for (var i = data.length - 1; i >= 0; i--) {
+    var item = data[i];
+    var button = document.createElement('button');
+    button.textContent = item.UpdatedOn;
+    button.setAttribute('id', 'userBtn' + i);
+    button.setAttribute('aria-expanded', 'false'); // Aria attribute for screen readers
+    button.setAttribute('onclick', 'displayUser(' + i + ')');
+    mn.appendChild(button);
+
+    var userDetails = document.createElement('div');
+    userDetails.setAttribute('id', 'userDetails' + i);
+    userDetails.style.display = 'none';
+    mn.appendChild(userDetails);
+  }
+}
+
+
+3. Calling displayData Function:
+
+After fetching the data, call the displayData() function to display it.
+
+async function fetchData() {
+  const response = await fetch('https://content.dropboxapi.com/2/files/download', {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Bearer ' + dropboxToken,
+      'Dropbox-API-Arg': JSON.stringify({
+        path: '/postMessage.txt',
+      }),
+    },
+  });
+
+  const data = await response.json();
+  displayData(data); // Call the displayData function to display the fetched data
+}
+
+
+Complete Code:
+
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Post Message</title>
-<style>
-/* Your CSS styles remain unchanged */
-</style>
-</head>
-<body>
-        <div id="postMessageDiv" class="form-container">
-    <header class="headingText" id="div2" tabindex="-1">Post a message</header>
-<textarea id="postMessage" name="post-message" placeholder="Enter your message here..."></textarea>
-            <button id="postMessageButton" onclick="sendMessage()">Post Message</button>
-        </div>
-<div id="mn"></div>
-<div id="alertBox">
-            <p id="validationError" aria-live="assertive" role="alert"></p>
-</div>
-<script>
-        function showMessage(message, color) {
-            const alertBox = document.getElementById('alertBox');
-            const validationError = document.getElementById('validationError');
-            validationError.innerText = message;
-            validationError.style.color = color;
-            alertBox.style.display = 'block';
-setTimeout(function(){
-            validationError.innerText = "";
-alertBox.style.display = 'none';
-}, 15000);
-        }
-function fetchData() {
-            const response = await fetch('https://content.dropboxapi.com/2/files/download', {
-                method: 'POST',
-                headers: {
-                    'Authorization': 'Bearer ' + dropboxToken,
-                    'Dropbox-API-Arg': JSON.stringify({
-                        path: '/postMessage.txt'
-                    })
-                }
-            });
-            const userData = await response.json();
-displayData();
 
-            } else {
-                showMessage('Invalid email or password. Please try again.', 'red');
-            }
-        }
-// Function to display data in expandable buttons
-function displayData() {
-    var mn = document.getElementById("mn");
-    mn.innerHTML = ""; // Clear previous content
-    for (var i = data.length - 1; i >= 0; i--) {
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Post Message</title>
+  <style>
+    /* Your CSS styles remain unchanged */
+  </style>
+</head>
+
+<body>
+  <div id="postMessageDiv" class="form-container">
+    <header class="headingText" id="div2" tabindex="-1">Post a message</header>
+    <textarea id="postMessage" name="post-message" placeholder="Enter your message here..."></textarea>
+    <button id="postMessageButton" onclick="sendMessage()">Post Message</button>
+  </div>
+
+  <div id="mn"></div>
+
+  <div id="alertBox">
+    <p id="validationError" aria-live="assertive" role="alert"></p>
+  </div>
+
+  <script>
+    function showMessage(message, color) {
+      const alertBox = document.getElementById('alertBox');
+      const validationError = document.getElementById('validationError');
+      validationError.innerText = message;
+      validationError.style.color = color;
+      alertBox.style.display = 'block';
+      setTimeout(function() {
+        validationError.innerText = "";
+        alertBox.style.display = 'none';
+      }, 15000);
+    }
+
+    async function fetchData() {
+      const response = await fetch('https://content.dropboxapi.com/2/files/download', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + dropboxToken,
+          'Dropbox-API-Arg': JSON.stringify({
+            path: '/postMessage.txt',
+          }),
+        },
+      });
+
+      const data = await response.json();
+      displayData(data); // Call the displayData function to display the fetched data
+    }
+
+    // Function to display data in expandable buttons
+    function displayData(data) {
+      var mn = document.getElementById("mn");
+      mn.innerHTML = ""; // Clear previous content
+      for (var i = data.length - 1; i >= 0; i--) {
         var item = data[i];
         var button = document.createElement('button');
         button.textContent = item.UpdatedOn;
@@ -86,16 +142,17 @@ function displayData() {
         userDetails.setAttribute('id', 'userDetails' + i);
         userDetails.style.display = 'none';
         mn.appendChild(userDetails);
+      }
     }
-}
-// Function to display user details on button click
-function displayUser(index) {
-    var userDetails = document.getElementById('userDetails' + index);
-    var button = document.getElementById('userBtn' + index);
-    if (userDetails.style.display === 'block') {
+
+    // Function to display user details on button click
+    function displayUser(index) {
+      var userDetails = document.getElementById('userDetails' + index);
+      var button = document.getElementById('userBtn' + index);
+      if (userDetails.style.display === 'block') {
         userDetails.style.display = 'none';
         button.setAttribute('aria-expanded', 'false');
-    } else {
+      } else {
         userDetails.style.display = 'block';
         userDetails.innerHTML = `
             <p>Message updated on: ${data[index].UpdatedOn}</p>
@@ -103,93 +160,123 @@ function displayUser(index) {
             <button onclick="deleteUser('${data[index].UpdatedOn}', '${data[index].PostMessage}')">Delete This Message</button>
         `;
         button.setAttribute('aria-expanded', 'true');
+      }
     }
-}
-// Function to delete a user
-function deleteUser(updatedOn, postMessage) {
-    var postMessages = updatedOn;
-    var confirmation = confirm("Are you sure you want to delete user: " + postMessages + "?");
-    if (confirmation) {
+
+    // Function to delete a user
+    function deleteUser(updatedOn, postMessage) {
+      var postMessages = updatedOn;
+      var confirmation = confirm("Are you sure you want to delete user: " + postMessages + "?");
+      if (confirmation) {
         var index = data.findIndex(function(item) {
-            return item.UpdatedOn === updatedOn && item.PostMessage === postMessage;
+          return item.UpdatedOn === updatedOn && item.PostMessage === postMessage;
         });
         if (index !== -1) {
-            data.splice(index, 1);
-            sendData();
+          data.splice(index, 1);
+          sendData();
         }
+      }
     }
-}
 
-var xhr = new XMLHttpRequest();
+    var xhr = new XMLHttpRequest();
 
-xhr.upload.onprogress = function(evt) {
-    var percentComplete = parseInt(100.0 * evt.loaded / evt.total);
-    // Upload in progress. Do something here with the percent complete.
-};
+    xhr.upload.onprogress = function(evt) {
+      var percentComplete = parseInt(100.0 * evt.loaded / evt.total);
+      // Upload in progress. Do something here with the percent complete.
+    };
 
-xhr.onload = function() {
-    if (xhr.status === 200) {
+    xhr.onload = function() {
+      if (xhr.status === 200) {
         // Upload succeeded. Do something here with the file info.
         alert("Message deleted successfully.");
         fetchData(); // Refresh the data after deletion
-    } else {
+      } else {
         var errorMessage = xhr.response || 'Unable to send your request. Please contact us via email.';
         // Upload failed. Do something here with the error.
         alert("Dropbox error: " + errorMessage);
-    }
-};
+      }
+    };
 
-function sendData() {
-    var gdbbjr = JSON.stringify(data);
-    var blob = new Blob([gdbbjr], { type: "text/plain;charset=utf-8" });
-    var file = new File([blob], "postMessage.txt", { type: "text/plane", lastModified: Date.now() });
-    xhr.open('POST', 'https://content.dropboxapi.com/2/files/upload');
-    xhr.setRequestHeader('Authorization', 'Bearer ' + dropboxToken);
-    xhr.setRequestHeader('Content-Type', 'application/octet-stream');
-    xhr.setRequestHeader('Dropbox-API-Arg', JSON.stringify({
+    function sendData() {
+      var gdbbjr = JSON.stringify(data);
+      var blob = new Blob([gdbbjr], {
+        type: "text/plain;charset=utf-8"
+      });
+      var file = new File([blob], "postMessage.txt", {
+        type: "text/plane",
+        lastModified: Date.now()
+      });
+      xhr.open('POST', 'https://content.dropboxapi.com/2/files/upload');
+      xhr.setRequestHeader('Authorization', 'Bearer ' + dropboxToken);
+      xhr.setRequestHeader('Content-Type', 'application/octet-stream');
+      xhr.setRequestHeader('Dropbox-API-Arg', JSON.stringify({
         path: '/' + file.name,
         'mode': 'overwrite',
         autorename: false,
         mute: false
-    }));
-    xhr.send(file);
-}
-        async function sendMessage() {
-            const postMessage = document.getElementById('postMessage').value;
-    let userData = await fetchDataFromDropbox('/user-accounts.txt');
+      }));
+      xhr.send(file);
+    }
 
-  const now = new Date();
-  const currentDateTime = now.toLocaleString();
+    async function sendMessage() {
+      const postMessage = document.getElementById('postMessage').value;
 
-  userData.push({
-    updatedOn: currentDateTime,
-    PostMessage: postMessage
-  });
+      if (!postMessage) {
+        showMessage('Please enter a message.', 'red');
+        return;
+      }
 
-            // Save updated user data to Dropbox
-            const updatedResponse = await fetch('https://content.dropboxapi.com/2/files/upload', {
-                method: 'POST',
-                headers: {
-                    'Authorization': 'Bearer ' + dropboxToken,
-                    'Content-Type': 'application/octet-stream',
-                    'Dropbox-API-Arg': JSON.stringify({
-                        path: '/postMessage.txt',
-                        'mode': 'overwrite',
-                        autorename: false,
-                        mute: false
-                    })
-                },
-                body: JSON.stringify(userData)
-            });
+      var userData = await fetchDataFromDropbox('/user-accounts.txt');
 
-            showMessage('Message posted successfully!', 'green');
-document.getElementById("postMessage").value = "";
-        fetchData();
+      const now = new Date();
+      const currentDateTime = now.toLocaleString();
+
+      userData.push({
+        updatedOn: currentDateTime,
+        PostMessage: postMessage
+      });
+
+      // Save updated user data to Dropbox
+      const updatedResponse = await fetch('https://content.dropboxapi.com/2/files/upload', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + dropboxToken,
+          'Content-Type': 'application/octet-stream',
+          'Dropbox-API-Arg': JSON.stringify({
+            path: '/postMessage.txt',
+            'mode': 'overwrite',
+            autorename: false,
+            mute: false
+          })
+        },
+        body: JSON.stringify(userData)
+      });
+
+      if (updatedResponse.status === 200) {
+        showMessage('Message posted successfully!', 'green');
+        document.getElementById("postMessage").value = "";
+        fetchData(); // Refresh the data after posting a new message
+      } else {
+        showMessage('Failed to post message. Please try again.', 'red');
+      }
+    }
+
+// Common function to fetch data from Dropbox
+async function fetchDataFromDropbox(path) {
+    const response = await fetch('https://content.dropboxapi.com/2/files/download', {
+        method: 'POST',
+        headers: {
+            'Authorization': 'Bearer ' + dropboxToken,
+            'Dropbox-API-Arg': JSON.stringify({
+                path: path
+            })
         }
-
+    });
+    return await response.json();
+}
 function generateToken(refreshToken, clientId, clientSecret) {
 const url = 'https://api.dropbox.com/oauth2/token';
-const data = `grant_type=refresh_token&refresh_token=${refreshToken}&client_id=${clientId}&client_secret=${clientSecret}`;
+const data = grant_type=refresh_token&refresh_token=${refreshToken}&client_id=${clientId}&client_secret=${clientSecret};
 return fetch(url, {
 method: 'POST',
 headers: {
@@ -214,12 +301,14 @@ function checkToken() {
 let localToken = JSON.parse(localStorage.getItem("localToken"));
 if (localToken && localToken.expire > new Date().getTime()) {
 dropboxToken = localToken.token;
+fetchData();
 } else {
 generateToken('AALu1gsBgjcAAAAAAAAAATLeuJoxd86bwIAnmd9KoDsWC4lRU_SruT9ZUVrfr8hz', '7u6mvcyvv6szugw', 'gka5o3baeaw2lin')
 .then((token) => {
 dropboxToken = token;
 var storeToken = { token: token, expire: new Date().getTime() + (3*60*60*1000)};
 localStorage.setItem("localToken", JSON.stringify(storeToken));
+fetchData();
 })
 .catch((error) => {
 showMessage(error.message, 'red');
@@ -227,8 +316,18 @@ showMessage(error.message, 'red');
 }
 }
 
-fetchData();
 window.addEventListener("load", checkToken);
-</script>
+  </script>
 </body>
 </html>
+
+
+This code includes the following functions:
+
+* sendData(): Sends the updated data to the postMessage.txt file on Dropbox.
+* sendMessage(): Posts a new message to the postMessage.txt file on Dropbox.
+* fetchDataFromDropbox(): Fetches data from a specified path on Dropbox.
+* generateToken(): Generates a new access token if the current one is expired.
+* checkToken(): Checks if the current access token is valid and fetches a new one if needed.
+
+Make sure to replace dropboxToken with your actual Dropbox access token in the code.
