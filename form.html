@@ -1,77 +1,3 @@
-There are a few issues in the provided code. Here's the corrected code.
-
-1. Function Call:
-
-You need to move the fetchData() function call to the bottom of the checkToken() function so that the data is fetched after the Dropbox token is obtained.
-
-function checkToken() {
-  let localToken = JSON.parse(localStorage.getItem("localToken"));
-  if (localToken && localToken.expire > new Date().getTime()) {
-    dropboxToken = localToken.token;
-  } else {
-    generateToken('AALu1gsBgjcAAAAAAAAAATLeuJoxd86bwIAnmd9KoDsWC4lRU_SruT9ZUVrfr8hz', '7u6mvcyvv6szugw', 'gka5o3baeaw2lin')
-      .then((token) => {
-        dropboxToken = token;
-        var storeToken = { token: token, expire: new Date().getTime() + (3 * 60 * 60 * 1000) };
-        localStorage.setItem("localToken", JSON.stringify(storeToken));
-      })
-      .catch((error) => {
-        showMessage(error.message, 'red');
-      });
-  }
-
-  // Fetch data after obtaining the Dropbox token
-  fetchData();
-}
-
-
-2. Displaying Data:
-
-The code to display the fetched data is missing. Add the displayData() function to display the data after fetching it.
-
-// Function to display data in expandable buttons
-function displayData(data) {
-  var mn = document.getElementById("mn");
-  mn.innerHTML = ""; // Clear previous content
-  for (var i = data.length - 1; i >= 0; i--) {
-    var item = data[i];
-    var button = document.createElement('button');
-    button.textContent = item.UpdatedOn;
-    button.setAttribute('id', 'userBtn' + i);
-    button.setAttribute('aria-expanded', 'false'); // Aria attribute for screen readers
-    button.setAttribute('onclick', 'displayUser(' + i + ')');
-    mn.appendChild(button);
-
-    var userDetails = document.createElement('div');
-    userDetails.setAttribute('id', 'userDetails' + i);
-    userDetails.style.display = 'none';
-    mn.appendChild(userDetails);
-  }
-}
-
-
-3. Calling displayData Function:
-
-After fetching the data, call the displayData() function to display it.
-
-async function fetchData() {
-  const response = await fetch('https://content.dropboxapi.com/2/files/download', {
-    method: 'POST',
-    headers: {
-      'Authorization': 'Bearer ' + dropboxToken,
-      'Dropbox-API-Arg': JSON.stringify({
-        path: '/postMessage.txt',
-      }),
-    },
-  });
-
-  const data = await response.json();
-  displayData(data); // Call the displayData function to display the fetched data
-}
-
-
-Complete Code:
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -96,6 +22,7 @@ Complete Code:
   <div id="alertBox">
     <p id="validationError" aria-live="assertive" role="alert"></p>
   </div>
+  <div id="message"></div>
 
   <script>
     function showMessage(message, color) {
@@ -110,20 +37,25 @@ Complete Code:
       }, 15000);
     }
 
-    async function fetchData() {
-      const response = await fetch('https://content.dropboxapi.com/2/files/download', {
-        method: 'POST',
-        headers: {
-          'Authorization': 'Bearer ' + dropboxToken,
-          'Dropbox-API-Arg': JSON.stringify({
-            path: '/postMessage.txt',
-          }),
-        },
-      });
+async function fetchData() {
+  const response = await fetch('https://content.dropboxapi.com/2/files/download', {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Bearer ' + dropboxToken,
+      'Dropbox-API-Arg': JSON.stringify({
+        path: '/postMessage.txt',
+      }),
+    },
+  });
 
-      const data = await response.json();
-      displayData(data); // Call the displayData function to display the fetched data
-    }
+  const data = await response.text();
+  
+  // Display the data in an HTML element with id "message"
+  document.getElementById('message').innerText = data;
+
+  // Get the data from the div with id "message" and display it in the div with id "mn" using displayData function
+  displayData(data);
+}
 
     // Function to display data in expandable buttons
     function displayData(data) {
@@ -182,6 +114,7 @@ Complete Code:
 
     xhr.upload.onprogress = function(evt) {
       var percentComplete = parseInt(100.0 * evt.loaded / evt.total);
+);
       // Upload in progress. Do something here with the percent complete.
     };
 
@@ -276,7 +209,7 @@ async function fetchDataFromDropbox(path) {
 }
 function generateToken(refreshToken, clientId, clientSecret) {
 const url = 'https://api.dropbox.com/oauth2/token';
-const data = grant_type=refresh_token&refresh_token=${refreshToken}&client_id=${clientId}&client_secret=${clientSecret};
+const data = `grant_type=refresh_token&refresh_token=${refreshToken}&client_id=${clientId}&client_secret=${clientSecret}`;
 return fetch(url, {
 method: 'POST',
 headers: {
@@ -320,14 +253,3 @@ window.addEventListener("load", checkToken);
   </script>
 </body>
 </html>
-
-
-This code includes the following functions:
-
-* sendData(): Sends the updated data to the postMessage.txt file on Dropbox.
-* sendMessage(): Posts a new message to the postMessage.txt file on Dropbox.
-* fetchDataFromDropbox(): Fetches data from a specified path on Dropbox.
-* generateToken(): Generates a new access token if the current one is expired.
-* checkToken(): Checks if the current access token is valid and fetches a new one if needed.
-
-Make sure to replace dropboxToken with your actual Dropbox access token in the code.
