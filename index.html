@@ -10,7 +10,8 @@
     <p>Please select your correct date of birth below to check if you meet our age limit rule and are eligible to proceed with the application process.</p>
 <strong id="selectedDate"></strong>
 <strong id="message" aria-live="polite"></strong>
-<input type="date" id="dob" aria-hidden="true">
+<input type="date" id="dob" style="opacity: 0; position: absolute; z-index: -1;">
+
 <button class="continue-button" id="dateButton">Select date of birth of applicant</button>
             <button class="continue-button" id="next1">Continue</button>
 </div>
@@ -301,7 +302,7 @@ function validateStep(step) {
     let alertShown = false;
     if (step === 1) {
         let dob = document.getElementById("dob").value;
-        let age = calculateAge(dob);
+        let age = calculateAgeDetails(dob);
         if (dob === "" && !alertShown) {
             alertMessage("Please select date of birth of the applicant.");
             isValid = false;
