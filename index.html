@@ -68,6 +68,15 @@ button:hover {
 .continue-button:hover {
     background-color: #218838;
 }
+#dob {
+opacity: 0; 
+position: absolute; 
+z-index: -1;
+}
+#dateButton {
+    display: block;}
+#next0 {
+    display: none;}
 
 .prevBtn, .nextBtn {
     width: calc(50% - 5px);
@@ -157,7 +166,8 @@ strong {
     <p>Please select your correct date of birth below to check if you meet our age limit rule and are eligible to proceed with the application process.</p>
 <strong id="selectedDate"></strong>
 <strong id="message" aria-live="polite"></strong>
-<input type="date" id="dob">
+<input type="date" id="dob" aria-hidden="true">
+<button class="continue-button" id="dateButton">Select date of birth of applicant</button>
 
             <button class="continue-button" id="next1">Continue</button>
 </div>
@@ -351,9 +361,7 @@ document.getElementById("alertBox").style.display="none";
 }, 5000);
 }
 
-let today = new Date();
-
-const getMonthName = (month) => {
+let today = new Date();const getMonthName = (month) => {
     const monthNames = [
         'January', 'February', 'March', 'April', 'May', 'June',
         'July', 'August', 'September', 'October', 'November', 'December'
@@ -377,33 +385,34 @@ document.getElementById("dob").addEventListener("change", function () {
         return;
     }
 
-    // Formatting the selected date to (Day Month Year)
     const formattedDate = `${selectedDate.getDate()} ${getMonthName(selectedDate.getMonth())} ${selectedDate.getFullYear()}`;
     document.getElementById("selectedDate").innerHTML = "Selected birthdate:<br>" + formattedDate;
 
-    // Calculate the age in years, months, and days
     const { years, months, days } = calculateAgeDetails(selectedDate);
 
     let ageMessage = `Your age is ${years} ${years === 1 ? "year" : "years"}, ` +
                      `${months} ${months === 1 ? "month" : "months"}, and ` +
                      `${days} ${days === 1 ? "day" : "days"}.`;
 
-    // Show eligibility message
     if (years < 16 || years > 40) {
         document.getElementById("message").innerHTML =
             "Sorry, only individuals aged between 16 and 40 are eligible to fill this form." +
             "<br>" + ageMessage;
+        document.getElementById("dateButton").disabled = true;
     } else {
         document.getElementById("message").innerHTML =
             "Congratulations! You are eligible to proceed." +
             "<br>" + ageMessage +
             "<br>Click continue to begin enrollment.";
+        document.getElementById("next1").style.display = "block";
+        document.getElementById("dateButton").style.display = "none";
+
         document.getElementById("dob").dataset.formattedDate = formattedDate;
         document.getElementById("dob").dataset.age = `${years} years, ${months} months, and ${days} days`;
     }
 });
 
-// Calculate age details (years, months, and days)
+(years, months, and days)
 function calculateAgeDetails(dob) {
     let birthDate = new Date(dob);
 
@@ -412,28 +421,30 @@ function calculateAgeDetails(dob) {
     let days = today.getDate() - birthDate.getDate();
 
     if (months < 0 || (months === 0 && days < 0)) {
-        years--; // Adjust the year if the current month/day is earlier than the birth month/day
+        years--;
         months += 12;
     }
     if (days < 0) {
-        months--; // Adjust the month if the current day is earlier than the birth day
+        months--;
         days += new Date(today.getFullYear(), today.getMonth(), 0).getDate(); // Days in the previous month
     }
 
     return { years, months, days };
 }
 
-// Transition from Step 1 to Step 2
 document.getElementById("next1").addEventListener("click", function () {
-    // Get the selected date and age from Step 1
     const formattedDate = document.getElementById("dob").dataset.formattedDate;
     const age = document.getElementById("dob").dataset.age;
 
-    // Set the values in Step 2
     document.getElementById("your-dob").value = formattedDate;
     document.getElementById("your-age").value = age;
 
 });
+
+document.getElementById("dateButton").addEventListener("click", function () {
+    document.getElementById("dob").click();
+});
+
 
 
 let currentStep = 1;
@@ -1111,7 +1122,7 @@ function validateFileInput(inputId, validFormats, maxSizeKB, dimensions = null) 
 validateFileInput("photo", ["image/jpeg", "image/jpg", "image/png"], 300, { width: 400, height: 500 });
 validateFileInput("aadhaarFront", ["image/jpeg", "image/jpg"], 1024);
 validateFileInput("aadhaarBack", ["image/jpeg", "image/jpg"], 1024);
-validateFileInput("lastEduCertificate", ["image/jpeg", "image/jpg"], 1024);
+validateFileInput("eduCertificate", ["image/jpeg", "image/jpg"], 1024);
 validateFileInput("udid", ["image/jpeg", "image/jpg"], 1024);
 // Function to validate input as alphabets with a single space allowed
 function validateAlphabetsInput(input) {
