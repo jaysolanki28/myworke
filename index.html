@@ -75,7 +75,7 @@ z-index: -1;
 }
 #dateButton {
     display: block;}
-#next0 {
+#next1 {
     display: none;}
 
 .prevBtn, .nextBtn {
@@ -361,7 +361,9 @@ document.getElementById("alertBox").style.display="none";
 }, 5000);
 }
 
-let today = new Date();const getMonthName = (month) => {
+let today = new Date(); 
+
+const getMonthName = (month) => {
     const monthNames = [
         'January', 'February', 'March', 'April', 'May', 'June',
         'July', 'August', 'September', 'October', 'November', 'December'
@@ -388,6 +390,7 @@ document.getElementById("dob").addEventListener("change", function () {
     const formattedDate = `${selectedDate.getDate()} ${getMonthName(selectedDate.getMonth())} ${selectedDate.getFullYear()}`;
     document.getElementById("selectedDate").innerHTML = "Selected birthdate:<br>" + formattedDate;
 
+    // Get age details (years, months, days)
     const { years, months, days } = calculateAgeDetails(selectedDate);
 
     let ageMessage = `Your age is ${years} ${years === 1 ? "year" : "years"}, ` +
@@ -399,6 +402,7 @@ document.getElementById("dob").addEventListener("change", function () {
             "Sorry, only individuals aged between 16 and 40 are eligible to fill this form." +
             "<br>" + ageMessage;
         document.getElementById("dateButton").disabled = true;
+alertMessage("Sorry, only individuals aged between 16 and 40 are eligible to fill this form." + "<br>" + ageMessage);
     } else {
         document.getElementById("message").innerHTML =
             "Congratulations! You are eligible to proceed." +
@@ -406,13 +410,15 @@ document.getElementById("dob").addEventListener("change", function () {
             "<br>Click continue to begin enrollment.";
         document.getElementById("next1").style.display = "block";
         document.getElementById("dateButton").style.display = "none";
+alertMessage("Congratulations! You are eligible to proceed." + "<br>" + ageMessage + "<br>Click continue to begin enrollment.");
 
+        // Store formatted date and age in dataset attributes for transfer to Step 2
         document.getElementById("dob").dataset.formattedDate = formattedDate;
         document.getElementById("dob").dataset.age = `${years} years, ${months} months, and ${days} days`;
     }
 });
 
-(years, months, and days)
+// ✅ Fixed function: calculateAgeDetails
 function calculateAgeDetails(dob) {
     let birthDate = new Date(dob);
 
@@ -432,18 +438,19 @@ function calculateAgeDetails(dob) {
     return { years, months, days };
 }
 
+// ✅ Transfer date & age to Step 2 when clicking "Next"
 document.getElementById("next1").addEventListener("click", function () {
     const formattedDate = document.getElementById("dob").dataset.formattedDate;
     const age = document.getElementById("dob").dataset.age;
 
     document.getElementById("your-dob").value = formattedDate;
     document.getElementById("your-age").value = age;
-
 });
 
 document.getElementById("dateButton").addEventListener("click", function () {
     document.getElementById("dob").click();
 });
+
 
 
 
@@ -970,15 +977,18 @@ document.getElementById("disabilityStatus").addEventListener("change", function 
         document.getElementById("disability-yes").style.display = "block";
         document.getElementById("certificate-no").style.display = "none";
         document.getElementById("certificate-yes").style.display = "none";
+reset();
 validation();
     } else if (disabilityStatus === "No, I have no disability") {
         document.getElementById("disability-yes").style.display = "none";
         document.getElementById("certificate-no").style.display = "none";
         document.getElementById("certificate-yes").style.display = "none";
+reset();
     } else {
         document.getElementById("disability-yes").style.display = "none";
         document.getElementById("certificate-no").style.display = "none";
         document.getElementById("certificate-yes").style.display = "none";
+reset();
 validation();
     }
 });
@@ -989,17 +999,34 @@ document.getElementById("certificateStatus").addEventListener("change", function
     if (certificateStatus === "Yes, I have disability certificate") {
         document.getElementById("certificate-yes").style.display = "block";
         document.getElementById("certificate-no").style.display = "none";
+document.getElementById('agreement').checked = false;
+
+document.getElementById('udid').value = '';
     } else if (certificateStatus === "No, I don't have any disability certificate") {
         document.getElementById("certificate-no").style.display = "block";
         document.getElementById("certificate-yes").style.display = "none";
+document.getElementById('agreement').checked = false;
+
+document.getElementById('udid').value = '';
 validation();
     } else {
         document.getElementById("certificate-no").style.display = "none";
         document.getElementById("certificate-yes").style.display = "none";
+document.getElementById('agreement').checked = false;
+
+document.getElementById('udid').value = '';
 validation();
     }
 });
 
+function reset {
+document.getElementById('disabilityType').selectedIndex = 0;
+document.getElementById('disabilityPercentage').selectedIndex = 0;
+document.getElementById('certificateStatus').selectedIndex = 0;
+document.getElementById('agreement').checked = false;
+
+document.getElementById('udid').value = '';
+}
     document.getElementById('termsConditions').addEventListener('change', function() {
         if (this.checked) {
     alertMessage("You have agreed to the terms and conditions. Thank you!");
@@ -1252,18 +1279,20 @@ function updateAgreementText() {
     const userFullName = document.getElementById("userFullName");
     const agreementCheckbox = document.getElementById("agreement");
 
-    if (firstName && lastName) {
-        const fullName = `${firstName} ${lastName}`;
-        userFullName.textContent = fullName;
-        agreementCheckbox.value = `I, ${fullName}, hereby declare that I do not currently possess any document or official proof to validate my disability status. I understand that as soon as I receive the official document verifying my disability, I am obligated to submit a copy of the document to Saint Joseph's Academy immediately.`;
+    if (agreementCheckbox.checked) {
+        if (firstName && lastName) {
+            const fullName = `${firstName} ${lastName}`;
+            userFullName.textContent = fullName;
+            agreementCheckbox.value = `I, ${fullName}, hereby declare that I do not currently possess any document or official proof to validate my disability status. I understand that as soon as I receive the official document verifying my disability, I am obligated to submit a copy of the document to Saint Joseph's Academy immediately.`;
+        } else {
+            userFullName.textContent = "[Your Name]";
+            agreementCheckbox.value = "";
+        }
     } else {
-        userFullName.textContent = "[Your Name]";
         agreementCheckbox.value = "";
     }
 }
 function displayFormData() {
-const timestamp = document.getElementById("timestamp").value;
-    const age = document.getElementById("your-age").value;
     const firstName = document.getElementById("firstName").value;
     const lastName = document.getElementById("lastName").value;
     const gender = document.getElementById("gender").value;
@@ -1300,18 +1329,18 @@ const timestamp = document.getElementById("timestamp").value;
         <p><strong>Name:</strong> ${firstName} ${lastName}</p>
         <p><strong>Gender:</strong> ${gender}</p>
         <p><strong>Date of Birth:</strong> ${dob}</p>
-        <p><strong>Age:</strong> ${age}</p>
         <p><strong>Mobile Number:</strong> ${mobileNumber}</p>
         <p><strong>WhatsApp Number:</strong> ${whatsappNumber}</p>
+        <p><strong>E-Mail Address:</strong> ${email}</p>
         <p><strong>Parent/Guardian Name:</strong> ${parentFirstName} ${parentLastName}</p>
         <p><strong>Relationship with Parent/Guardian:</strong> ${relationship}</p>
-        <p><strong>Mobile number of Parent/Guardian:</strong> ${parentMobile}</p>
-        <p><strong>WhatsApp number of Parent/Guardian:</strong> ${parentWhatsApp}</p>
+        <p><strong>Mobile number of the Parent/Guardian:</strong> ${parentMobile}</p>
+        <p><strong>WhatsApp number of the Parent/Guardian:</strong> ${parentWhatsApp}</p>
         <p><strong>Address:</strong> ${house}, ${street}, ${area}, ${city}, ${district}, ${state}, India ${pinCode}</p>
         <p><strong>Highest Education:</strong> ${education}</p>
         <p><strong>Selected Course:</strong> ${course}</p>
         <p><strong>Disability Status:</strong> ${disabilityStatus}</p>
-        <p><strong>Disability Type:</strong> ${disabilityType}</p>
+        <p><strong>Type of Disability:</strong> ${disabilityType}</p>
         <p><strong>Percentage of Disability:</strong> ${disabilityPercentage}</p>
         <p><strong>Disability Certificate Status:</strong> ${certificateStatus}</p>
         <p><strong>No Disability Certificate Consent:</strong> ${agreement}</p>
