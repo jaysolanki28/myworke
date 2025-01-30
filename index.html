@@ -980,14 +980,8 @@ document.getElementById("disabilityStatus").addEventListener("change", function 
 reset();
 validation();
     } else if (disabilityStatus === "No, I have no disability") {
-        document.getElementById("disability-yes").style.display = "none";
-        document.getElementById("certificate-no").style.display = "none";
-        document.getElementById("certificate-yes").style.display = "none";
 reset();
     } else {
-        document.getElementById("disability-yes").style.display = "none";
-        document.getElementById("certificate-no").style.display = "none";
-        document.getElementById("certificate-yes").style.display = "none";
 reset();
 validation();
     }
@@ -999,12 +993,16 @@ document.getElementById("certificateStatus").addEventListener("change", function
     if (certificateStatus === "Yes, I have disability certificate") {
         document.getElementById("certificate-yes").style.display = "block";
         document.getElementById("certificate-no").style.display = "none";
+        document.getElementById("certificate-yes-detail").style.display = "blocke";
+        document.getElementById("certificate-no-detail").style.display = "none";
 document.getElementById('agreement').checked = false;
 
 document.getElementById('udid').value = '';
     } else if (certificateStatus === "No, I don't have any disability certificate") {
         document.getElementById("certificate-no").style.display = "block";
         document.getElementById("certificate-yes").style.display = "none";
+        document.getElementById("certificate-no-detail").style.display = "block";
+        document.getElementById("certificate-yes-detail").style.display = "none";
 document.getElementById('agreement').checked = false;
 
 document.getElementById('udid').value = '';
@@ -1012,6 +1010,8 @@ validation();
     } else {
         document.getElementById("certificate-no").style.display = "none";
         document.getElementById("certificate-yes").style.display = "none";
+        document.getElementById("certificate-no-detail").style.display = "none";
+        document.getElementById("certificate-yes-detail").style.display = "none";
 document.getElementById('agreement').checked = false;
 
 document.getElementById('udid').value = '';
@@ -1019,7 +1019,14 @@ validation();
     }
 });
 
-function reset {
+function reset() {
+        document.getElementById("disability-yes").style.display = "none";
+        document.getElementById("certificate-no").style.display = "none";
+        document.getElementById("certificate-yes").style.display = "none";
+        document.getElementById("disability-yes-detail").style.display = "none";
+        document.getElementById("certificate-no-detail").style.display = "none";
+        document.getElementById("certificate-yes-detail").style.display = "none";
+
 document.getElementById('disabilityType').selectedIndex = 0;
 document.getElementById('disabilityPercentage').selectedIndex = 0;
 document.getElementById('certificateStatus').selectedIndex = 0;
@@ -1151,10 +1158,11 @@ validateFileInput("aadhaarFront", ["image/jpeg", "image/jpg"], 1024);
 validateFileInput("aadhaarBack", ["image/jpeg", "image/jpg"], 1024);
 validateFileInput("eduCertificate", ["image/jpeg", "image/jpg"], 1024);
 validateFileInput("udid", ["image/jpeg", "image/jpg"], 1024);
-// Function to validate input as alphabets with a single space allowed
+// Function to validate input as alphabets with only a single space allowed
 function validateAlphabetsInput(input) {
-    return /^[A-Za-z]+(?: [A-Za-z]+)?$/.test(input);
+    return /^[A-Za-z]+(?: [A-Za-z]*)?$/.test(input);
 }
+
 
 function validateMobileNumber(number) {
     // Check if the number starts with 0, 1, 2, 3, 4, or 5
@@ -1224,7 +1232,7 @@ document.getElementById('prev7').addEventListener('click', () => {
 document.getElementById('next1').addEventListener('click', () => {
     if (validateStep(1)) {
     document.getElementById("step1").style.display = "none";
-goToStep(2);
+goToStep(5);
   document.getElementById("div2").focus();
     }
 });
@@ -1293,65 +1301,126 @@ function updateAgreementText() {
     }
 }
 function displayFormData() {
-    const firstName = document.getElementById("firstName").value;
-    const lastName = document.getElementById("lastName").value;
-    const gender = document.getElementById("gender").value;
-    const dob = document.getElementById("your-dob").value;
-    const mobileNumber = document.getElementById("mobileNumber").value;
-    const whatsappNumber = document.getElementById("whatsappNumber").value;
-        const email = document.getElementById("email").value;
-        const parentFirstName = document.getElementById("parentFirstName").value;
-        const parentLastName = document.getElementById("parentLastName").value;
-        const relationship = document.getElementById("relationship").value;
-        const parentMobile = document.getElementById("parentMobile").value;
-        const parentWhatsApp = document.getElementById("parentWhatsApp").value;
-    const state = document.getElementById("state").value;
-    const house = document.getElementById("house").value;
-    const street = document.getElementById("street").value;
-    const area = document.getElementById("area").value;
-    const city = document.getElementById("city").value;
-    const district = document.getElementById("district").value;
-    const pinCode = document.getElementById("pinCode").value;
-    const education = document.getElementById("education").value;
-    const course = document.getElementById("course").value;
-    const disabilityStatus = document.getElementById("disabilityStatus").value;
-    const disabilityType = document.getElementById("disabilityType").value;
-        const disabilityPercentage = document.getElementById("disabilityPercentage").value;
-        const certificateStatus = document.getElementById("certificateStatus").value;
-        const agreement = document.getElementById("agreement").value;
-    const photo = document.getElementById("photo").value;
-    const aadhaarFront = document.getElementById("aadhaarFront").value;
-    const aadhaarBack = document.getElementById("aadhaarBack").value;
-    const udid = document.getElementById("udid").value;
-        const termsConditions = document.getElementById("termsConditions").value;
-        const acknowledgment = document.getElementById("acknowledgment").value;
-    const reviewInfo = `
-        <p><strong>Name:</strong> ${firstName} ${lastName}</p>
-        <p><strong>Gender:</strong> ${gender}</p>
-        <p><strong>Date of Birth:</strong> ${dob}</p>
-        <p><strong>Mobile Number:</strong> ${mobileNumber}</p>
-        <p><strong>WhatsApp Number:</strong> ${whatsappNumber}</p>
-        <p><strong>E-Mail Address:</strong> ${email}</p>
-        <p><strong>Parent/Guardian Name:</strong> ${parentFirstName} ${parentLastName}</p>
-        <p><strong>Relationship with Parent/Guardian:</strong> ${relationship}</p>
-        <p><strong>Mobile number of the Parent/Guardian:</strong> ${parentMobile}</p>
-        <p><strong>WhatsApp number of the Parent/Guardian:</strong> ${parentWhatsApp}</p>
-        <p><strong>Address:</strong> ${house}, ${street}, ${area}, ${city}, ${district}, ${state}, India ${pinCode}</p>
-        <p><strong>Highest Education:</strong> ${education}</p>
-        <p><strong>Selected Course:</strong> ${course}</p>
-        <p><strong>Disability Status:</strong> ${disabilityStatus}</p>
-        <p><strong>Type of Disability:</strong> ${disabilityType}</p>
-        <p><strong>Percentage of Disability:</strong> ${disabilityPercentage}</p>
-        <p><strong>Disability Certificate Status:</strong> ${certificateStatus}</p>
-        <p><strong>No Disability Certificate Consent:</strong> ${agreement}</p>
-        <p><strong>photo:</strong> ${photo}</p>
-        <p><strong>Aadhaar Card Front:</strong> ${aadhaarFront}</p>
-        <p><strong>Aadhaar Card Back:</strong> ${aadhaarBack}</p>
-        <p><strong>Disability Certificate:</strong> ${udid}</p>
-    `;
+    const getValue = (id) => document.getElementById(id)?.value || "Not Provided";
+    const getFile = (id) => document.getElementById(id)?.files[0];
 
-    document.getElementById("reviewInfo").innerHTML = reviewInfo;
+    const firstName = getValue("firstName");
+    const lastName = getValue("lastName");
+    const gender = getValue("gender");
+    const dob = getValue("your-dob");
+    const mobileNumber = getValue("mobileNumber");
+    const whatsappNumber = getValue("whatsappNumber");
+    const email = getValue("email");
+    const parentFirstName = getValue("parentFirstName");
+    const parentLastName = getValue("parentLastName");
+    const relationship = getValue("relationship");
+    const parentMobile = getValue("parentMobile");
+    const parentWhatsApp = getValue("parentWhatsApp");
+    const state = getValue("state");
+    const house = getValue("house");
+    const street = getValue("street");
+    const area = getValue("area");
+    const city = getValue("city");
+    const district = getValue("district");
+    const pinCode = getValue("pinCode");
+    const education = getValue("education");
+    const course = getValue("course");
+    const disabilityStatus = getValue("disabilityStatus");
+    const disabilityType = getValue("disabilityType");
+    const disabilityPercentage = getValue("disabilityPercentage");
+    const certificateStatus = getValue("certificateStatus");
+    const agreement = getValue("agreement");
+
+    // File Inputs
+    const photo = getFile("photo");
+    const aadhaarFront = getFile("aadhaarFront");
+    const aadhaarBack = getFile("aadhaarBack");
+    const eduCertificate = getFile("eduCertificate");
+    const udid = getFile("udid");
+
+    // Helper function to generate image preview
+    const getImagePreview = (file, altText, width, height) => {
+        return file
+            ? `<img src="${URL.createObjectURL(file)}" alt="${altText}" width="${width}" height="${height}">`
+            : "<p>No file selected</p>";
+    };
+
+    const reviewInfo = `
+        <div class="review-section">
+            <h2>Personal Information</h2>
+            <p><strong>Name:</strong> ${firstName} ${lastName}</p>
+            <p><strong>Gender:</strong> ${gender}</p>
+            <p><strong>Date of Birth:</strong> ${dob}</p>
+            <p><strong>Mobile Number:</strong> ${mobileNumber}</p>
+            <p><strong>WhatsApp Number:</strong> ${whatsappNumber}</p>
+            <p><strong>Email Address:</strong> ${email}</p>
+        </div>
+
+        <div class="review-section">
+            <h2>Parent/Guardian Details</h2>
+            <p><strong>Parent/Guardian Name:</strong> ${parentFirstName} ${parentLastName}</p>
+            <p><strong>Relationship:</strong> ${relationship}</p>
+            <p><strong>Parent Mobile Number:</strong> ${parentMobile}</p>
+            <p><strong>Parent WhatsApp Number:</strong> ${parentWhatsApp}</p>
+        </div>
+
+        <div class="review-section">
+            <h2>Address Details</h2>
+            <p><strong>Full Address:</strong> ${house}, ${street}, ${area}, ${city}, ${district}, ${state}, India - ${pinCode}</p>
+        </div>
+
+        <div class="review-section">
+            <h2>Education & Course</h2>
+            <p><strong>Highest Education:</strong> ${education}</p>
+            <p><strong>Selected Course:</strong> ${course}</p>
+        </div>
+
+        <div class="review-section">
+            <h2>Disability Details</h2>
+            <p><strong>Status of Disability:</strong> ${disabilityStatus}</p>
+    <div id="disability-yes-detail">
+            <p><strong>Type of Disability:</strong> ${disabilityType}</p>
+            <p><strong>Percentage of Disability:</strong> ${disabilityPercentage}</p>
+            <p><strong>Status of Disability Certificate:</strong> ${certificateStatus}</p>
+        </div>
+    <div id="certificate-no-detail">
+            <p><strong>No Disability Certificate Consent:</strong> ${agreement}</p>
+        </div>
+        </div>
+
+        <div class="uploaded-documents">
+            <h2>Uploaded Documents</h2>
+
+            <div class="doc">
+                <h3>Passport-Style Photo</h3>
+                ${getImagePreview(photo, "Passport Photo", 200, 250)}
+            </div>
+
+            <div class="doc">
+                <h3>Aadhaar Card (Front)</h3>
+                ${getImagePreview(aadhaarFront, "Aadhaar Front", 400, 300)}
+            </div>
+
+            <div class="doc">
+                <h3>Aadhaar Card (Back)</h3>
+                ${getImagePreview(aadhaarBack, "Aadhaar Back", 400, 300)}
+            </div>
+
+            <div class="doc">
+                <h3>Education Certificate</h3>
+                ${getImagePreview(eduCertificate, "Education Certificate", 400, 300)}
+            </div>
+
+            <div id="certificate-yes-detail" class="doc">
+                <h3>Disability Certificate</h3>
+                ${getImagePreview(udid, "Disability Certificate", 300, 400)}
+            </div>
+        </div>
+    `;
+
+    document.getElementById("reviewInfo").innerHTML = reviewInfo;
 }
+
 // Function to generate a unique registration ID
 function generateRegistrationID() {
     const firstName = document.getElementById("firstName").value.trim();
