@@ -1,76 +1,1448 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Audio Recorder</title>
-</head>
-<body>
+<style>
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+    background-color: #f7f7f7;
+}
 
-  <button id="startRecord">Start Recording</button>
-  <button id="pauseRecord" disabled>Pause Recording</button>
-  <button id="resumeRecord" disabled>Resume Recording</button>
-  <button id="stopRecord" disabled>Stop Recording</button>
+.form-container {
+    max-width: 800px;
+    margin: 30px auto;
+    padding: 20px;
+    background: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+.form-step {
+    display: none;}
 
-  <audio id="audioPlayback" controls></audio>
-  <a id="downloadLink" style="display:none;">Download Recording</a>
+.form-step:first-child {
+    display: block;}
 
-What is this JavaScript trying to say? 
+.headingText {
+    font-size: 1.4rem;
+    font-weight: bold;
+    margin-bottom: 15px;
+    color: #333333;
+}
+
+label {
+    display: block;
+    margin: 10px 0 5px;
+    font-weight: bold;
+    color: #555555;
+}
+
+input, select, button {
+    width: 100%;
+    padding: 10px;
+    margin-bottom: 15px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 1rem;
+}
+
+input[type="checkbox"], {
+    width: auto;
+    margin-right: 10px;
+}
+
+button {
+    background-color: #0073aa;
+    color: #ffffff;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+button:hover {
+    background-color: #005f8c;
+}
+
+.continue-button {
+    background-color: #28a745;
+}
+
+.continue-button:hover {
+    background-color: #218838;
+}
+#dob {
+opacity: 0; 
+position: absolute; 
+z-index: -1;
+}
+#dateButton {
+    display: block;}
+#next1 {
+    display: none;}
+
+.prevBtn, .nextBtn {
+    width: calc(50% - 5px);
+    float: left;
+}
+
+.prevBtn {
+    background-color: #6c757d;
+}
+
+.prevBtn:hover {
+    background-color: #5a6268;
+}
+
+.nextBtn {
+    background-color: #007bff;
+}
+
+.nextBtn:hover {
+    background-color: #0056b3;
+}
+
+.terms-acknowledg {
+    font-size: 0.9rem;
+    margin: 10px 0;
+}
+
+#noteMessage {
+    font-size: 1rem;
+    font-style: italic;
+    color: #333333;
+}
+
+#alertBox {
+    margin-top: 20px;
+    background: #ffeeba;
+    padding: 15px;
+    border: 1px solid #ffc107;
+    border-radius: 5px;
+    color: #856404;
+}
+.review-section {
+    background-color: #f8f9fa;
+    padding: 15px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    border-left: 5px solid #007bff;
+}
+
+.uploaded-documents {
+    margin-top: 20px;
+    background-color: #ffffff;
+    padding: 15px;
+    border-radius: 8px;
+    border: 2px solid #ddd;
+}
+
+.doc {
+    margin-bottom: 15px;
+    text-align: center;
+}
+
+.doc h3 {
+    font-size: 16px;
+    color: #333;
+}
+
+.doc img {
+    display: block;
+    margin: 10px auto;
+    border-radius: 5px;
+    border: 2px solid #ccc;
+}
+
+
+@media (max-width: 768px) {
+    .prevBtn, .nextBtn {
+        width: 100%;
+        float: none;
+        margin-bottom: 10px;
+    }
+
+    input, select, button {
+        font-size: 0.7rem;
+    }
+
+    .headingText {
+        font-size: 1rem;
+    }
+}
+</style>
+
+<div class="form-container">
+    <form target="secret-frame" method="post" id="admissionForm" onsubmit="submitForm()">
+<div class="form-step" id="step1">
+  <h3 class="headingText" id="div1" tabindex="-1">Check eligibility of applicant.<br>Step 1 of 7.</h3>
+  <p class="welcome">Dear applicant, Welcome to Saint Joseph's Academy, where we help students prepare for government exams.</p>
+  <p>To ensure that our applicants meet the eligibility criteria, we have set an age limit for enrollment.</p>
+  <p class="age-limit">Only individuals aged between 16 and 40 years are eligible to apply for our academy.</p>
+  <p>Please select your correct date of birth below to check if you meet our age limit rule and are eligible to proceed with the application process.</p>
+  <strong id="selectedDate"></strong>
+  <strong id="message" aria-live="polite"></strong>
+  <input type="date" id="dob" aria-hidden="true" placeholder="Select your DOB">
+  <button class="continue-button" id="dateButton">Select date of birth of applicant</button>
+  <button class="continue-button" id="next1">Continue</button>
+</div>
+
+<div class="form-step" id="step2">
+  <input type="hidden" id="registrationID" name="registrationID">
+  <input type="hidden" id="timestamp" name="timestamp">
+  <input type="hidden" id="your-age" name="your-age">
+  <h3 class="headingText" id="div2" tabindex="-1">Personal information of the Applicant.<br>Step 2 of 7.</h3>
+  <label id="firstNameLabel" tabindex="-1">First Name: *</label>
+  <input type="text" id="firstName" placeholder="Enter your first name">
+  <label id="lastNameLabel" tabindex="-1">Last Name: *</label>
+  <input type="text" id="lastName" placeholder="Enter your last name">
+  <label id="genderLabel" tabindex="-1">Gender: *</label>
+  <select id="gender">
+    <option value="">Select Gender of the Applicant</option>
+    <option value="male">Male</option>
+    <option value="female">Female</option>
+    <option value="Other">Other</option>
+  </select>
+  <label tabindex="-1">Your Date of birth: *</label>
+  <input type="text" id="your-dob" disabled placeholder="Date of birth will be auto-filled">
+  <label id="mobileNumberLabel" tabindex="-1">Mobile Number: *</label>
+  <input type="tel" id="mobileNumber" placeholder="Enter your mobile number" maxlength="10">
+  <label id="whatsappNumberLabel" tabindex="-1">WhatsApp Number: *</label>
+  <label class="checkBox">
+    <input type="checkbox" id="sameMobile"> Same as Mobile Number
+  </label>
+  <input type="tel" id="whatsappNumber" placeholder="Enter your WhatsApp number" maxlength="10">
+  <label id="emailLabel" tabindex="-1">Email address: *</label>
+  <input type="email" id="email" placeholder="Enter your email address">
+  <button class="nextBtn" id="next2" type="button">Next</button>
+</div>
+
+<div class="form-step" id="step3">
+  <h3 class="headingText" id="div3" tabindex="-1">Parent/Guardian Information.<br>Step 3 of 7.</h3>
+  <label id="parentFirstNameLabel" tabindex="-1">First Name of the Parent/Guardian: *</label>
+  <input type="text" id="parentFirstName" placeholder="Enter parent's first name">
+  <label id="parentLastNameLabel" tabindex="-1">Last Name of the Parent/Guardian: *</label>
+  <input type="text" id="parentLastName" placeholder="Enter parent's last name">
+  <label id="relationshipLabel" tabindex="-1">Relationship with Parent/Guardian: *</label>
+  <select id="relationship">
+    <option value="">Select Relationship with Parent/Guardian</option>
+    <option value="Mother">Mother</option>
+    <option value="Father">Father</option>
+    <option value="Stepparent">Stepparent</option>
+    <option value="Grandparent">Grandparent</option>
+    <option value="Legal Guardian">Legal Guardian</option>
+  </select>
+  <label id="parentMobileLabel" tabindex="-1">Mobile Number of the Parent/Guardian: *</label>
+  <input type="tel" id="parentMobile" placeholder="Enter parent's mobile number" maxlength="10">
+  <label id="parentWhatsAppLabel" tabindex="-1">WhatsApp Number of the Parent/Guardian:</label>
+  <label class="checkBox">
+    <input type="checkbox" id="sameParentMobile"> Same as Mobile Number
+  </label>
+  <input type="tel" id="parentWhatsApp" placeholder="Enter parent's WhatsApp number" maxlength="10">
+  <button class="prevBtn" id="prev3" type="button">Previous</button>
+  <button class="nextBtn" id="next3" type="button">Next</button>
+</div>
+
+<div class="form-step" id="step4">
+  <h3 class="headingText" id="div4" tabindex="-1">Address of the Applicant.<br>Step 4 of 7.</h3>
+  <label id="houseLabel" tabindex="-1">House Number/Building Name: *</label>
+  <input type="text" id="house" placeholder="Enter house number or building name" maxlength="50">
+  <label id="streetLabel" tabindex="-1">Street Name/Locality: *</label>
+  <input type="text" id="street" placeholder="Enter street name or locality" maxlength="50">
+  <label id="areaLabel" tabindex="-1">Area/Village: *</label>
+  <input type="text" id="area" placeholder="Enter area or village" maxlength="50">
+  <label id="cityLabel" tabindex="-1">City/Town/Tehsil: *</label>
+  <input type="text" id="city" placeholder="Enter city, town, or tehsil" maxlength="50">
+  <label id="pinCodeLabel" tabindex="-1">Pin Code: *</label>
+  <input type="tel" id="pinCode" placeholder="Enter your 6-digit PIN code" maxlength="6">
+  <label id="addressLabel" tabindex="-1">Remaining Address: *</label>
+  <input type="text" id="address" disabled placeholder="Address will be auto-filled">
+  <button class="prevBtn" id="prev4" type="button">Previous</button>
+  <button class="nextBtn" id="next4" type="button">Next</button>
+</div>
+
+<div class="form-step" id="step5">
+  <h3 class="headingText" id="div5" tabindex="-1">Additional Information.<br>Step 5 of 7.</h3>
+  <label id="educationLabel" tabindex="-1">Highest Level of Education of the Applicant: *</label>
+  <select id="education">
+    <option value="">Select highest level of education of the Applicant</option>
+    <option value="10th Standard">10th Standard</option>
+    <option value="12th Standard">12th Standard</option>
+    <option value="Diploma">Diploma</option>
+    <option value="Graduate">Graduate</option>
+    <option value="Postgraduate">Postgraduate</option>
+    <option value="Postgraduate and above">Postgraduate and above</option>
+  </select>
+  <label id="courseLabel" tabindex="-1">Select the course in which you want to be enrolled: *</label>
+  <select id="course">
+    <option value="">Select</option>
+    <option value="Maths and Reasoning">Maths and Reasoning</option>
+    <option value="English">English</option>
+    <option value="Both of These, Maths and Reasoning, English">Both of These, Maths and Reasoning, English</option>
+  </select>
+  <label id="disabilityStatusLabel" tabindex="-1">Do you have any disability? *</label>
+  <select id="disabilityStatus">
+    <option value="">Select</option>
+    <option value="Yes, I have disability">Yes, I have disability</option>
+    <option value="No, I have no disability">No, I have no disability</option>
+  </select>
+  <div id="disability-yes" style="display: none;">
+    <label id="disabilityTypeLabel" tabindex="-1">Type of Disability of the Applicant: *</label>
+    <select id="disabilityType">
+      <option value="">Select Type of Disability</option>
+      <option value="Visually Impaired">Visually Impaired (Blind)</option>
+      <option value="Physically Handicap">Physically Handicapped</option>
+    </select>
+    <label id="disabilityPercentageLabel" tabindex="-1">Disability Percentage of the Applicant: *</label>
+    <select id="disabilityPercentage">
+      <option value="">Select Disability Percentage</option>
+      <option value="40%">40%</option>
+      <option value="50%">50%</option>
+      <option value="60%">60%</option>
+      <option value="70%">70%</option>
+      <option value="80%">80%</option>
+      <option value="90%">90%</option>
+      <option value="100%">100%</option>
+    </select>
+    <label id="certificateStatusLabel" tabindex="-1">Do you have any disability certificate? *</label>
+    <select id="certificateStatus">
+      <option value="">Select</option>
+      <option value="Yes, I have disability certificate">Yes, I have disability certificate</option>
+      <option value="No, I don't have any disability certificate">No, I don't have any disability certificate</option>
+    </select>
+  </div>
+  <div id="certificate-no" style="display: none;">
+    <label id="agreementLabel" tabindex="-1">Provide your consent: *</label>
+    <label>
+      <input type="checkbox" id="agreement">
+      <span id="userAgreement">I, [Your Name], hereby declare that I do not currently possess any document or official proof to validate my disability status.</span>
+    </label>
+  </div>
+  <button class="prevBtn" id="prev5" type="button">Previous</button>
+  <button class="nextBtn" id="next5" type="button">Next</button>
+</div>
+
+<div class="form-step" id="step6">
+  <h3 class="headingText" id="div6" tabindex="-1">Upload documents.<br>Step 6 of 7.</h3>
+  <label id="photoLabel" tabindex="-1">Passport style photo: *</label>
+  <input type="file" id="photo" accept="image/*">
+  <label id="aadhaarFrontLabel" tabindex="-1">Aadhaar Card: * (Front Side)</label>
+  <input type="file" id="aadhaarFront" accept="image/jpeg, image/jpg">
+  <label id="aadhaarBackLabel" tabindex="-1">Aadhaar Card: * (Back Side)</label>
+  <input type="file" id="aadhaarBack" accept="image/jpeg, image/jpg">
+  <label id="eduCertificateLabel" tabindex="-1">Highest Education Certificate: *</label>
+  <input type="file" id="eduCertificate" accept="image/jpeg, image/jpg">
+  <div id="certificate-yes" style="display: none;">
+    <label id="udidLabel" tabindex="-1">UDID Card/Disability Certificate: *</label>
+    <input type="file" id="udid" accept="image/jpeg, image/jpg">
+  </div>
+  <button class="prevBtn" id="prev6" type="button">Previous</button>
+  <button class="nextBtn" id="next6" type="button">Next</button>
+</div>
+
+<div class="form-step" id="step7">
+  <h3 class="headingText" id="div7" tabindex="-1">Review your Information: Step 7 of 7.</h3>
+  <div id="reviewInfo"></div>
+  <label class="terms-acknowledg">
+    <input type="checkbox" value="[ ] I have agreed to the terms and conditions." id="termsConditions">
+    [ ] I have agreed to the terms and conditions.
+  </label>
+  <label class="terms-acknowledg">
+    <input type="checkbox" value="[ ] I acknowledged that the information provided in this form is true and accurate to the best of my knowledge" id="acknowledgment">
+    [ ] I acknowledge that the information provided in this form is true and accurate to the best of my knowledge.
+  </label>
+  <strong id="noteMessage">By checking the boxes above, you confirm that you have agreed our terms and conditions and that the information you have provided is correct. Thank you for your submission.</strong>
+  <button class="prevBtn" id="prev7" type="button">Previous</button>
+  <button id="submitBtn" type="submit">Submit</button>
+</div>
+<div id="alertBox">
+  <p id="errorStatus" aria-live="polite"></p>
+</div>
+
+
+<iframe name="secret-frame" width="0" height="0" border="0" style="display: none;"></iframe>
 <script>
-,     let mediaRecorder;
-,     let audioChunks = [];
-,     let isPaused = false;    
-,     document.getElementById("startRecord").addEventListener("click", async () => {
-,         const stream = await navigator.mediaDevices.getUserMedia({
-,             audio: {
-,                 channelCount: 1, // Mono recording
-,                 sampleRate: 48000,
-,                 noiseSuppression: true,
-,                 echoCancellation: true,
-,                 autoGainControl: true
-,             }
-,         });        
-,         mediaRecorder = new MediaRecorder(stream, { mimeType: "audio/webm; codecs=opus" });        
-,         mediaRecorder.ondataavailable = event => {
-,             if (event.data.size > 0) {
-,                 audioChunks.push(event.data);
-,             }
-,         };        
-,         mediaRecorder.onstop = async () => {
-,             const audioBlob = new Blob(audioChunks, { type: "audio/webm" });
-,             const audioUrl = URL.createObjectURL(audioBlob);
-,             document.getElementById("audioPlayback").src = audioUrl;            
-,             const downloadLink = document.getElementById("downloadLink");
-,             downloadLink.href = audioUrl;
-,             downloadLink.download = "recording.mp3";
-,             downloadLink.style.display = "block";
-,         };        
-,         mediaRecorder.start();
-,         document.getElementById("startRecord").disabled = true;
-,         document.getElementById("pauseRecord").disabled = false;
-,         document.getElementById("stopRecord").disabled = false;
-,         audioChunks = [];
-,     });    
-,     document.getElementById("pauseRecord").addEventListener("click", () => {
-,         if (mediaRecorder.state === "recording") {
-,             mediaRecorder.pause();
-,             document.getElementById("pauseRecord").disabled = true;
-,             document.getElementById("resumeRecord").disabled = false;
-,         }
-,     });    
-,     document.getElementById("resumeRecord").addEventListener("click", () => {
-,         if (mediaRecorder.state === "paused") {
-,             mediaRecorder.resume();
-,             document.getElementById("pauseRecord").disabled = false;
-,             document.getElementById("resumeRecord").disabled = true;
-,         }
-,     });    
-,     document.getElementById("stopRecord").addEventListener("click", () => {
-,         mediaRecorder.stop();
-,         document.getElementById("startRecord").disabled = false;
-,         document.getElementById("pauseRecord").disabled = true;
-,         document.getElementById("resumeRecord").disabled = true;
-,         document.getElementById("stopRecord").disabled = true;
-,     });
-, </script>
+function alertMessage(message) {   
+document.getElementById("alertBox").style.display="block";
+document.getElementById("errorStatus").innerHTML = message;
+setTimeout(function(){
+document.getElementById("alertBox").style.display="none";
+    document.getElementById("errorStatus").innerHTML = "";
+}, 5000);
+}
 
-</body>
-</html>
+let today = new Date(); 
+
+const getMonthName = (month) => {
+    const monthNames = [
+        'January', 'February', 'March', 'April', 'May', 'June',
+        'July', 'August', 'September', 'October', 'November', 'December'
+    ];
+    return monthNames[month];
+};
+
+document.getElementById("dob").addEventListener("change", function () {
+    let dob = this.value;
+    let selectedDate = new Date(dob);
+
+    if (!today) {
+        alertMessage("Unable to fetch current date. Please try again.");
+        this.value = "";
+        return;
+    }
+
+    if (selectedDate > today) {
+        alertMessage("Please select a valid date of birth (not a future date).");
+        this.value = ""; // Clear the input field if a future date is selected
+        return;
+    }
+
+    const formattedDate = `${selectedDate.getDate()} ${getMonthName(selectedDate.getMonth())} ${selectedDate.getFullYear()}`;
+    document.getElementById("selectedDate").innerHTML = "Selected birthdate:<br>" + formattedDate;
+
+    // Get age details (years, months, days)
+    const { years, months, days } = calculateAgeDetails(selectedDate);
+
+    let ageMessage = `Your age is ${years} ${years === 1 ? "year" : "years"}, ` +
+                     `${months} ${months === 1 ? "month" : "months"}, and ` +
+                     `${days} ${days === 1 ? "day" : "days"}.`;
+
+    if (years < 16 || years > 40) {
+        document.getElementById("message").innerHTML =
+            "Sorry, only individuals aged between 16 and 40 are eligible to fill this form." +
+            "<br>" + ageMessage;
+        document.getElementById("dateButton").disabled = true;
+alertMessage("Sorry, only individuals aged between 16 and 40 are eligible to fill this form." + "<br>" + ageMessage);
+    } else {
+        document.getElementById("message").innerHTML =
+            "Congratulations! You are eligible to proceed." +
+            "<br>" + ageMessage +
+            "<br>Click continue to begin enrollment.";
+        document.getElementById("next1").style.display = "block";
+        document.getElementById("dateButton").style.display = "none";
+alertMessage("Congratulations! You are eligible to proceed." + "<br>" + ageMessage + "<br>Click continue to begin enrollment.");
+
+        // Store formatted date and age in dataset attributes for transfer to Step 2
+        document.getElementById("dob").dataset.formattedDate = formattedDate;
+        document.getElementById("dob").dataset.age = `${years} years, ${months} months, and ${days} days`;
+    }
+});
+
+// ✅ Fixed function: calculateAgeDetails
+function calculateAgeDetails(dob) {
+    let birthDate = new Date(dob);
+
+    let years = today.getFullYear() - birthDate.getFullYear();
+    let months = today.getMonth() - birthDate.getMonth();
+    let days = today.getDate() - birthDate.getDate();
+
+    if (months < 0 || (months === 0 && days < 0)) {
+        years--;
+        months += 12;
+    }
+    if (days < 0) {
+        months--;
+        days += new Date(today.getFullYear(), today.getMonth(), 0).getDate(); // Days in the previous month
+    }
+
+    return { years, months, days };
+}
+
+// ✅ Transfer date & age to Step 2 when clicking "Next"
+document.getElementById("next1").addEventListener("click", function () {
+    const formattedDate = document.getElementById("dob").dataset.formattedDate;
+    const age = document.getElementById("dob").dataset.age;
+
+    document.getElementById("your-dob").value = formattedDate;
+    document.getElementById("your-age").value = age;
+});
+
+document.getElementById("dateButton").addEventListener("click", function () {
+    document.getElementById("dob").click();
+});
+
+
+
+
+let currentStep = 1;
+
+function validateStep(step) {
+    let isValid = true;
+
+    let alertShown = false;
+    if (step === 1) {
+        let dob = document.getElementById("dob").value;
+        let age = calculateAgeDetails(dob);
+        if (dob === "" && !alertShown) {
+            alertMessage("Please select date of birth of the applicant.");
+            isValid = false;
+            alertShown = true;
+        }
+        if (age < 16 || age > 40 && !alertShown) {
+            alertMessage("Sorry, only individuals aged between 16 and 40 are eligible to fill this form. ");
+            isValid = false;
+            alertShown = true;
+        }
+    }
+    if (step === 2) {
+        let firstName = document.getElementById("firstName").value;
+        let lastName = document.getElementById("lastName").value;
+        let gender = document.getElementById("gender").value;
+    let mobileNumber = document.getElementById("mobileNumber").value;
+    let whatsappNumber = document.getElementById("whatsappNumber").value;
+        let email = document.getElementById("email").value;
+        if (firstName.length < 3 && !alertShown) {
+            document.getElementById("firstNameLabel").focus();
+            alertMessage("Please enter a valid First Name of the Applicant.");
+            isValid = false;
+            alertShown = true;
+        }
+        if (firstName.length > 15 && !alertShown) {
+            document.getElementById("firstNameLabel").focus();
+            alertMessage("Please enter a valid First Name of the Applicant.");
+            isValid = false;
+            alertShown = true;
+        }
+if (!validateAlphabetsInput(firstName) && !alertShown) {
+    document.getElementById("firstNameLabel").focus();
+    alertMessage("Please enter a valid First Name of the Applicant using alphabets only.");
+    isValid = false;
+    alertShown = true;
+}
+        if (lastName.length < 3 && !alertShown) {
+            document.getElementById("lastNameLabel").focus();
+            alertMessage("Please enter a valid Last Name of the Applicant.");
+            isValid = false;
+            alertShown = true;
+        }
+        if (lastName.length > 15 && !alertShown) {
+            document.getElementById("lastNameLabel").focus();
+            alertMessage("Please enter a valid Last Name of the Applicant.");
+            isValid = false;
+            alertShown = true;
+        }
+if (!validateAlphabetsInput(lastName) && !alertShown) {
+    document.getElementById("lastNameLabel").focus();
+    alertMessage("Please enter a valid Last Name of the Applicant using alphabets only.");
+    isValid = false;
+    alertShown = true;
+}
+        if (gender === "" && !alertShown) {
+            document.getElementById("genderLabel").focus();
+            alertMessage("Please select gender of the Applicant.");
+            isValid = false;
+            alertShown = true;
+        }
+        if (mobileNumber.length < 10 && !alertShown) {
+            document.getElementById("mobileNumberLabel").focus();
+            alertMessage("Please enter a valid Mobile Number of the Applicant.");
+            isValid = false;
+            alertShown = true;
+        }
+        if (mobileNumber.length > 10 && !alertShown) {
+            document.getElementById("mobileNumberLabel").focus();
+            alertMessage("Please enter a valid Mobile Number of the Applicant.");
+            isValid = false;
+            alertShown = true;
+        }
+        if (!validateMobileNumber(mobileNumber) && !alertShown) {
+            document.getElementById("mobileNumberLabel").focus();
+    alertMessage("Please enter a valid Mobile Number of the Applicant that consists only of digits, does not contain any symbols or alphabets, does not start with 0-5, and does not have any single digit repeated more than 10 times consecutively.");
+            isValid = false;
+            alertShown = true;
+        }
+        if (whatsappNumber.length < 10 && !alertShown) {
+            document.getElementById("whatsappNumberLabel").focus();
+            alertMessage("Please enter a valid WhatsApp Number of the Applicant.");
+            isValid = false;
+            alertShown = true;
+        }
+        if (whatsappNumber.length > 10 && !alertShown) {
+            document.getElementById("whatsappNumberLabel").focus();
+            alertMessage("Please enter a valid WhatsApp Number of the Applicant.");
+            isValid = false;
+            alertShown = true;
+        }
+        if (!validateMobileNumber(whatsappNumber) && !alertShown) {
+            document.getElementById("whatsappNumberLabel").focus();
+    alertMessage("Please enter a valid WhatsApp Number of the Applicant that consists only of digits, does not contain any symbols or alphabets, does not start with 0-5, and does not have any single digit repeated more than 10 times consecutively.");
+            isValid = false;
+            alertShown = true;
+        }
+        if (email.length < 15 && !alertShown) {
+            document.getElementById("emailLabel").focus();
+            alertMessage("Please enter a valid Email Address of the Applicant.");
+            isValid = false;
+            alertShown = true;
+        }
+        if (email.length > 42 && !alertShown) {
+            document.getElementById("emailLabel").focus();
+            alertMessage("Please enter a valid Email Address of the Applicant.");
+            isValid = false;
+            alertShown = true;
+        }
+        if (!validateEmailAddress(email) && !alertShown) {
+            document.getElementById("emailLabel").focus();
+            alertMessage("Please enter a valid email address of the Applicant from the allowed domains: @gmail.com, @outlook.com, @hotmail.com, @yahoo.com");
+            isValid = false;
+            alertShown = true;
+        }
+}
+    if (step === 3) {
+        let parentFirstName = document.getElementById("parentFirstName").value;
+        let parentLastName = document.getElementById("parentLastName").value;
+        let relationship = document.getElementById("relationship").value;
+        let parentMobile = document.getElementById("parentMobile").value;
+        let parentWhatsApp = document.getElementById("parentWhatsApp").value;
+        if (parentFirstName.length < 3 && !alertShown) {
+            document.getElementById("parentFirstNameLabel").focus();
+            alertMessage("Please enter a valid First Name of the Parent/Guardian.");
+            isValid = false;
+            alertShown = true;
+        }
+        if (parentFirstName.length >15 && !alertShown) {
+            document.getElementById("parentFirstNameLabel").focus();
+            alertMessage("Please enter a valid First Name of the Parent/Guardian.");
+            isValid = false;
+            alertShown = true;
+        }
+if (!validateAlphabetsInput(parentFirstName) && !alertShown) {
+    document.getElementById("parentFirstNameLabel").focus();
+    alertMessage("Please enter a valid First Name of the Parent/Guardian using alphabets only.");
+    isValid = false;
+    alertShown = true;
+}
+        if (parentLastName.length < 3 && !alertShown) {
+            document.getElementById("parentLastNameLabel").focus();
+            alertMessage("Please enter a valid Last Name of the Parent/Guardian.");
+            isValid = false;
+            alertShown = true;
+        }
+        if (parentLastName.length > 15 && !alertShown) {
+            document.getElementById("parentLastNameLabel").focus();
+            alertMessage("Please enter a valid Last Name of the Parent/Guardian.");
+            isValid = false;
+            alertShown = true;
+        }
+if (!validateAlphabetsInput(parentLastName) && !alertShown) {
+    document.getElementById("parentLastNameLabel").focus();
+    alertMessage("Please enter a valid Last Name of the Parent/Guardian using alphabets only.");
+    isValid = false;
+    alertShown = true;
+}
+        if ( relationship === "" && !alertShown) {
+            document.getElementById("relationshipLabel").focus();
+            alertMessage("Please select the type of relationship the Applicant has with the parent/guardian from the dropdown list.");
+            isValid = false;
+            alertShown = true;
+        }
+        if (parentMobile.length < 10 && !alertShown) {
+            document.getElementById("parentMobileLabel").focus();
+            alertMessage("Please enter a valid Mobile Number of the Parent/Guardian.");
+            isValid = false;
+            alertShown = true;
+        }
+        if (parentMobile.length > 10 && !alertShown) {
+            document.getElementById("parentMobileLabel").focus();
+            alertMessage("Please enter a valid Mobile Number of the Parent/Guardian.");
+            isValid = false;
+            alertShown = true;
+        }
+        if (!validateMobileNumber(parentMobile) && !alertShown) {
+            document.getElementById("parentMobileLabel").focus();
+    alertMessage("Please enter a valid Mobile Number of the Parent/Guardian that consists only of digits, does not contain any symbols or alphabets, does not start with 0-5, and does not have any single digit repeated more than 10 times consecutively.");
+            isValid = false;
+            alertShown = true;
+        }
+        if (parentWhatsApp.length < 10 && !alertShown) {
+            document.getElementById("parentWhatsAppLabel").focus();
+            alertMessage("Please enter a valid WhatsApp Number of the Parent/Guardian.");
+            isValid = false;
+            alertShown = true;
+        }
+        if (parentWhatsApp.length > 10 && !alertShown) {
+            document.getElementById("parentWhatsAppLabel").focus();
+            alertMessage("Please enter a valid WhatsApp Number of the Parent/Guardian.");
+            isValid = false;
+            alertShown = true;
+        }
+        if (!validateMobileNumber(parentWhatsApp) && !alertShown) {
+            document.getElementById("parentWhatsAppLabel").focus();
+    alertMessage("Please enter a valid WhatsApp Number of the Parent/Guardian that consists only of digits, does not contain any symbols or alphabets, does not start with 0-5, and does not have any single digit repeated more than 10 times consecutively.");
+            isValid = false;
+            alertShown = true;
+        }
+}
+if (step === 4) {
+    let house = document.getElementById("house").value.trim();
+    let street = document.getElementById("street").value.trim();
+    let area = document.getElementById("area").value.trim();
+    let city = document.getElementById("city").value.trim();
+    let pinCode = document.getElementById("pinCode").value.trim();
+    let address = document.getElementById("address").value;
+
+    if (house === "" && !alertShown) {
+        document.getElementById("houseLabel").focus();
+        alertMessage("Please enter House Number/Building Name.");
+        isValid = false;
+        alertShown = true;
+    }
+
+    if (street === "" && !alertShown) {
+        document.getElementById("streetLabel").focus();
+        alertMessage("Please enter Street Name/Locality.");
+        isValid = false;
+        alertShown = true;
+    }
+
+    if (area === "" && !alertShown) {
+        document.getElementById("areaLabel").focus();
+        alertMessage("Please enter Area/Village.");
+        isValid = false;
+        alertShown = true;
+    }
+
+    if (city === "" && !alertShown) {
+        document.getElementById("cityLabel").focus();
+        alertMessage("Please enter City/Town/Tehsil.");
+        isValid = false;
+        alertShown = true;
+    }
+
+    if (pinCode === "" && !alertShown) {
+        document.getElementById("pinCodeLabel").focus();
+        alertMessage("Please enter Pin Code.");
+        isValid = false;
+        alertShown = true;
+    } else if (pinCode.length !== 6 && !alertShown) {
+        document.getElementById("pinCodeLabel").focus();
+        alertMessage("Please enter a valid 6-digit Pin Code.");
+        isValid = false;
+        alertShown = true;
+    } else if (!/^\d{6}$/.test(pinCode) && !alertShown) {
+        document.getElementById("pinCodeLabel").focus();
+        alertMessage("Pin Code must contain only digits.");
+        isValid = false;
+        alertShown = true;
+    }
+    if (address === "" && !alertShown) {
+        document.getElementById("addressLabel").focus();
+        alertMessage("Remaining address cannot be empty");
+        isValid = false;
+        alertShown = true;
+    }
+
+
+
+
+}
+
+if (step === 5) {
+    let education = document.getElementById("education").value;
+    let course = document.getElementById("course").value;
+    let disabilityStatus = document.getElementById("disabilityStatus").value;
+    let disabilityType = document.getElementById("disabilityType").value;
+    let disabilityPercentage = document.getElementById("disabilityPercentage").value;
+    let certificateStatus = document.getElementById("certificateStatus").value;
+    let agreement = document.getElementById("agreement").checked;
+
+    if (education === "" && !alertShown) {
+        document.getElementById("educationLabel").focus();
+        alertMessage("Please select the highest level of education of the Applicant.");
+        isValid = false;
+        alertShown = true;
+    }
+
+    if (course === "" && !alertShown) {
+        document.getElementById("courseLabel").focus();
+        alertMessage("Please select the course.");
+        isValid = false;
+        alertShown = true;
+    }
+    if (disabilityStatus === "Yes, I have disability") {
+        if (disabilityType === "" && !alertShown) {
+            document.getElementById("disabilityTypeLabel").focus();
+            alertMessage("Please select the Type of Disability of the Applicant.");
+            isValid = false;
+            alertShown = true;
+        }
+
+        if (disabilityPercentage === "" && !alertShown) {
+            document.getElementById("disabilityPercentageLabel").focus();
+            alertMessage("Please select the Disability Percentage of the Applicant.");
+            isValid = false;
+            alertShown = true;
+        }
+
+        if (certificateStatus === "Yes, I have disability certificate") {
+            agreement = true;
+        } else if (certificateStatus === "No, I don't have any disability certificate") {
+            if (!agreement && !alertShown) {
+                document.getElementById("agreementLabel").focus();
+                alertMessage("Please provide your consent to proceed.");
+                isValid = false;
+                alertShown = true;
+            }
+        } else if (certificateStatus === "" && !alertShown) {
+            document.getElementById("certificateStatusLabel").focus();
+            alertMessage("Please select whether you have a Disability Certificate.");
+            isValid = false;
+            alertShown = true;
+        }
+    } else if (disabilityStatus === "No, I have no disability") {
+        disabilityType = true;
+        disabilityPercentage = true;
+        certificateStatus = true;
+        agreement = true;
+    } else if (disabilityStatus === "" && !alertShown) {
+        document.getElementById("disabilityStatusLabel").focus();
+        alertMessage("Please select whether you have any Disability.");
+        isValid = false;
+        alertShown = true;
+    }
+}
+if (step === 6) {
+    let photo = document.getElementById("photo").files[0];
+    let aadhaarFront = document.getElementById("aadhaarFront").files[0];
+    let aadhaarBack = document.getElementById("aadhaarBack").files[0];
+    let eduCertificate = document.getElementById("eduCertificate").files[0];
+    let udid = document.getElementById("udid").files[0];
+    // Validate Passport Size Photo
+    if (photo) {
+        let validFormats = ["image/jpeg", "image/jpg", "image/png"];
+        if (!validFormats.includes(photo.type)) {
+            document.getElementById("photoLabel").focus();
+            alertMessage("Passport photo must be in JPG, JPEG, or PNG format.");
+            isValid = false;
+            alertShown = true;
+        } else if (photo.size > 300 * 1024) { // 300 KB
+            document.getElementById("photoLabel").focus();
+            alertMessage("Passport photo size must not exceed 300 KB.");
+            isValid = false;
+            alertShown = true;
+        } else {
+            let img = new Image();
+            img.onload = function () {
+                if (this.width !== 400 || this.height !== 500) {
+                    document.getElementById("photoLabel").focus();
+                    alertMessage("Passport photo dimensions must be 400x500 pixels.");
+                    isValid = false;
+                    alertShown = true;
+                }
+            };
+            img.src = URL.createObjectURL(photo);
+        }
+    } else if (!alertShown) {
+        document.getElementById("photoLabel").focus();
+        alertMessage("Please upload a passport-style photo.");
+        isValid = false;
+        alertShown = true;
+    }
+
+    // Validate Aadhaar Front
+    if (aadhaarFront) {
+        let validFormats = ["image/jpeg", "image/jpg"];
+        if (!validFormats.includes(aadhaarFront.type)) {
+            document.getElementById("aadhaarFrontLabel").focus();
+            alertMessage("Aadhaar Front must be in JPG or JPEG format.");
+            isValid = false;
+            alertShown = true;
+        } else if (aadhaarFront.size > 1 * 1024 * 1024) { // 1 MB
+            document.getElementById("aadhaarFrontLabel").focus();
+            alertMessage("Aadhaar Front size must not exceed 1 MB.");
+            isValid = false;
+            alertShown = true;
+        }
+    } else if (!alertShown) {
+        document.getElementById("aadhaarFrontLabel").focus();
+        alertMessage("Please upload the front side of the Aadhaar card.");
+        isValid = false;
+        alertShown = true;
+    }
+
+    // Validate Aadhaar Back
+    if (aadhaarBack) {
+        let validFormats = ["image/jpeg", "image/jpg"];
+        if (!validFormats.includes(aadhaarBack.type)) {
+            document.getElementById("aadhaarBackLabel").focus();
+            alertMessage("Aadhaar Back must be in JPG or JPEG format.");
+            isValid = false;
+            alertShown = true;
+        } else if (aadhaarBack.size > 1 * 1024 * 1024) { // 1 MB
+            document.getElementById("aadhaarBackLabel").focus();
+            alertMessage("Aadhaar Back size must not exceed 1 MB.");
+            isValid = false;
+            alertShown = true;
+        }
+    } else if (!alertShown) {
+        document.getElementById("aadhaarBackLabel").focus();
+        alertMessage("Please upload the back side of the Aadhaar card.");
+        isValid = false;
+        alertShown = true;
+    }
+    // Validate education certificate
+    if (eduCertificate) {
+        let validFormats = ["image/jpeg", "image/jpg"];
+        if (!validFormats.includes(eduCertificate.type)) {
+            document.getElementById("eduCertificateLabel").focus();
+            alertMessage("Education certificate must be in JPG or JPEG format.");
+            isValid = false;
+            alertShown = true;
+        } else if (eduCertificate.size > 1 * 1024 * 1024) { // 1 MB
+            document.getElementById("eduCertificateLabel").focus();
+            alertMessage("Education certificate size must not exceed 1 MB.");
+            isValid = false;
+            alertShown = true;
+        }
+    } else if (!alertShown) {
+        document.getElementById("eduCertificateLabel").focus();
+        alertMessage("Please upload the highest education certificate of the applicant.");
+        isValid = false;
+        alertShown = true;
+    }
+    if (document.getElementById("certificate-yes").style.display === "block" && udid) {
+        let validFormats = ["image/jpeg", "image/jpg"];
+        if (!validFormats.includes(udid.type)) {
+            document.getElementById("udidLabel").focus();
+            alertMessage("Disability Certificate must be in JPG or JPEG format.");
+            isValid = false;
+            alertShown = true;
+        } else if (udid.size > 1 * 1024 * 1024) { // 1 MB
+            document.getElementById("udidLabel").focus();
+            alertMessage("Disability Certificate size must not exceed 1 MB.");
+            isValid = false;
+            alertShown = true;
+        }
+    } else if (document.getElementById("certificate-yes").style.display === "block" && !alertShown) {
+        document.getElementById("udidLabel").focus();
+        alertMessage("Please upload the UDID Card/Disability Certificate.");
+        isValid = false;
+        alertShown = true;
+    }
+}
+    if (step === 7) {
+            let termsConditions = document.getElementById("termsConditions").checked;
+            let acknowledgment = document.getElementById("acknowledgment").checked;
+        if (termsConditions == false && !alertShown) {
+document.getElementById("termsConditions").focus();
+            alertMessage("Please agree to the terms and conditions before submitting.");
+            isValid = false;
+            alertShown = true;
+        }
+        if (acknowledgment == false && !alertShown) {
+document.getElementById("acknowledgment").focus();
+            alertMessage("Please acknowledge the information before submitting.");
+            isValid = false;
+            alertShown = true;
+        }
+}
+
+
+    return isValid;
+}
+function handleCheckboxChange(checkboxId, sourceFieldId, targetFieldId, message, labelId) {
+    const checkbox = document.getElementById(checkboxId);
+
+    checkbox.addEventListener('change', function () {
+        const sourceValue = document.getElementById(sourceFieldId).value;
+
+        // Validate the source value
+        if (sourceValue.length !== 10 || !validateMobileNumber(sourceValue)) {
+            alertMessage(message);
+            document.getElementById(labelId).focus();
+            checkbox.checked = false;
+        } else if (this.checked) {
+            document.getElementById(targetFieldId).value = sourceValue;
+            alertMessage("Applied successfully!");
+        } else {
+            document.getElementById(targetFieldId).value = '';
+            validateStep(currentStep);
+        }
+    });
+}
+handleCheckboxChange(
+    'sameMobile',
+    'mobileNumber',
+    'whatsappNumber',
+    "Please enter a valid 10 digit Mobile Number of the Applicant.",
+    'mobileNumberLabel'
+);
+
+handleCheckboxChange(
+    'sameParentMobile',
+    'parentMobile',
+    'parentWhatsApp',
+    "Please enter a valid 10 digit mobile number of the Parent/Guardian.",
+    'parentMobileLabel'
+);
+        document.getElementById("pincode").addEventListener("input", function () {
+            const pinCode = this.value.trim();
+
+            if (pinCode.length === 6) {
+                alertMessage("Fetching location...");
+
+                fetch(`https://geocode.maps.co/search?q=${pinCode}&api_key=679e20e6cfc3f458522763qny884f8c`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.length > 0) {
+                            const location = data[0].display_name;
+                            document.getElementById("address").value = location;
+                            alertMessage(`Location Found: ${location}`);
+                        } else {
+                            document.getElementById("address").value = "";
+                            alertMessage("Invalid PIN Code. No location found.");
+                        }
+                    })
+                    .catch(error => {
+                        console.error("Error fetching location data:", error);
+                        alertMessage("Could not retrieve location.");
+                    });
+            }
+        });
+document.getElementById("disabilityStatus").addEventListener("change", function () {
+    const disabilityStatus = this.value;
+
+    if (disabilityStatus === "Yes, I have disability") {
+        document.getElementById("disability-yes").style.display = "block";
+        document.getElementById("certificate-no").style.display = "none";
+        document.getElementById("certificate-yes").style.display = "none";
+reset();
+validation();
+    } else if (disabilityStatus === "No, I have no disability") {
+        document.getElementById("disability-yes").style.display = "none";
+        document.getElementById("certificate-no").style.display = "none";
+        document.getElementById("certificate-yes").style.display = "none";
+reset();
+    } else {
+        document.getElementById("disability-yes").style.display = "none";
+        document.getElementById("certificate-no").style.display = "none";
+        document.getElementById("certificate-yes").style.display = "none";
+reset();
+validation();
+    }
+});
+
+document.getElementById("certificateStatus").addEventListener("change", function () {
+    const certificateStatus = this.value;
+
+    if (certificateStatus === "Yes, I have disability certificate") {
+        document.getElementById("certificate-yes").style.display = "block";
+        document.getElementById("certificate-no").style.display = "none";
+document.getElementById('agreement').checked = false;
+
+document.getElementById('udid').value = '';
+updateAgreementText();
+    } else if (certificateStatus === "No, I don't have any disability certificate") {
+        document.getElementById("certificate-no").style.display = "block";
+        document.getElementById("certificate-yes").style.display = "none";
+document.getElementById('agreement').checked = false;
+
+document.getElementById('udid').value = '';
+validation();
+    } else {
+        document.getElementById("certificate-no").style.display = "none";
+        document.getElementById("certificate-yes").style.display = "none";
+document.getElementById('agreement').checked = false;
+
+document.getElementById('udid').value = '';
+validation();
+updateAgreementText();
+    }
+});
+
+function reset() {
+document.getElementById('disabilityType').selectedIndex = 0;
+document.getElementById('disabilityPercentage').selectedIndex = 0;
+document.getElementById('certificateStatus').selectedIndex = 0;
+document.getElementById('agreement').checked = false;
+
+document.getElementById('udid').value = '';
+}
+    document.getElementById('termsConditions').addEventListener('change', function() {
+        if (this.checked) {
+    alertMessage("You have agreed to the terms and conditions. Thank you!");
+validation();
+        } else {
+            alertMessage("Please agree to the terms and conditions before submitting.");
+        }
+    });
+    document.getElementById('acknowledgment').addEventListener('change', function() {
+        if (this.checked) {
+    alertMessage("Your information is acknowledged. Thank you!");
+validation();
+        } else {
+            alertMessage("Please acknowledge the information before submitting.");
+        }
+    });
+// Centralized validation setup function
+function setupRealTimeValidation(fieldId, validationFunction, errorMessage) {
+    const field = document.getElementById(fieldId);
+
+    if (field) {
+        field.addEventListener("input", function () {
+            const value = this.value;
+
+            if (!validationFunction(value)) {
+                alertMessage(errorMessage);
+            }
+        });
+    }
+}
+
+// Setup real time validations for all fields
+setupRealTimeValidation(
+    "firstName",
+    validateAlphabetsInput,
+    "Please enter a valid First Name of the Applicant using alphabets only."
+);
+
+setupRealTimeValidation(
+    "lastName",
+    validateAlphabetsInput,
+    "Please enter a valid Last Name of the Applicant using alphabets only."
+);
+
+setupRealTimeValidation(
+    "mobileNumber",
+    validateMobileNumber,
+    "Please enter a valid Mobile Number of the Applicant. It must consist only of digits, start with 6-9, and have exactly 10 digits."
+);
+
+setupRealTimeValidation(
+    "whatsappNumber",
+    validateMobileNumber,
+    "Please enter a valid WhatsApp Number of the Applicant. It must consist only of digits, start with 6-9, and have exactly 10 digits."
+);
+
+setupRealTimeValidation(
+    "parentFirstName",
+    validateAlphabetsInput,
+    "Please enter a valid First Name of the Parent/Guardian using alphabets only."
+);
+
+setupRealTimeValidation(
+    "parentLastName",
+    validateAlphabetsInput,
+    "Please enter a valid Last Name of the Parent/Guardian using alphabets only."
+);
+
+setupRealTimeValidation(
+    "parentMobile",
+    validateMobileNumber,
+    "Please enter a valid Mobile Number of the Parent/Guardian. It must consist only of digits, start with 6-9, and have exactly 10 digits."
+);
+
+setupRealTimeValidation(
+    "parentWhatsApp",
+    validateMobileNumber,
+    "Please enter a valid WhatsApp Number of the Parent/Guardian. It must consist only of digits, start with 6-9, and have exactly 10 digits."
+);
+// Function to validate file uploads in real-time
+function validateFileInput(inputId, validFormats, maxSizeKB, dimensions = null) {
+    document.getElementById(inputId).addEventListener("change", function () {
+        const file = this.files[0];
+        const label = document.getElementById(inputId + "Label");
+
+        if (file) {
+            // Validate file format
+            if (!validFormats.includes(file.type)) {
+                alertMessage(`Invalid file format. Only ${validFormats.join(", ").replace("image/", "").toUpperCase()} allowed.`);
+                this.value = "";
+                label.focus();
+                return;
+            }
+
+            // Validate file size
+            if (file.size > maxSizeKB * 1024) {
+                alertMessage(`File size must not exceed ${maxSizeKB} KB.`);
+                this.value = "";
+                label.focus();
+                return;
+            }
+
+            // Validate image dimensions (if required)
+            if (dimensions) {
+                let img = new Image();
+                img.onload = function () {
+                    if (this.width !== dimensions.width || this.height !== dimensions.height) {
+                        alertMessage(`Invalid dimensions! Must be ${dimensions.width}x${dimensions.height} pixels.`);
+                        document.getElementById(inputId).value = "";
+                        label.focus();
+                    }
+                };
+                img.src = URL.createObjectURL(file);
+            }
+        }
+    });
+}
+
+// Real-time validation setup for Step 6 fields
+validateFileInput("photo", ["image/jpeg", "image/jpg", "image/png"], 300, { width: 400, height: 500 });
+validateFileInput("aadhaarFront", ["image/jpeg", "image/jpg"], 1024);
+validateFileInput("aadhaarBack", ["image/jpeg", "image/jpg"], 1024);
+validateFileInput("eduCertificate", ["image/jpeg", "image/jpg"], 1024);
+validateFileInput("udid", ["image/jpeg", "image/jpg"], 1024);
+// Function to validate input as alphabets with only a single space allowed
+function validateAlphabetsInput(input) {
+    return /^[A-Za-z]+(?: [A-Za-z]*)?$/.test(input);
+}
+
+
+function validateMobileNumber(number) {
+    // Check if the number starts with 0, 1, 2, 3, 4, or 5
+    if (/^[0-5]/.test(number)) {
+        return false;
+    }
+
+    // Check if the number has the same digit repeated more than 10 times consecutively
+    if (/(.)\1{9}/.test(number)) {
+        return false;
+    }
+
+    // Check if the number contains symbols
+    if (/[^0-9]/.test(number)) {
+        return false;
+    }
+
+    // Check if the number contains alphabets
+    if (/[a-zA-Z]/.test(number)) {
+        return false;
+}
+
+    return true;
+}
+// Function for strong validation of email address
+function validateEmailAddress(email) {
+    let allowedDomains = ['gmail.com', 'outlook.com', 'hotmail.com', 'yahoo.com'];
+    let parts = email.split('@');
+    if (parts.length !== 2) {
+        return false;
+    }
+
+    let domain = parts[1];
+    if (!allowedDomains.includes(domain)) {
+        return false;
+    }
+
+    return true;
+}
+
+function goToStep(step) {
+    document.getElementById(`step${currentStep}`).style.display = "none";
+    document.getElementById(`step${step}`).style.display = "block";
+    currentStep = step;
+}
+document.getElementById('prev3').addEventListener('click', () => {
+        goToStep(2);
+  document.getElementById("div2").focus();
+    });
+document.getElementById('prev4').addEventListener('click', () => {
+        goToStep(3);
+  document.getElementById("div3").focus();
+    });
+document.getElementById('prev5').addEventListener('click', () => {
+        goToStep(4);
+  document.getElementById("div4").focus();
+    });
+document.getElementById('prev6').addEventListener('click', () => {
+        goToStep(5);
+  document.getElementById("div5").focus();
+    });
+document.getElementById('prev7').addEventListener('click', () => {
+        goToStep(6);
+  document.getElementById("div6").focus();
+    });
+
+document.getElementById('next1').addEventListener('click', () => {
+    if (validateStep(1)) {
+    document.getElementById("step1").style.display = "none";
+goToStep(2);
+  document.getElementById("div2").focus();
+    }
+});
+
+document.getElementById('next2').addEventListener('click', () => {
+    if (validateStep(2)) {
+goToStep(3);
+  document.getElementById("div3").focus();
+    }
+});
+document.getElementById('next3').addEventListener('click', () => {
+    if (validateStep(3)) {
+goToStep(4);
+  document.getElementById("div4").focus();
+    }
+});
+document.getElementById('next4').addEventListener('click', () => {
+    if (validateStep(4)) {
+goToStep(5);
+updateAgreementText();
+  document.getElementById("div5").focus();
+    }
+});
+
+document.getElementById('next5').addEventListener('click', () => {
+    if (validateStep(5)) {
+goToStep(6);
+  document.getElementById("div6").focus();
+    }
+});
+
+document.getElementById('next6').addEventListener('click', () => {
+    if (validateStep(6)) {
+        displayFormData();
+        goToStep(7); // Navigate to the review step
+  document.getElementById("div7").focus();
+    }
+});
+document.getElementById('submitBtn').addEventListener('click', () => {
+    const registrationID = generateRegistrationID();
+    if (registrationID) {
+        document.getElementById("registrationID").value = registrationID;
+    }
+    if (validateStep(7)) {
+document.getElementById("timestamp").value = getTimestamp();
+    submitForm();
+}
+});
+    function updateAgreementText() {
+        const firstName = document.getElementById("firstName").value.trim();
+        const lastName = document.getElementById("lastName").value.trim();
+        const agreementCheckbox = document.getElementById("agreement");
+        const userAgreement = document.getElementById("userAgreement");
+
+        if (agreementCheckbox.checked) {
+            if (firstName && lastName) {
+                const fullName = `${firstName} ${lastName}`;
+                userAgreement.innerHTML = `I, ${fullName}, hereby declare that I do not currently possess any document or official proof to validate my disability status. I understand that as soon as I receive the official document verifying my disability, I am obligated to submit a copy of the document to Saint Joseph's Academy immediately.`;
+                agreementCheckbox.value = `I, ${fullName}, hereby declare that I do not currently possess any document or official proof to validate my disability status. I understand that as soon as I receive the official document verifying my disability, I am obligated to submit a copy of the document to Saint Joseph's Academy immediately.`;
+            } else {
+                userAgreement.innerHTML = `I, [Your Name], hereby declare that I do not currently possess any document or official proof to validate my disability status.`;
+                agreementCheckbox.value = "";
+            }
+        } else {
+            userAgreement.innerHTML = `I, [Your Name], hereby declare that I do not currently possess any document or official proof to validate my disability status.`;
+            agreementCheckbox.value = "";
+        }
+    }
+
+    document.getElementById("firstName").addEventListener("input", updateAgreementText);
+    document.getElementById("lastName").addEventListener("input", updateAgreementText);
+    document.getElementById("agreement").addEventListener("change", updateAgreementText);
+function displayFormData() {
+    const getValue = (id) => document.getElementById(id)?.value?.trim() || null;
+    const getFile = (id) => document.getElementById(id)?.files[0];
+
+    const fields = [
+        { label: "Name", value: `${getValue("firstName")} ${getValue("lastName")}` },
+        { label: "Gender", value: getValue("gender") },
+        { label: "Date of Birth", value: getValue("your-dob") },
+        { label: "Mobile Number", value: getValue("mobileNumber") },
+        { label: "WhatsApp Number", value: getValue("whatsappNumber") },
+        { label: "Email Address", value: getValue("email") },
+        { label: "Parent/Guardian Name", value: `${getValue("parentFirstName")} ${getValue("parentLastName")}` },
+        { label: "Relationship with Parent/Guardian", value: getValue("relationship") },
+        { label: "Parent Mobile Number", value: getValue("parentMobile") },
+        { label: "Parent WhatsApp Number", value: getValue("parentWhatsApp") },
+        { label: "Address", value: `${getValue("house")}, ${getValue("street")}, ${getValue("area")}, ${getValue("city")}, ${getValue("address")}` },
+        { label: "Highest Education", value: getValue("education") },
+        { label: "Selected Course", value: getValue("course") },
+        { label: "Disability Status", value: getValue("disabilityStatus") },
+        { label: "Type of Disability", value: getValue("disabilityType") },
+        { label: "Percentage of Disability", value: getValue("disabilityPercentage") },
+        { label: "Disability Certificate Status", value: getValue("certificateStatus") },
+        { label: "No Disability Certificate Consent", value: getValue("agreement") }
+    ];
+
+    const images = [
+        { label: "Passport-Style Photo", file: getFile("photo"), width: 100, height: 150 },
+        { label: "Aadhaar Card (Front)", file: getFile("aadhaarFront"), width: 400, height: 300 },
+        { label: "Aadhaar Card (Back)", file: getFile("aadhaarBack"), width: 400, height: 300 },
+        { label: "Education Certificate", file: getFile("eduCertificate"), width: 300, height: 400 },
+        { label: "Disability Certificate", file: getFile("udid"), width: 300, height: 400 }
+    ];
+
+    // Generate text fields preview
+    let textPreview = fields
+        .filter(field => field.value && field.value !== "null") // Remove empty fields
+        .map(field => `<p><strong>${field.label}:</strong> ${field.value}</p>`)
+        .join("");
+
+    // Generate image previews
+    let imagePreview = images
+        .filter(img => img.file) // Remove fields with no selected file
+        .map(img => `
+            <div class="doc">
+                <h3>${img.label}</h3>
+                <img src="${URL.createObjectURL(img.file)}" alt="${img.label}" width="${img.width}" height="${img.height}">
+            </div>
+        `)
+        .join("");
+
+    // Final preview
+    document.getElementById("reviewInfo").innerHTML = `
+        <div class="review-section">
+            <h2>Form Preview</h2>
+            ${textPreview}
+        </div>
+        <div class="uploaded-documents">
+            <h2>Uploaded Documents</h2>
+            ${imagePreview || "<p>No documents uploaded.</p>"}
+        </div>
+    `;
+}
+
+
+// Function to generate a unique registration ID
+function generateRegistrationID() {
+    const firstName = document.getElementById("firstName").value.trim();
+    const lastName = document.getElementById("lastName").value.trim();
+    const gender = document.getElementById("gender").value;
+    const mobileNumber = document.getElementById("mobileNumber").value.trim();
+
+    const firstInitial = firstName.charAt(0).toUpperCase();
+    const lastInitial = lastName.charAt(0).toUpperCase();
+    const genderInitial = gender.charAt(0).toUpperCase();
+    const lastTwoMobileDigits = mobileNumber.slice(-2); // Last two digits of mobile number
+
+    const now = new Date();
+    const formattedDateTime = 
+        String(now.getDate()).padStart(2, '0') +      // DD
+        String(now.getMonth() + 1).padStart(2, '0') + // MM
+        String(now.getFullYear()).slice(-2) +         // YY (last two digits)
+        String(now.getHours()).padStart(2, '0') +     // HH
+        String(now.getMinutes()).padStart(2, '0') +   // MM
+        String(now.getSeconds()).padStart(2, '0');    // SS
+
+    return `SJA${firstInitial}${lastInitial}${genderInitial}${lastTwoMobileDigits}${formattedDateTime}`;
+}
+function getTimestamp() {
+    const now = new Date();
+    const dayName = now.toLocaleDateString("en-US", { weekday: "long" });
+
+    const date = now.getDate();
+    const month = now.toLocaleDateString("en-US", { month: "long" });
+    const year = now.getFullYear();
+
+    const time = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true });
+
+    return `${dayName}, ${date} ${month} ${year}, ${time}`;
+}
+function validation() {   
+setTimeout(function(){
+validateAllStep();
+}, 2500);
+}
+function validateAllStep() {
+    if (validateStep(1) && validateStep(2) && validateStep(3) && validateStep(4) && validateStep(5) && validateStep(6) && validateStep(7)) {
+    alertMessage("Now you are all set to submit this form, click submit button to continue!");
+} else {
+    validateStep(currentStep);
+}
+}
+
+
+
+
+function submitForm() {
+// alertMessage("Not implemented...");
+
+}
+</script>
