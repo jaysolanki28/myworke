@@ -1,1846 +1,257 @@
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
-<style>
-body {
-    font-family: Arial, sans-serif;
-    line-height: 1.6;
-    margin: 0;
-    padding: 0;
-    background-color: #f7f7f7;
-}
-
-.form-container {
-    max-width: 800px;
-    margin: 30px auto;
-    padding: 20px;
-    background: #ffffff;
-    border-radius: 8px;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
-}
-.form-step {
-    display: none;}
-
-.form-step:first-child {
-    display: block;}
-
-.headingText {
-    font-weight: bold;
-            text-align: center;
-    margin-bottom: 15px;
-    color: #333333;
-}
-
-label {
-    display: block;
-    margin: 10px 0 5px;
-    font-weight: bold;
-    color: #555555;
-}
-
-input, select, button {
-    width: 100%;
-    padding: 10px;
-    margin-bottom: 15px;
-    border: 1px solid #ddd;
-    border-radius: 5px;
-    font-size: 1rem;
-}
-
-input[type="checkbox"], {
-    width: auto;
-    margin-right: 10px;
-}
-
-button {
-    background-color: #0073aa;
-    color: #ffffff;
-    border: none;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-}
-
-button:hover {
-    background-color: #005f8c;
-}
-        button:disabled {
-            background-color: #D3D3D3;
-            cursor: not-allowed;
-        }
-#resetBtn {
-    background-color: red;
-}
-
-.continue-button {
-    background-color: #28a745;
-}
-
-.continue-button:hover {
-    background-color: #218838;
-}
-#dob {
-opacity: 0; 
-position: absolute; 
-z-index: -1;
-}
-#dateButton {
-    display: block;}
-    .policies {
-      margin-top: 20px;
-      font-size: 14px;
-    }
-    .policies a {
-      color: #0073aa;
-      text-decoration: none;
-      font-weight: bold;
-    }
-    .policies a:hover {
-      text-decoration: underline;
-    }
-        .actions {
-            margin-top: 20px;
-            text-align: center;
-        }
-        .actions label {
-            font-size: 16px;
-        }
-
-.prevBtn, .nextBtn {
-    width: calc(50% - 5px);
-    float: left;
-}
-
-.prevBtn {
-    background-color: #6c757d;
-}
-
-.prevBtn:hover {
-    background-color: #5a6268;
-}
-
-.nextBtn {
-    background-color: #007bff;
-}
-
-.nextBtn:hover {
-    background-color: #0056b3;
-}
-
-.terms-acknowledg {
-    font-size: 0.9rem;
-    margin: 10px 0;
-}
-
-#noteMessage {
-    font-size: 1rem;
-    font-style: italic;
-    color: #333333;
-}
-
-#alertBox {
-    margin-top: 20px;
-    background: #ffeeba;
-    padding: 15px;
-    border: 1px solid #ffc107;
-    border-radius: 5px;
-    color: #856404;
-}
-.review-section {
-    background-color: #f8f9fa;
-    padding: 15px;
-    margin-bottom: 10px;
-    border-radius: 8px;
-    border-left: 5px solid #007bff;
-}
-
-.uploaded-documents {
-    margin-top: 20px;
-    background-color: #ffffff;
-    padding: 15px;
-    border-radius: 8px;
-    border: 2px solid #ddd;
-}
-
-.doc {
-    margin-bottom: 15px;
-    text-align: center;
-}
-
-.doc h3 {
-    font-size: 16px;
-    color: #333;
-}
-
-.doc img {
-    display: block;
-    margin: 10px auto;
-    border-radius: 5px;
-    border: 2px solid #ccc;
-}
-
-
-@media (max-width: 768px) {
-    .prevBtn, .nextBtn {
-        width: 100%;
-        float: none;
-        margin-bottom: 10px;
-    }
-
-    input, select, button {
-        font-size: 0.7rem;
-    }
-
-    .headingText {
-        font-size: 1rem;
-    }
-}
-</style>
-
-<div class="form-container">
-    <form target="secret-frame" method="post" id="enrollmentForm" onsubmit="submitForm()">
-<div class="form-step" id="step1">
-  <h3 class="headingText" id="div1" tabindex="-1">Check eligibility of applicant.<br>Step 1 of 7.</h3>
-  <p>
-    Dear Applicant,<br>
-    Welcome to <strong>Saint Joseph's Academy</strong>, where we help students prepare for government competitive exams. We are dedicated to empowering students through free and affordable education.
-  </p>
-  <p>
-    To ensure that our applicants meet the eligibility criteria, we have set an age limit for enrollment. Only individuals aged between <strong>16 and 40 years</strong> are eligible to apply.
-  </p>
-  <p>
-    Please select your correct date of birth below to check if you meet our age limit rule and are eligible to proceed with the application process.
-  </p>
-  <strong id="selectedDate"></strong>
-  <strong id="message" aria-live="polite"></strong>
-  <input type="date" id="dob" aria-hidden="true" placeholder="Select your DOB">
-  <button class="continue-button" id="dateButton">Select date of birth of applicant</button>
-    <div class="policies">
-      <p>
-        By proceeding further on this form, you confirm that you have carefully read and accept our 
-        <a href="/enrollment-policy" target="_blank">Enrollment Policy</a>| 
-        <a href="/privacy-policy" target="_blank">Privacy Policy</a>| 
-        <a href="/terms-and-conditions" target="_blank">Terms and Conditions</a> and 
-        <a href="/terms-of-use" target="_blank">Terms of Use</a>.
-      </p>
-</div>
-        <div class="actions">
-            <label>
-                <input type="checkbox" disabled id="termsCheckbox" onclick="clickContinue()"> By submitting the enrollment form, I acknowledge that I have read, understood, and agreed to these terms and conditions.
-            </label>
-  <button class="continue-button" id="next1" disabled>Continue</button>
-        </div>
-</div>
-
-<div class="form-step" id="step2">
-  <input type="hidden" id="registrationID" name="registrationID">
-  <input type="hidden" id="timestamp" name="timestamp">
-  <input type="hidden" id="your-age" name="your-age">
-  <h3 class="headingText" id="div2" tabindex="-1">Personal information of the Applicant.<br>Step 2 of 7.</h3>
-  <label id="firstNameLabel" tabindex="-1">First Name: *</label>
-  <input type="text" id="firstName" placeholder="Enter your first name">
-  <label id="lastNameLabel" tabindex="-1">Last Name: *</label>
-  <input type="text" id="lastName" placeholder="Enter your last name">
-  <label id="genderLabel" tabindex="-1">Gender: *</label>
-  <select id="gender">
-    <option value="">Select Gender of the Applicant</option>
-    <option value="male">Male</option>
-    <option value="female">Female</option>
-    <option value="Other">Other</option>
-  </select>
-  <label tabindex="-1">Your Date of birth: *</label>
-  <input type="text" id="your-dob" disabled placeholder="Date of birth will be auto-filled">
-  <label id="mobileNumberLabel" tabindex="-1">Mobile Number: *</label>
-  <input type="tel" id="mobileNumber" placeholder="Enter your mobile number" maxlength="10">
-  <label id="whatsappNumberLabel" tabindex="-1">WhatsApp Number: *</label>
-  <label class="checkBox">
-    <input type="checkbox" id="sameMobile"> Same as Mobile Number
-  </label>
-  <input type="tel" id="whatsappNumber" placeholder="Enter your WhatsApp number" maxlength="10">
-  <label id="emailLabel" tabindex="-1">Email address: *</label>
-  <input type="email" id="email" placeholder="Enter your email address">
-  <button class="nextBtn" id="next2" type="button">Next</button>
-</div>
-
-<div class="form-step" id="step3">
-  <h3 class="headingText" id="div3" tabindex="-1">Parent/Guardian Information.<br>Step 3 of 7.</h3>
-  <label id="parentFirstNameLabel" tabindex="-1">First Name of the Parent/Guardian: *</label>
-  <input type="text" id="parentFirstName" placeholder="Enter parent's first name">
-  <label id="parentLastNameLabel" tabindex="-1">Last Name of the Parent/Guardian: *</label>
-  <input type="text" id="parentLastName" placeholder="Enter parent's last name">
-  <label id="relationshipLabel" tabindex="-1">Relationship with Parent/Guardian: *</label>
-  <select id="relationship">
-    <option value="">Select Relationship with Parent/Guardian</option>
-    <option value="Mother">Mother</option>
-    <option value="Father">Father</option>
-    <option value="Stepparent">Stepparent</option>
-    <option value="Grandparent">Grandparent</option>
-    <option value="Legal Guardian">Legal Guardian</option>
-  </select>
-  <label id="parentMobileLabel" tabindex="-1">Mobile Number of the Parent/Guardian: *</label>
-  <input type="tel" id="parentMobile" placeholder="Enter parent's mobile number" maxlength="10">
-  <label id="parentWhatsAppLabel" tabindex="-1">WhatsApp Number of the Parent/Guardian:</label>
-  <label class="checkBox">
-    <input type="checkbox" id="sameParentMobile"> Same as Mobile Number
-  </label>
-  <input type="tel" id="parentWhatsApp" placeholder="Enter parent's WhatsApp number" maxlength="10">
-  <button class="prevBtn" id="prev3" type="button">Previous</button>
-  <button class="nextBtn" id="next3" type="button">Next</button>
-</div>
-
-<div class="form-step" id="step4">
-  <h3 class="headingText" id="div4" tabindex="-1">Address of the Applicant.<br>Step 4 of 7.</h3>
-  <label id="houseLabel" tabindex="-1">House Number/Building Name: *</label>
-  <input type="text" id="house" placeholder="Enter house number or building name" maxlength="50">
-  <label id="streetLabel" tabindex="-1">Street Name/Locality: *</label>
-  <input type="text" id="street" placeholder="Enter street name or locality" maxlength="50">
-  <label id="areaLabel" tabindex="-1">Area/Village: *</label>
-  <input type="text" id="area" placeholder="Enter area or village" maxlength="50">
-  <label id="cityLabel" tabindex="-1">City/Town/Tehsil: *</label>
-  <input type="text" id="city" placeholder="Enter city, town, or tehsil" maxlength="50">
-  <label id="pinCodeLabel" tabindex="-1">Pin Code: *</label>
-  <input type="tel" id="pinCode" placeholder="Enter your 6-digit PIN code" maxlength="6">
-  <label id="addressLabel" tabindex="-1">Remaining Address: *</label>
-  <input type="text" id="address" disabled placeholder="Address will be auto-filled">
-  <button class="prevBtn" id="prev4" type="button">Previous</button>
-  <button class="nextBtn" id="next4" type="button">Next</button>
-</div>
-
-<div class="form-step" id="step5">
-  <h3 class="headingText" id="div5" tabindex="-1">Additional Information.<br>Step 5 of 7.</h3>
-  <label id="educationLabel" tabindex="-1">Highest Level of Education of the Applicant: *</label>
-  <select id="education">
-    <option value="">Select highest level of education of the Applicant</option>
-    <option value="10th Standard">10th Standard</option>
-    <option value="12th Standard">12th Standard</option>
-    <option value="Diploma">Diploma</option>
-    <option value="Graduate">Graduate</option>
-    <option value="Postgraduate">Postgraduate</option>
-    <option value="Postgraduate and above">Postgraduate and above</option>
-  </select>
-  <label id="courseLabel" tabindex="-1">Select the course in which you want to be enrolled: *</label>
-  <select id="course">
-    <option value="">Select</option>
-    <option value="Maths and Reasoning">Maths and Reasoning</option>
-    <option value="English">English</option>
-    <option value="Both of These, Maths and Reasoning, English">Both of These, Maths and Reasoning, English</option>
-  </select>
-  <label id="disabilityStatusLabel" tabindex="-1">Do you have any disability? *</label>
-  <select id="disabilityStatus">
-    <option value="">Select</option>
-    <option value="Yes, I have disability">Yes, I have disability</option>
-    <option value="No, I have no disability">No, I have no disability</option>
-  </select>
-  <div id="disability-yes" style="display: none;">
-    <label id="disabilityTypeLabel" tabindex="-1">Type of Disability of the Applicant: *</label>
-    <select id="disabilityType">
-      <option value="">Select Type of Disability</option>
-      <option value="Visually Impaired">Visually Impaired (Blind)</option>
-      <option value="Physically Handicap">Physically Handicapped</option>
-    </select>
-    <label id="disabilityPercentageLabel" tabindex="-1">Disability Percentage of the Applicant: *</label>
-    <select id="disabilityPercentage">
-      <option value="">Select Disability Percentage</option>
-      <option value="40%">40%</option>
-      <option value="50%">50%</option>
-      <option value="60%">60%</option>
-      <option value="70%">70%</option>
-      <option value="80%">80%</option>
-      <option value="90%">90%</option>
-      <option value="100%">100%</option>
-    </select>
-    <label id="certificateStatusLabel" tabindex="-1">Do you have any disability certificate? *</label>
-    <select id="certificateStatus">
-      <option value="">Select</option>
-      <option value="Yes, I have disability certificate">Yes, I have disability certificate</option>
-      <option value="No, I don't have any disability certificate">No, I don't have any disability certificate</option>
-    </select>
-  </div>
-  <div id="certificate-no" style="display: none;">
-    <label id="agreementLabel" tabindex="-1">Provide your consent: *</label>
-    <label>
-      <input type="checkbox" id="agreement">
-      <span id="userAgreement">Provide your consent by checking this checkbox.</span>
-    </label>
-  </div>
-  <button class="prevBtn" id="prev5" type="button">Previous</button>
-  <button class="nextBtn" id="next5" type="button">Next</button>
-</div>
-
-<div class="form-step" id="step6">
-  <h3 class="headingText" id="div6" tabindex="-1">Upload documents.<br>Step 6 of 7.</h3>
-  <label id="photoLabel" tabindex="-1">Passport style photo: *</label>
-  <input type="file" id="photo" accept="image/*">
-  <label id="aadhaarFrontLabel" tabindex="-1">Aadhaar Card: * (Front Side)</label>
-  <input type="file" id="aadhaarFront" accept="image/jpeg, image/jpg">
-  <label id="aadhaarBackLabel" tabindex="-1">Aadhaar Card: * (Back Side)</label>
-  <input type="file" id="aadhaarBack" accept="image/jpeg, image/jpg">
-  <label id="eduCertificateLabel" tabindex="-1">Highest Education Certificate: *</label>
-  <input type="file" id="eduCertificate" accept="image/jpeg, image/jpg">
-  <div id="certificate-yes" style="display: none;">
-    <label id="udidLabel" tabindex="-1">UDID Card/Disability Certificate: *</label>
-    <input type="file" id="udid" accept="image/jpeg, image/jpg">
-  </div>
-  <button class="prevBtn" id="prev6" type="button">Previous</button>
-  <button class="nextBtn" id="next6" type="button">Next</button>
-</div>
-
-<div class="form-step" id="step7">
-  <h3 class="headingText" id="div7" tabindex="-1">Review your Information: Step 7 of 7.</h3>
-  <div id="reviewInfo"></div>
-  <label class="terms-acknowledg">
-    <input type="checkbox" value="[ ] I have agreed to the terms and conditions." id="termsConditions">
-    [ ] I have agreed to the terms and conditions.
-  </label>
-  <label class="terms-acknowledg">
-    <input type="checkbox" value="[ ] I acknowledged that the information provided in this form is true and accurate to the best of my knowledge" id="acknowledgment">
-    [ ] I acknowledge that the information provided in this form is true and accurate to the best of my knowledge.
-  </label>
-  <strong id="noteMessage">By checking the boxes above, you confirm that you have agreed our terms and conditions and that the information you have provided is correct. Thank you for your submission.</strong>
-  <button class="prevBtn" id="prev7" type="button">Previous</button>
-  <button id="submitBtn" type="submit">Submit</button>
-</div>
-  <button type="button" id="resetBtn">Reset Form</button>
-</form>
-
-</div>
-<div id="alertBox">
-  <p id="errorStatus" aria-live="polite"></p>
-</div>
-
-
-<iframe name="secret-frame" width="0" height="0" border="0" style="display: none;"></iframe>
-<div id="pdfContainer" style="display: block;"></div>
 <script>
-function alertMessage(message) {   
-document.getElementById("alertBox").style.display="block";
-document.getElementById("errorStatus").innerHTML = message;
-setTimeout(function(){
-document.getElementById("alertBox").style.display="none";
-    document.getElementById("errorStatus").innerHTML = "";
-}, 5000);
-}
-        function clickContinue() {
-            const checkbox = document.getElementById("termsCheckbox");
-            const button = document.getElementById("next1");
-            button.disabled = !checkbox.checked;
-        }
+    let audio = new Audio();
+    let currentEpisodeIndex = -1;
+    let episodes = [];
+    let displayedCount = 0;
 
-let today = new Date(); 
+async function fetchPodcasts() {
+    const rssUrl = "https://podcasts.files.bbci.co.uk/p09ds7zx.rss";
+    const podcastContainer = document.getElementById('podcastContainer');
 
-const getMonthName = (month) => {
-    const monthNames = [
-        'January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'
-    ];
-    return monthNames[month];
-};
+    podcastContainer.innerHTML = "Loading podcasts...";
 
-document.getElementById("dob").addEventListener("change", function () {
-    let dob = this.value;
-    let selectedDate = new Date(dob);
+    try {
+        const response = await fetch(rssUrl);
+        const rssText = await response.text();
+        const parser = new DOMParser();
+        const rssDoc = parser.parseFromString(rssText, "application/xml");
 
-    if (!today) {
-        alertMessage("Unable to fetch current date. Please try again.");
-        this.value = "";
-        return;
-    }
+        episodes = Array.from(rssDoc.querySelectorAll("item")).map(item => {
+            let rawDate = item.querySelector("pubDate")?.textContent;
+            let formattedDate = "Unknown Date";
 
-    if (selectedDate > today) {
-        alertMessage("Please select a valid date of birth (not a future date).");
-        this.value = ""; // Clear the input field if a future date is selected
-        return;
-    }
-
-    const formattedDate = `${selectedDate.getDate()} ${getMonthName(selectedDate.getMonth())} ${selectedDate.getFullYear()}`;
-    document.getElementById("selectedDate").innerHTML = "Selected birthdate:<br>" + formattedDate;
-
-    const { years, months, days } = calculateAgeDetails(selectedDate);
-
-    let ageMessage = `Your age is ${years} ${years === 1 ? "year" : "years"}, ` +
-                     `${months} ${months === 1 ? "month" : "months"}, and ` +
-                     `${days} ${days === 1 ? "day" : "days"}.`;
-
-    if (years < 16 || years > 40) {
-        document.getElementById("message").innerHTML =
-            "Sorry, only individuals aged between 16 and 40 are eligible to fill this form." +
-            "<br>" + ageMessage;
-        document.getElementById("termsCheckbox").disabled = true;
-        document.getElementById("next1").disabled = true;
-        document.getElementById("dateButton").disabled = true;
-alertMessage("Sorry, only individuals aged between 16 and 40 are eligible to fill this form." + "<br>" + ageMessage);
-    } else {
-        document.getElementById("message").innerHTML =
-            "Congratulations! You are eligible to proceed." +
-            "<br>" + ageMessage +
-            "<br>Accept terms and conditions, and click continue to begin enrollment.";
-        document.getElementById("termsCheckbox").disabled = false;
-        document.getElementById("dateButton").disabled = true;
-
-alertMessage("Congratulations! You are eligible to proceed." + "<br>" + ageMessage + "<br>Accept terms and conditions, and click continue to begin enrollment.");
-
-        document.getElementById("dob").dataset.formattedDate = formattedDate;
-        document.getElementById("dob").dataset.age = `${years} years, ${months} months, and ${days} days`;
-    }
-});
-
-function calculateAgeDetails(dob) {
-    let birthDate = new Date(dob);
-
-    let years = today.getFullYear() - birthDate.getFullYear();
-    let months = today.getMonth() - birthDate.getMonth();
-    let days = today.getDate() - birthDate.getDate();
-
-    if (months < 0 || (months === 0 && days < 0)) {
-        years--;
-        months += 12;
-    }
-    if (days < 0) {
-        months--;
-        days += new Date(today.getFullYear(), today.getMonth(), 0).getDate(); // Days in the previous month
-    }
-
-    return { years, months, days };
-}
-
-document.getElementById("next1").addEventListener("click", function () {
-    const formattedDate = document.getElementById("dob").dataset.formattedDate;
-    const age = document.getElementById("dob").dataset.age;
-
-    document.getElementById("your-dob").value = formattedDate;
-    document.getElementById("your-age").value = age;
-                localStorage.setItem("your-dob", formattedDate);
-                localStorage.setItem("your-age", age);
-});
-
-document.getElementById("dateButton").addEventListener("click", function () {
-    document.getElementById("dob").click();
-});
-
-
-
-
-let currentStep = 1;
-
-function validateStep(step) {
-    let isValid = true;
-
-    let alertShown = false;
-    if (step === 1) {
-        let dob = document.getElementById("dob").value;
-        let age = calculateAgeDetails(dob);
-        if (dob === "" && !alertShown) {
-            alertMessage("Please select date of birth of the applicant.");
-            isValid = false;
-            alertShown = true;
-        }
-        if (age < 16 || age > 40 && !alertShown) {
-            alertMessage("Sorry, only individuals aged between 16 and 40 are eligible to fill this form. ");
-            isValid = false;
-            alertShown = true;
-        }
-    }
-    if (step === 2) {
-        let firstName = document.getElementById("firstName").value;
-        let lastName = document.getElementById("lastName").value;
-        let gender = document.getElementById("gender").value;
-    let mobileNumber = document.getElementById("mobileNumber").value;
-    let whatsappNumber = document.getElementById("whatsappNumber").value;
-        let email = document.getElementById("email").value;
-        if (firstName.length < 3 && !alertShown) {
-            document.getElementById("firstNameLabel").focus();
-            alertMessage("Please enter a valid First Name of the Applicant.");
-            isValid = false;
-            alertShown = true;
-        }
-        if (firstName.length > 15 && !alertShown) {
-            document.getElementById("firstNameLabel").focus();
-            alertMessage("Please enter a valid First Name of the Applicant.");
-            isValid = false;
-            alertShown = true;
-        }
-if (!validateAlphabetsInput(firstName) && !alertShown) {
-    document.getElementById("firstNameLabel").focus();
-    alertMessage("Please enter a valid First Name of the Applicant using alphabets only.");
-    isValid = false;
-    alertShown = true;
-}
-        if (lastName.length < 3 && !alertShown) {
-            document.getElementById("lastNameLabel").focus();
-            alertMessage("Please enter a valid Last Name of the Applicant.");
-            isValid = false;
-            alertShown = true;
-        }
-        if (lastName.length > 15 && !alertShown) {
-            document.getElementById("lastNameLabel").focus();
-            alertMessage("Please enter a valid Last Name of the Applicant.");
-            isValid = false;
-            alertShown = true;
-        }
-if (!validateAlphabetsInput(lastName) && !alertShown) {
-    document.getElementById("lastNameLabel").focus();
-    alertMessage("Please enter a valid Last Name of the Applicant using alphabets only.");
-    isValid = false;
-    alertShown = true;
-}
-        if (gender === "" && !alertShown) {
-            document.getElementById("genderLabel").focus();
-            alertMessage("Please select gender of the Applicant.");
-            isValid = false;
-            alertShown = true;
-        }
-        if (mobileNumber.length < 10 && !alertShown) {
-            document.getElementById("mobileNumberLabel").focus();
-            alertMessage("Please enter a valid Mobile Number of the Applicant.");
-            isValid = false;
-            alertShown = true;
-        }
-        if (mobileNumber.length > 10 && !alertShown) {
-            document.getElementById("mobileNumberLabel").focus();
-            alertMessage("Please enter a valid Mobile Number of the Applicant.");
-            isValid = false;
-            alertShown = true;
-        }
-        if (!validateMobileNumber(mobileNumber) && !alertShown) {
-            document.getElementById("mobileNumberLabel").focus();
-    alertMessage("Please enter a valid Mobile Number of the Applicant that consists only of digits, does not contain any symbols or alphabets, does not start with 0-5, and does not have any single digit repeated more than 10 times consecutively.");
-            isValid = false;
-            alertShown = true;
-        }
-        if (whatsappNumber.length < 10 && !alertShown) {
-            document.getElementById("whatsappNumberLabel").focus();
-            alertMessage("Please enter a valid WhatsApp Number of the Applicant.");
-            isValid = false;
-            alertShown = true;
-        }
-        if (whatsappNumber.length > 10 && !alertShown) {
-            document.getElementById("whatsappNumberLabel").focus();
-            alertMessage("Please enter a valid WhatsApp Number of the Applicant.");
-            isValid = false;
-            alertShown = true;
-        }
-        if (!validateMobileNumber(whatsappNumber) && !alertShown) {
-            document.getElementById("whatsappNumberLabel").focus();
-    alertMessage("Please enter a valid WhatsApp Number of the Applicant that consists only of digits, does not contain any symbols or alphabets, does not start with 0-5, and does not have any single digit repeated more than 10 times consecutively.");
-            isValid = false;
-            alertShown = true;
-        }
-        if (email.length < 15 && !alertShown) {
-            document.getElementById("emailLabel").focus();
-            alertMessage("Please enter a valid Email Address of the Applicant.");
-            isValid = false;
-            alertShown = true;
-        }
-        if (email.length > 42 && !alertShown) {
-            document.getElementById("emailLabel").focus();
-            alertMessage("Please enter a valid Email Address of the Applicant.");
-            isValid = false;
-            alertShown = true;
-        }
-        if (!validateEmailAddress(email) && !alertShown) {
-            document.getElementById("emailLabel").focus();
-            alertMessage("Please enter a valid email address of the Applicant from the allowed domains: @gmail.com, @outlook.com, @hotmail.com, @yahoo.com");
-            isValid = false;
-            alertShown = true;
-        }
-}
-    if (step === 3) {
-        let parentFirstName = document.getElementById("parentFirstName").value;
-        let parentLastName = document.getElementById("parentLastName").value;
-        let relationship = document.getElementById("relationship").value;
-        let parentMobile = document.getElementById("parentMobile").value;
-        let parentWhatsApp = document.getElementById("parentWhatsApp").value;
-        if (parentFirstName.length < 3 && !alertShown) {
-            document.getElementById("parentFirstNameLabel").focus();
-            alertMessage("Please enter a valid First Name of the Parent/Guardian.");
-            isValid = false;
-            alertShown = true;
-        }
-        if (parentFirstName.length >15 && !alertShown) {
-            document.getElementById("parentFirstNameLabel").focus();
-            alertMessage("Please enter a valid First Name of the Parent/Guardian.");
-            isValid = false;
-            alertShown = true;
-        }
-if (!validateAlphabetsInput(parentFirstName) && !alertShown) {
-    document.getElementById("parentFirstNameLabel").focus();
-    alertMessage("Please enter a valid First Name of the Parent/Guardian using alphabets only.");
-    isValid = false;
-    alertShown = true;
-}
-        if (parentLastName.length < 3 && !alertShown) {
-            document.getElementById("parentLastNameLabel").focus();
-            alertMessage("Please enter a valid Last Name of the Parent/Guardian.");
-            isValid = false;
-            alertShown = true;
-        }
-        if (parentLastName.length > 15 && !alertShown) {
-            document.getElementById("parentLastNameLabel").focus();
-            alertMessage("Please enter a valid Last Name of the Parent/Guardian.");
-            isValid = false;
-            alertShown = true;
-        }
-if (!validateAlphabetsInput(parentLastName) && !alertShown) {
-    document.getElementById("parentLastNameLabel").focus();
-    alertMessage("Please enter a valid Last Name of the Parent/Guardian using alphabets only.");
-    isValid = false;
-    alertShown = true;
-}
-        if ( relationship === "" && !alertShown) {
-            document.getElementById("relationshipLabel").focus();
-            alertMessage("Please select the type of relationship the Applicant has with the parent/guardian from the dropdown list.");
-            isValid = false;
-            alertShown = true;
-        }
-        if (parentMobile.length < 10 && !alertShown) {
-            document.getElementById("parentMobileLabel").focus();
-            alertMessage("Please enter a valid Mobile Number of the Parent/Guardian.");
-            isValid = false;
-            alertShown = true;
-        }
-        if (parentMobile.length > 10 && !alertShown) {
-            document.getElementById("parentMobileLabel").focus();
-            alertMessage("Please enter a valid Mobile Number of the Parent/Guardian.");
-            isValid = false;
-            alertShown = true;
-        }
-        if (!validateMobileNumber(parentMobile) && !alertShown) {
-            document.getElementById("parentMobileLabel").focus();
-    alertMessage("Please enter a valid Mobile Number of the Parent/Guardian that consists only of digits, does not contain any symbols or alphabets, does not start with 0-5, and does not have any single digit repeated more than 10 times consecutively.");
-            isValid = false;
-            alertShown = true;
-        }
-        if (parentWhatsApp.length < 10 && !alertShown) {
-            document.getElementById("parentWhatsAppLabel").focus();
-            alertMessage("Please enter a valid WhatsApp Number of the Parent/Guardian.");
-            isValid = false;
-            alertShown = true;
-        }
-        if (parentWhatsApp.length > 10 && !alertShown) {
-            document.getElementById("parentWhatsAppLabel").focus();
-            alertMessage("Please enter a valid WhatsApp Number of the Parent/Guardian.");
-            isValid = false;
-            alertShown = true;
-        }
-        if (!validateMobileNumber(parentWhatsApp) && !alertShown) {
-            document.getElementById("parentWhatsAppLabel").focus();
-    alertMessage("Please enter a valid WhatsApp Number of the Parent/Guardian that consists only of digits, does not contain any symbols or alphabets, does not start with 0-5, and does not have any single digit repeated more than 10 times consecutively.");
-            isValid = false;
-            alertShown = true;
-        }
-}
-if (step === 4) {
-    let house = document.getElementById("house").value.trim();
-    let street = document.getElementById("street").value.trim();
-    let area = document.getElementById("area").value.trim();
-    let city = document.getElementById("city").value.trim();
-    let pinCode = document.getElementById("pinCode").value.trim();
-    let address = document.getElementById("address").value;
-
-    if (house === "" && !alertShown) {
-        document.getElementById("houseLabel").focus();
-        alertMessage("Please enter House Number/Building Name.");
-        isValid = false;
-        alertShown = true;
-    }
-
-    if (street === "" && !alertShown) {
-        document.getElementById("streetLabel").focus();
-        alertMessage("Please enter Street Name/Locality.");
-        isValid = false;
-        alertShown = true;
-    }
-
-    if (area === "" && !alertShown) {
-        document.getElementById("areaLabel").focus();
-        alertMessage("Please enter Area/Village.");
-        isValid = false;
-        alertShown = true;
-    }
-
-    if (city === "" && !alertShown) {
-        document.getElementById("cityLabel").focus();
-        alertMessage("Please enter City/Town/Tehsil.");
-        isValid = false;
-        alertShown = true;
-    }
-
-    if (pinCode === "" && !alertShown) {
-        document.getElementById("pinCodeLabel").focus();
-        alertMessage("Please enter Pin Code.");
-        isValid = false;
-        alertShown = true;
-    } else if (pinCode.length !== 6 && !alertShown) {
-        document.getElementById("pinCodeLabel").focus();
-        alertMessage("Please enter a valid 6-digit Pin Code.");
-        isValid = false;
-        alertShown = true;
-    } else if (!/^\d{6}$/.test(pinCode) && !alertShown) {
-        document.getElementById("pinCodeLabel").focus();
-        alertMessage("Pin Code must contain only digits.");
-        isValid = false;
-        alertShown = true;
-    }
-    if (address === "" && !alertShown) {
-        document.getElementById("addressLabel").focus();
-        alertMessage("Remaining address cannot be empty");
-        isValid = false;
-        alertShown = true;
-    }
-
-
-
-
-}
-
-if (step === 5) {
-    let education = document.getElementById("education").value;
-    let course = document.getElementById("course").value;
-    let disabilityStatus = document.getElementById("disabilityStatus").value;
-    let disabilityType = document.getElementById("disabilityType").value;
-    let disabilityPercentage = document.getElementById("disabilityPercentage").value;
-    let certificateStatus = document.getElementById("certificateStatus").value;
-    let agreement = document.getElementById("agreement").checked;
-
-    if (education === "" && !alertShown) {
-        document.getElementById("educationLabel").focus();
-        alertMessage("Please select the highest level of education of the Applicant.");
-        isValid = false;
-        alertShown = true;
-    }
-
-    if (course === "" && !alertShown) {
-        document.getElementById("courseLabel").focus();
-        alertMessage("Please select the course.");
-        isValid = false;
-        alertShown = true;
-    }
-    if (disabilityStatus === "Yes, I have disability") {
-        if (disabilityType === "" && !alertShown) {
-            document.getElementById("disabilityTypeLabel").focus();
-            alertMessage("Please select the Type of Disability of the Applicant.");
-            isValid = false;
-            alertShown = true;
-        }
-
-        if (disabilityPercentage === "" && !alertShown) {
-            document.getElementById("disabilityPercentageLabel").focus();
-            alertMessage("Please select the Disability Percentage of the Applicant.");
-            isValid = false;
-            alertShown = true;
-        }
-
-        if (certificateStatus === "Yes, I have disability certificate") {
-            agreement = true;
-        } else if (certificateStatus === "No, I don't have any disability certificate") {
-            if (!agreement && !alertShown) {
-                document.getElementById("agreementLabel").focus();
-                alertMessage("Please provide your consent to proceed.");
-                isValid = false;
-                alertShown = true;
+            if (rawDate) {
+                let dateObj = new Date(rawDate);
+                formattedDate = dateObj.toLocaleDateString("en-GB");
             }
-        } else if (certificateStatus === "" && !alertShown) {
-            document.getElementById("certificateStatusLabel").focus();
-            alertMessage("Please select whether you have a Disability Certificate.");
-            isValid = false;
-            alertShown = true;
-        }
-    } else if (disabilityStatus === "No, I have no disability") {
-        disabilityType = true;
-        disabilityPercentage = true;
-        certificateStatus = true;
-        agreement = true;
-    } else if (disabilityStatus === "" && !alertShown) {
-        document.getElementById("disabilityStatusLabel").focus();
-        alertMessage("Please select whether you have any Disability.");
-        isValid = false;
-        alertShown = true;
-    }
-}
-if (step === 6) {
-    let photo = document.getElementById("photo").files[0];
-    let aadhaarFront = document.getElementById("aadhaarFront").files[0];
-    let aadhaarBack = document.getElementById("aadhaarBack").files[0];
-    let eduCertificate = document.getElementById("eduCertificate").files[0];
-    let udid = document.getElementById("udid").files[0];
-    // Validate Passport Size Photo
-    if (photo) {
-        let validFormats = ["image/jpeg", "image/jpg", "image/png"];
-        if (!validFormats.includes(photo.type)) {
-            document.getElementById("photoLabel").focus();
-            alertMessage("Passport photo must be in JPG, JPEG, or PNG format.");
-            isValid = false;
-            alertShown = true;
-        } else if (photo.size > 300 * 1024) { // 300 KB
-            document.getElementById("photoLabel").focus();
-            alertMessage("Passport photo size must not exceed 300 KB.");
-            isValid = false;
-            alertShown = true;
-        } else {
-            let img = new Image();
-            img.onload = function () {
-                if (this.width !== 400 || this.height !== 500) {
-                    document.getElementById("photoLabel").focus();
-                    alertMessage("Passport photo dimensions must be 400x500 pixels.");
-                    isValid = false;
-                    alertShown = true;
-                }
+
+            let rawDuration = item.querySelector("itunes\\:duration, duration")?.textContent || "Unknown Duration";
+            let formattedDuration = formatDuration(rawDuration);
+
+            return {
+                title: item.querySelector("title").textContent,
+                audioUrl: item.querySelector("enclosure")?.getAttribute("url"),
+                date: formattedDate,
+                duration: formattedDuration
             };
-            img.src = URL.createObjectURL(photo);
-        }
-    } else if (!alertShown) {
-        document.getElementById("photoLabel").focus();
-        alertMessage("Please upload a passport-style photo.");
-        isValid = false;
-        alertShown = true;
-    }
-
-    // Validate Aadhaar Front
-    if (aadhaarFront) {
-        let validFormats = ["image/jpeg", "image/jpg"];
-        if (!validFormats.includes(aadhaarFront.type)) {
-            document.getElementById("aadhaarFrontLabel").focus();
-            alertMessage("Aadhaar Front must be in JPG or JPEG format.");
-            isValid = false;
-            alertShown = true;
-        } else if (aadhaarFront.size > 1 * 1024 * 1024) { // 1 MB
-            document.getElementById("aadhaarFrontLabel").focus();
-            alertMessage("Aadhaar Front size must not exceed 1 MB.");
-            isValid = false;
-            alertShown = true;
-        }
-    } else if (!alertShown) {
-        document.getElementById("aadhaarFrontLabel").focus();
-        alertMessage("Please upload the front side of the Aadhaar card.");
-        isValid = false;
-        alertShown = true;
-    }
-
-    // Validate Aadhaar Back
-    if (aadhaarBack) {
-        let validFormats = ["image/jpeg", "image/jpg"];
-        if (!validFormats.includes(aadhaarBack.type)) {
-            document.getElementById("aadhaarBackLabel").focus();
-            alertMessage("Aadhaar Back must be in JPG or JPEG format.");
-            isValid = false;
-            alertShown = true;
-        } else if (aadhaarBack.size > 1 * 1024 * 1024) { // 1 MB
-            document.getElementById("aadhaarBackLabel").focus();
-            alertMessage("Aadhaar Back size must not exceed 1 MB.");
-            isValid = false;
-            alertShown = true;
-        }
-    } else if (!alertShown) {
-        document.getElementById("aadhaarBackLabel").focus();
-        alertMessage("Please upload the back side of the Aadhaar card.");
-        isValid = false;
-        alertShown = true;
-    }
-    // Validate education certificate
-    if (eduCertificate) {
-        let validFormats = ["image/jpeg", "image/jpg"];
-        if (!validFormats.includes(eduCertificate.type)) {
-            document.getElementById("eduCertificateLabel").focus();
-            alertMessage("Education certificate must be in JPG or JPEG format.");
-            isValid = false;
-            alertShown = true;
-        } else if (eduCertificate.size > 1 * 1024 * 1024) { // 1 MB
-            document.getElementById("eduCertificateLabel").focus();
-            alertMessage("Education certificate size must not exceed 1 MB.");
-            isValid = false;
-            alertShown = true;
-        }
-    } else if (!alertShown) {
-        document.getElementById("eduCertificateLabel").focus();
-        alertMessage("Please upload the highest education certificate of the applicant.");
-        isValid = false;
-        alertShown = true;
-    }
-    if (document.getElementById("certificate-yes").style.display === "block" && udid) {
-        let validFormats = ["image/jpeg", "image/jpg"];
-        if (!validFormats.includes(udid.type)) {
-            document.getElementById("udidLabel").focus();
-            alertMessage("Disability Certificate must be in JPG or JPEG format.");
-            isValid = false;
-            alertShown = true;
-        } else if (udid.size > 1 * 1024 * 1024) { // 1 MB
-            document.getElementById("udidLabel").focus();
-            alertMessage("Disability Certificate size must not exceed 1 MB.");
-            isValid = false;
-            alertShown = true;
-        }
-    } else if (document.getElementById("certificate-yes").style.display === "block" && !alertShown) {
-        document.getElementById("udidLabel").focus();
-        alertMessage("Please upload the UDID Card/Disability Certificate.");
-        isValid = false;
-        alertShown = true;
-    }
-}
-    if (step === 7) {
-            let termsConditions = document.getElementById("termsConditions").checked;
-            let acknowledgment = document.getElementById("acknowledgment").checked;
-        if (termsConditions == false && !alertShown) {
-document.getElementById("termsConditions").focus();
-            alertMessage("Please agree to the terms and conditions before submitting.");
-            isValid = false;
-            alertShown = true;
-        }
-        if (acknowledgment == false && !alertShown) {
-document.getElementById("acknowledgment").focus();
-            alertMessage("Please acknowledge the information before submitting.");
-            isValid = false;
-            alertShown = true;
-        }
-}
-
-
-    return isValid;
-}
-function handleCheckboxChange(checkboxId, sourceFieldId, targetFieldId, message, labelId) {
-    const checkbox = document.getElementById(checkboxId);
-
-    checkbox.addEventListener('change', function () {
-        const sourceValue = document.getElementById(sourceFieldId).value;
-
-        // Validate the source value
-        if (sourceValue.length !== 10 || !validateMobileNumber(sourceValue)) {
-            alertMessage(message);
-            document.getElementById(labelId).focus();
-            checkbox.checked = false;
-        } else if (this.checked) {
-            document.getElementById(targetFieldId).value = sourceValue;
-            alertMessage("Applied successfully!");
-        } else {
-            document.getElementById(targetFieldId).value = '';
-            validateStep(currentStep);
-        }
-    });
-}
-handleCheckboxChange(
-    'sameMobile',
-    'mobileNumber',
-    'whatsappNumber',
-    "Please enter a valid 10 digit Mobile Number of the Applicant.",
-    'mobileNumberLabel'
-);
-
-handleCheckboxChange(
-    'sameParentMobile',
-    'parentMobile',
-    'parentWhatsApp',
-    "Please enter a valid 10 digit mobile number of the Parent/Guardian.",
-    'parentMobileLabel'
-);
-        document.getElementById("pinCode").addEventListener("input", function () {
-            const pinCode = this.value.trim();
-
-            if (pinCode.length === 6) {
-                alertMessage("Fetching location...");
-
-                fetch(`https://geocode.maps.co/search?q=${pinCode}&api_key=679e20e6cfc3f458522763qny884f8c`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.length > 0) {
-                            const location = data[0].display_name;
-                            document.getElementById("address").value = location;
-                localStorage.setItem("address", location);
-                            alertMessage(`Location Found: ${location}`);
-                        } else {
-                            document.getElementById("address").value = "";
-localStorage.removeItem("address");
-                            alertMessage("Invalid PIN Code. No location found.");
-                        }
-                    })
-                    .catch(error => {
-                        console.error("Error fetching location data:", error);
-                            document.getElementById("address").value = "";
-localStorage.removeItem("address");
-                        alertMessage("Could not retrieve location.");
-                    });
-            }
         });
-document.getElementById("disabilityStatus").addEventListener("change", function () {
-    const disabilityStatus = this.value;
 
-    if (disabilityStatus === "Yes, I have disability") {
-        document.getElementById("disability-yes").style.display = "block";
-        document.getElementById("certificate-no").style.display = "none";
-        document.getElementById("certificate-yes").style.display = "none";
-        reset();
-        validation();
-    } else {
-        document.getElementById("disability-yes").style.display = "none";
-        document.getElementById("certificate-no").style.display = "none";
-        document.getElementById("certificate-yes").style.display = "none";
-        localStorage.removeItem("disabilityType");
-        localStorage.removeItem("disabilityPercentage");
-        localStorage.removeItem("certificateStatus");
-        localStorage.removeItem("agreement");
-        localStorage.removeItem("agreementText");
-        reset();
-        validation();
+        podcastContainer.innerHTML = "";
+        displayPodcasts(10);
+
+    } catch (error) {
+        podcastContainer.innerHTML = "Error fetching podcasts. Please try again later.";
+        console.error("Error fetching podcasts:", error);
     }
-});
-
-
-document.getElementById("certificateStatus").addEventListener("change", function () {
-    const certificateStatus = this.value;
-
-    if (certificateStatus === "Yes, I have disability certificate") {
-        document.getElementById("certificate-yes").style.display = "block";
-        document.getElementById("certificate-no").style.display = "none";
-document.getElementById('agreement').checked = false;
-
-document.getElementById('udid').value = '';
-        localStorage.removeItem("agreement");
-        localStorage.removeItem("agreementText");
-updateAgreementText();
-    } else if (certificateStatus === "No, I don't have any disability certificate") {
-        document.getElementById("certificate-no").style.display = "block";
-        document.getElementById("certificate-yes").style.display = "none";
-document.getElementById('agreement').checked = false;
-
-document.getElementById('udid').value = '';
-        localStorage.removeItem("agreement");
-        localStorage.removeItem("agreementText");
-validation();
-    } else {
-        document.getElementById("certificate-no").style.display = "none";
-        document.getElementById("certificate-yes").style.display = "none";
-document.getElementById('agreement').checked = false;
-
-document.getElementById('udid').value = '';
-        localStorage.removeItem("agreement");
-        localStorage.removeItem("agreementText");
-validation();
-updateAgreementText();
-    }
-});
-
-function reset() {
-document.getElementById('disabilityType').selectedIndex = 0;
-document.getElementById('disabilityPercentage').selectedIndex = 0;
-document.getElementById('certificateStatus').selectedIndex = 0;
-document.getElementById('agreement').checked = false;
-
-document.getElementById('udid').value = '';
 }
-    document.getElementById('termsConditions').addEventListener('change', function() {
-        if (this.checked) {
-    alertMessage("You have agreed to the terms and conditions. Thank you!");
-validation();
-        } else {
-            alertMessage("Please agree to the terms and conditions before submitting.");
-        }
-    });
-    document.getElementById('acknowledgment').addEventListener('change', function() {
-        if (this.checked) {
-    alertMessage("Your information is acknowledged. Thank you!");
-validation();
-        } else {
-            alertMessage("Please acknowledge the information before submitting.");
-        }
-    });
-// Centralized validation setup function
-function setupRealTimeValidation(fieldId, validationFunction, errorMessage) {
-    const field = document.getElementById(fieldId);
 
-    if (field) {
-        field.addEventListener("input", function () {
-            const value = this.value;
+function displayPodcasts(count) {
+    const podcastContainer = document.getElementById('podcastContainer');
+    const loadMoreButton = document.getElementById('loadMoreButton');
 
-            if (!validationFunction(value)) {
-                alertMessage(errorMessage);
-            }
+    let end = displayedCount + count;
+    let newPodcastsCount = 0;
+
+    for (let i = displayedCount; i < end && i < episodes.length; i++) {
+        const episode = episodes[i];
+
+        const button = document.createElement("button");
+        button.setAttribute("aria-label", `Play ${episode.title} (${episode.date}, Duration: ${episode.duration})`);
+        button.innerHTML = `<div class="buttonContent"><span>${episode.title} (${episode.date}, ${episode.duration})</span></div>`;
+        button.addEventListener('click', () => {
+            playEpisode(i);
+            alertMessage(`Playing '${episode.title}'`);
         });
-    }
-}
 
-// Setup real time validations for all fields
-setupRealTimeValidation(
-    "firstName",
-    validateAlphabetsInput,
-    "Please enter a valid First Name of the Applicant using alphabets only."
-);
-
-setupRealTimeValidation(
-    "lastName",
-    validateAlphabetsInput,
-    "Please enter a valid Last Name of the Applicant using alphabets only."
-);
-
-setupRealTimeValidation(
-    "mobileNumber",
-    validateMobileNumber,
-    "Please enter a valid Mobile Number of the Applicant. It must consist only of digits, start with 6-9, and have exactly 10 digits."
-);
-
-setupRealTimeValidation(
-    "whatsappNumber",
-    validateMobileNumber,
-    "Please enter a valid WhatsApp Number of the Applicant. It must consist only of digits, start with 6-9, and have exactly 10 digits."
-);
-
-setupRealTimeValidation(
-    "parentFirstName",
-    validateAlphabetsInput,
-    "Please enter a valid First Name of the Parent/Guardian using alphabets only."
-);
-
-setupRealTimeValidation(
-    "parentLastName",
-    validateAlphabetsInput,
-    "Please enter a valid Last Name of the Parent/Guardian using alphabets only."
-);
-
-setupRealTimeValidation(
-    "parentMobile",
-    validateMobileNumber,
-    "Please enter a valid Mobile Number of the Parent/Guardian. It must consist only of digits, start with 6-9, and have exactly 10 digits."
-);
-
-setupRealTimeValidation(
-    "parentWhatsApp",
-    validateMobileNumber,
-    "Please enter a valid WhatsApp Number of the Parent/Guardian. It must consist only of digits, start with 6-9, and have exactly 10 digits."
-);
-// Function to validate file uploads in real-time
-function validateFileInput(inputId, validFormats, maxSizeKB, dimensions = null) {
-    document.getElementById(inputId).addEventListener("change", function () {
-        const file = this.files[0];
-        const label = document.getElementById(inputId + "Label");
-
-        if (file) {
-            // Validate file format
-            if (!validFormats.includes(file.type)) {
-                alertMessage(`Invalid file format. Only ${validFormats.join(", ").replace("image/", "").toUpperCase()} allowed.`);
-                this.value = "";
-                label.focus();
-                return;
-            }
-
-            // Validate file size
-            if (file.size > maxSizeKB * 1024) {
-                alertMessage(`File size must not exceed ${maxSizeKB} KB.`);
-                this.value = "";
-                label.focus();
-                return;
-            }
-
-            // Validate image dimensions (if required)
-            if (dimensions) {
-                let img = new Image();
-                img.onload = function () {
-                    if (this.width !== dimensions.width || this.height !== dimensions.height) {
-                        alertMessage(`Invalid dimensions! Must be ${dimensions.width}x${dimensions.height} pixels.`);
-                        document.getElementById(inputId).value = "";
-                        label.focus();
-                    }
-                };
-                img.src = URL.createObjectURL(file);
-            }
-        }
-    });
-}
-
-// Real-time validation setup for Step 6 fields
-validateFileInput("photo", ["image/jpeg", "image/jpg", "image/png"], 300, { width: 400, height: 500 });
-validateFileInput("aadhaarFront", ["image/jpeg", "image/jpg"], 1024);
-validateFileInput("aadhaarBack", ["image/jpeg", "image/jpg"], 1024);
-validateFileInput("eduCertificate", ["image/jpeg", "image/jpg"], 1024);
-validateFileInput("udid", ["image/jpeg", "image/jpg"], 1024);
-// Function to validate input as alphabets with only a single space allowed
-function validateAlphabetsInput(input) {
-    return /^[A-Za-z]+(?: [A-Za-z]*)?$/.test(input);
-}
-
-
-function validateMobileNumber(number) {
-    // Check if the number starts with 0, 1, 2, 3, 4, or 5
-    if (/^[0-5]/.test(number)) {
-        return false;
-    }
-
-    // Check if the number has the same digit repeated more than 10 times consecutively
-    if (/(.)\1{9}/.test(number)) {
-        return false;
-    }
-
-    // Check if the number contains symbols
-    if (/[^0-9]/.test(number)) {
-        return false;
-    }
-
-    // Check if the number contains alphabets
-    if (/[a-zA-Z]/.test(number)) {
-        return false;
-}
-
-    return true;
-}
-// Function for strong validation of email address
-function validateEmailAddress(email) {
-    let allowedDomains = ['gmail.com', 'outlook.com', 'hotmail.com', 'yahoo.com'];
-    let parts = email.split('@');
-    if (parts.length !== 2) {
-        return false;
+        podcastContainer.appendChild(button);
+        newPodcastsCount++;
     }
 
-    let domain = parts[1];
-    if (!allowedDomains.includes(domain)) {
-        return false;
-    }
+    displayedCount = end;
 
-    return true;
-}
-
-function goToStep(step) {
-    document.getElementById(`step${currentStep}`).style.display = "none";
-    document.getElementById(`step${step}`).style.display = "block";
-    currentStep = step;
-    localStorage.setItem("currentStep", step);
-}
-
-document.getElementById('prev3').addEventListener('click', () => {
-        goToStep(2);
-  document.getElementById("div2").focus();
-    });
-document.getElementById('prev4').addEventListener('click', () => {
-        goToStep(3);
-  document.getElementById("div3").focus();
-    });
-document.getElementById('prev5').addEventListener('click', () => {
-        goToStep(4);
-  document.getElementById("div4").focus();
-    });
-document.getElementById('prev6').addEventListener('click', () => {
-        goToStep(5);
-  document.getElementById("div5").focus();
-    });
-document.getElementById('prev7').addEventListener('click', () => {
-        goToStep(6);
-  document.getElementById("div6").focus();
-    });
-
-document.getElementById('next1').addEventListener('click', () => {
-    if (validateStep(1)) {
-    document.getElementById("step1").style.display = "none";
-goToStep(2);
-  document.getElementById("div2").focus();
-    }
-});
-
-document.getElementById('next2').addEventListener('click', () => {
-    if (validateStep(2)) {
-goToStep(3);
-  document.getElementById("div3").focus();
-    }
-});
-document.getElementById('next3').addEventListener('click', () => {
-    if (validateStep(3)) {
-goToStep(4);
-  document.getElementById("div4").focus();
-    }
-});
-document.getElementById('next4').addEventListener('click', () => {
-    if (validateStep(4)) {
-goToStep(5);
-updateAgreementText();
-  document.getElementById("div5").focus();
-    }
-});
-
-document.getElementById('next5').addEventListener('click', () => {
-    if (validateStep(5)) {
-goToStep(6);
-  document.getElementById("div6").focus();
-    }
-});
-
-document.getElementById('next6').addEventListener('click', () => {
-    if (validateStep(6)) {
-formPreview();
-        goToStep(7); // Navigate to the review step
-  document.getElementById("div7").focus();
-    }
-});
-document.getElementById('submitBtn').addEventListener('click', () => {
-    const registrationID = generateRegistrationID();
-    if (registrationID) {
-        document.getElementById("registrationID").value = registrationID;
-    }
-    if (validateStep(7)) {
-document.getElementById("timestamp").value = getTimestamp();
-generatePDF();
-    submitForm();
-}
-});
-function updateAgreementText() {
-    const firstName = document.getElementById("firstName").value.trim();
-    const lastName = document.getElementById("lastName").value.trim();
-    const agreementCheckbox = document.getElementById("agreement");
-    const userAgreement = document.getElementById("userAgreement");
-
-    if (agreementCheckbox.checked) {
-        if (firstName && lastName) {
-            const fullName = `${firstName} ${lastName}`;
-            const agreementText = `I, ${fullName}, hereby declare that I do not currently possess any document or official proof to validate my disability status. I understand that as soon as I receive the official document verifying my disability, I am obligated to submit a copy of the document to Saint Joseph's Academy immediately.`;
-            userAgreement.innerHTML = agreementText;
-            agreementCheckbox.value = agreementText;
-            localStorage.setItem("agreementText", agreementText);
-alertMessage(agreementText);
-        } else {
-            userAgreement.innerHTML = "Provide your consent by checking this checkbox.";
-            agreementCheckbox.value = "";
-            localStorage.removeItem("agreementText");
-alertMessage("Provide your consent by checking this checkbox.");
-        }
+    if (displayedCount < episodes.length) {
+        loadMoreButton.classList.remove("hidden");
     } else {
-        userAgreement.innerHTML = "Provide your consent by checking this checkbox.";
-        agreementCheckbox.value = "";
-        localStorage.removeItem("agreementText");
-alertMessage("Provide your consent by checking this checkbox.");
+        loadMoreButton.classList.add("hidden");
+    }
+
+    if (newPodcastsCount > 0) {
+        alertMessage(`${newPodcastsCount} more podcasts loaded.`);
     }
 }
 
-document.getElementById("firstName").addEventListener("input", updateAgreementText);
-document.getElementById("lastName").addEventListener("input", updateAgreementText);
-document.getElementById("agreement").addEventListener("change", updateAgreementText);
+function formatDuration(duration) {
+    if (!isNaN(duration)) {
+        let seconds = parseInt(duration, 10);
+        let hours = Math.floor(seconds / 3600);
+        let minutes = Math.floor((seconds % 3600) / 60);
+        seconds = seconds % 60;
 
-
-
-function formPreview() {
-    const getValue = (id) => document.getElementById(id)?.value?.trim() || null;
-    const getFile = (id) => document.getElementById(id)?.files[0];
-
-    const fields = [
-        { label: "Full name", value: `${getValue("firstName")} ${getValue("lastName")}` },
-        { label: "Gender", value: getValue("gender") },
-        { label: "Date of Birth", value: getValue("your-dob") },
-        { label: "Mobile Number", value: getValue("mobileNumber") },
-        { label: "WhatsApp Number", value: getValue("whatsappNumber") },
-        { label: "Email Address", value: getValue("email") },
-        { label: "Name of Parent", value: `${getValue("parentFirstName")} ${getValue("parentLastName")}` },
-        { label: "Relationship with Parent", value: getValue("relationship") },
-        { label: "Mobile Number of Parent", value: getValue("parentMobile") },
-        { label: "WhatsApp Number of Parent", value: getValue("parentWhatsApp") },
-        { label: "Address", value: `${getValue("house")}, ${getValue("street")}, ${getValue("area")}, ${getValue("city")}, ${getValue("address")}` },
-        { label: "Highest Education", value: getValue("education") },
-        { label: "Selected Course", value: getValue("course") },
-        { label: "Any kind of disability", value: getValue("disabilityStatus") },
-        { label: "Type of Disability", value: getValue("disabilityType") },
-        { label: "Percentage of Disability", value: getValue("disabilityPercentage") },
-        { label: "Have a disability certificate", value: getValue("certificateStatus") },
-        { label: "Consent for not having disability certificate", value: getValue("agreement") }
-    ];
-
-    const images = [
-        { label: "Passport-Style Photo", file: getFile("photo"), width: 100, height: 150 },
-        { label: "Aadhaar Card (Front)", file: getFile("aadhaarFront"), width: 400, height: 300 },
-        { label: "Aadhaar Card (Back)", file: getFile("aadhaarBack"), width: 400, height: 300 },
-        { label: "Education Certificate", file: getFile("eduCertificate"), width: 300, height: 400 },
-        { label: "Disability Certificate", file: getFile("udid"), width: 300, height: 400 }
-    ];
-
-    // Generate text fields preview
-    let textPreview = fields
-        .filter(field => field.value && field.value !== "null") // Remove empty fields
-        .map(field => `<p><strong>${field.label}:</strong> ${field.value}</p>`)
-        .join("");
-
-    // Generate image previews
-    let imagePreview = images
-        .filter(img => img.file) // Remove fields with no selected file
-        .map(img => `
-            <div class="doc">
-                <h3>${img.label}</h3>
-                <img src="${URL.createObjectURL(img.file)}" alt="${img.label}" width="${img.width}" height="${img.height}">
-            </div>
-        `)
-        .join("");
-
-    // Final preview
-    document.getElementById("reviewInfo").innerHTML = `
-        <div class="review-section">
-            <h2>Form Preview</h2>
-            ${textPreview}
-        </div>
-        <div class="uploaded-documents">
-            <h2>Uploaded Documents</h2>
-            ${imagePreview || "<p>No documents uploaded.</p>"}
-        </div>
-    `;
+        return hours > 0 
+            ? `${hours}h ${minutes}m ${seconds}s`
+            : `${minutes}m ${seconds}s`;
+    }
+    return duration;
 }
 
 
-// Function to generate a unique registration ID
-function generateRegistrationID() {
-    const firstName = document.getElementById("firstName").value.trim();
-    const lastName = document.getElementById("lastName").value.trim();
-    const gender = document.getElementById("gender").value;
-    const mobileNumber = document.getElementById("mobileNumber").value.trim();
+    function playEpisode(index) {
+        if (index < 0 || index >= episodes.length) return;
+        currentEpisodeIndex = index;
+        audio.src = episodes[index].audioUrl;
+        audio.play();
+        updatePlayPauseButton();
+        showPlayer();
+    }
 
-    const firstInitial = firstName.charAt(0).toUpperCase();
-    const lastInitial = lastName.charAt(0).toUpperCase();
-    const genderInitial = gender.charAt(0).toUpperCase();
-    const lastTwoMobileDigits = mobileNumber.slice(-2); // Last two digits of mobile number
+    function showPlayer() {
+        document.getElementById("audioPlayerContainer").classList.remove("hidden");
+    }
 
-    const now = new Date();
-    const formattedDateTime = 
-        String(now.getDate()).padStart(2, '0') +      // DD
-        String(now.getMonth() + 1).padStart(2, '0') + // MM
-        String(now.getFullYear()).slice(-2) +         // YY (last two digits)
-        String(now.getHours()).padStart(2, '0') +     // HH
-        String(now.getMinutes()).padStart(2, '0') +   // MM
-        String(now.getSeconds()).padStart(2, '0');    // SS
+    function updatePlayPauseButton() {
+        const playPauseButton = document.getElementById("playPauseButton");
+        playPauseButton.textContent = audio.paused ? "▶️" : "⏸️";
+        playPauseButton.setAttribute("aria-label", audio.paused ? "Play Podcast" : "Pause Podcast");
+    }
 
-    return `SJAF${firstInitial}${lastInitial}${genderInitial}${lastTwoMobileDigits}${formattedDateTime}`;
-}
-function getTimestamp() {
-    const now = new Date();
-    const dayName = now.toLocaleDateString("en-US", { weekday: "long" });
+    function alertMessage(message) {   
+        document.getElementById("alertBox").style.display = "block";
+        document.getElementById("errorStatus").innerHTML = message;
+        setTimeout(() => {
+            document.getElementById("alertBox").style.display = "none";
+            document.getElementById("errorStatus").innerHTML = "";
+        }, 5000);
+    }
 
-    const date = now.getDate();
-    const month = now.toLocaleDateString("en-US", { month: "long" });
-    const year = now.getFullYear();
-
-    const time = now.toLocaleTimeString("en-US", { hour: "2-digit", minute: "2-digit", second: "2-digit", hour12: true });
-
-    return `${dayName}, ${date} ${month} ${year}, ${time}`;
-}
-function validation() {   
-setTimeout(function(){
-validateAllStep();
-}, 2500);
-}
-function validateAllStep() {
-    if (validateStep(1) && validateStep(2) && validateStep(3) && validateStep(4) && validateStep(5) && validateStep(6) && validateStep(7)) {
-    alertMessage("Now you are all set to submit this form, click submit button to continue!");
-} else {
-    validateStep(currentStep);
-}
-}
-
-
-
-
-function submitForm() {
-// alertMessage("Not implemented...");
-
-}
-document.addEventListener("DOMContentLoaded", function () {
-  // List of field IDs to auto-save, including checkboxes for sameMobile and sameParentMobile
-  const formFields = [
- "your-age", "firstName", "lastName", "gender", "your-dob", "mobileNumber", "sameMobile", "whatsappNumber", "email", "parentFirstName", "parentLastName", "relationship", "parentMobile", "sameParentMobile", "parentWhatsApp", "house", "street", "area", "city", "district", "state", "pinCode", "address", "education", "course", "disabilityStatus", "disabilityType", "disabilityPercentage", "certificateStatus", "agreement" 
-  ];
-
-  // Restore data from localStorage when the page loads.
-  formFields.forEach(fieldId => {
-    const field = document.getElementById(fieldId);
-    if (field) {
-      const savedValue = localStorage.getItem(fieldId);
-      if (savedValue !== null) {
-        if (field.type === "checkbox") {
-          field.checked = (savedValue === "true");
+    document.getElementById("playPauseButton").addEventListener("click", () => {
+        if (audio.src === "" && episodes.length > 0) {
+            playEpisode(0);
         } else {
-          field.value = savedValue;
-        }
-      }
-    }
-  });
-  const disStatus = document.getElementById("disabilityStatus").value;
-  if (disStatus === "Yes, I have disability") {
-    document.getElementById("disability-yes").style.display = "block";
-  } else {
-    document.getElementById("disability-yes").style.display = "none";
-  }
-
-  const certStatus = document.getElementById("certificateStatus").value;
-  if (certStatus === "Yes, I have disability certificate") {
-    document.getElementById("certificate-yes").style.display = "block";
-    document.getElementById("certificate-no").style.display = "none";
-  } else if (certStatus === "No, I don't have any disability certificate") {
-    document.getElementById("certificate-no").style.display = "block";
-    document.getElementById("certificate-yes").style.display = "none";
-  } else {
-    // Default: hide both if no valid value is present
-    document.getElementById("certificate-yes").style.display = "none";
-    document.getElementById("certificate-no").style.display = "none";
-  }
-  // Restore auto-saved values for agreement text, if any.
-  const savedAgreement = localStorage.getItem("agreementText");
-  if (savedAgreement) {
-    const agreementCheckbox = document.getElementById("agreement");
-    const userAgreement = document.getElementById("userAgreement");
-    userAgreement.innerHTML = savedAgreement;
-    agreementCheckbox.value = savedAgreement;
-  }
-
-  // After if checkboxes are checked, trigger their change event to copy values
-  const sameMobile = document.getElementById("sameMobile");
-  if (sameMobile && sameMobile.checked) {
-    sameMobile.dispatchEvent(new Event("change"));
-  }
-
-  const sameParentMobile = document.getElementById("sameParentMobile");
-  if (sameParentMobile && sameParentMobile.checked) {
-    sameParentMobile.dispatchEvent(new Event("change"));
-  }
-
-  // Save data to localStorage on change or input for each field.
-  formFields.forEach(fieldId => {
-    const field = document.getElementById(fieldId);
-    if (field) {
-      // Use "input" event for text fields; "change" for checkboxes and selects.
-      const eventType = (field.tagName.toLowerCase() === "input" && field.type !== "checkbox") ? "input" : "change";
-      field.addEventListener(eventType, function () {
-        if (field.type === "checkbox") {
-          localStorage.setItem(fieldId, field.checked);
-        } else {
-          localStorage.setItem(fieldId, field.value);
-        }
-      });
-    }
-  });
-    const savedStep = localStorage.getItem("currentStep") || 1;
-    // Hide all steps first
-    document.querySelectorAll('.form-step').forEach(step => step.style.display = "none");
-    // Show the saved step
-    document.getElementById(`step${savedStep}`).style.display = "block";
-    currentStep = parseInt(savedStep, 10);
-});
-document.getElementById("resetBtn").addEventListener("click", function () {
-    if (confirm("Warning: This will reset the form and clear all saved data. Are you sure you want to proceed?")) {
-        document.getElementById("enrollmentForm").reset();
-        localStorage.clear();
-        alertMessage("Form and saved data have been reset.");
-// location.reload();
-    }
-});
-// Helper function to convert file input to Data URL
-function getFileDataURL(inputId) {
-    return new Promise((resolve) => {
-        const file = document.getElementById(inputId)?.files[0];
-        if (file) {
-            const reader = new FileReader();
-            reader.onload = function (e) {
-                resolve(e.target.result);
-            };
-            reader.readAsDataURL(file);
-        } else {
-            resolve(null);
+            if (audio.paused) {
+                audio.play();
+            } else {
+                audio.pause();
+            }
+            updatePlayPauseButton();
         }
     });
-}
 
-async function generatePDF() {
-    const getValue = (id) => {
-        const value = document.getElementById(id)?.value.trim();
-        return value ? value : null; // Return null for empty values
-    };
+    document.getElementById("rewindButton").addEventListener("click", () => {
+        audio.currentTime = Math.max(0, audio.currentTime - 10);
+    });
 
-    // Collecting Form Data
-    const registrationID = getValue("registrationID");
-    const timestamp = getValue("timestamp");
-    const yourAge = getValue("your-age");
-    const firstName = getValue("firstName");
-    const lastName = getValue("lastName");
-    const fullName = firstName && lastName ? `${firstName} ${lastName}` : null;
-    const gender = getValue("gender");
-    const dob = getValue("your-dob");
-    const mobileNumber = getValue("mobileNumber");
-    const whatsappNumber = getValue("whatsappNumber");
-    const email = getValue("email");
+    document.getElementById("forwardButton").addEventListener("click", () => {
+        audio.currentTime = Math.min(audio.duration, audio.currentTime + 10);
+    });
 
-    const parentFirstName = getValue("parentFirstName");
-    const parentLastName = getValue("parentLastName");
-    const parentName = parentFirstName && parentLastName ? `${parentFirstName} ${parentLastName}` : null;
-    const relationship = getValue("relationship");
-    const parentMobile = getValue("parentMobile");
-    const parentWhatsapp = getValue("parentWhatsApp");
+    document.getElementById("prevButton").addEventListener("click", () => {
+        if (currentEpisodeIndex > 0) {
+            alertMessage(`Playing previous podcast: '${episodes[currentEpisodeIndex - 1].title}'`);
+            playEpisode(currentEpisodeIndex - 1);
+        }
+    });
 
-    const house = getValue("house");
-    const street = getValue("street");
-    const area = getValue("area");
-    const city = getValue("city");
-    const address = getValue("address");
-    const fullAddress = house || street || area || city || address 
-        ? `${house || ""}, ${street || ""}, ${area || ""}, ${city || ""}, ${address || ""}`
-        : null;
+    document.getElementById("nextButton").addEventListener("click", () => {
+        if (currentEpisodeIndex < episodes.length - 1) {
+            alertMessage(`Playing next podcast: '${episodes[currentEpisodeIndex + 1].title}'`);
+            playEpisode(currentEpisodeIndex + 1);
+        }
+    });
 
-    const education = getValue("education");
-    const course = getValue("course");
+    document.getElementById("loadMoreButton").addEventListener("click", () => {
+        displayPodcasts(10);
+    });
 
-    const disabilityStatus = getValue("disabilityStatus");
-    const disabilityType = getValue("disabilityType");
-    const disabilityPercentage = getValue("disabilityPercentage");
-    const certificateStatus = getValue("certificateStatus");
-    const agreement = getValue("agreement");
-
-    // Fetch Image Data URLs
-    const passportPhoto = await getFileDataURL("photo");
-    const aadhaarFront = await getFileDataURL("aadhaarFront");
-    const aadhaarBack = await getFileDataURL("aadhaarBack");
-    const eduCertificate = await getFileDataURL("eduCertificate");
-    const udid = await getFileDataURL("udid");
-
-    const generateHTML = (label, value) => value ? `<p>${label}: ${value}</p>` : "";
-
-    const htmlContent = `
-<div style="font-family: 'Arial', sans-serif; padding: 30px; color: #333; line-height: 1.6; font-size: 14px;">
-    <div style="width: 100%; border-bottom: 2px solid #ddd; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
-        <div style="text-align: left;">
-            <img src="/wp-content/uploads/2025/02/Saint-Josephs-Academy-foundation-logo.png" style="max-width: 150px; vertical-align: middle;">
-        </div>
-        <div style="text-align: right;">
-            <h2 style="margin: 0; color: #0056b3; font-size: 20px;">Enrollment Confirmation</h2>
-        </div>
-    </div>
-
-    <div style="margin-bottom: 20px;">
-        <p style="font-size: 16px; color: #555;">Thank you for your enrollment at Saint Joseph's Academy.  Please find below a summary of your application details.</p>
-    </div>
-
-    <div style="width: 100%; display: flex; margin-bottom: 20px;">
-        <div style="width: 50%; vertical-align: top; padding-right: 15px;">
-            <h3 style="color: #0056b3; margin-bottom: 10px; font-size: 18px;">Applicant Information</h3>
-                ${generateHTML("Registration ID", registrationID)}
-                ${generateHTML("Full Name", fullName)}
-                ${generateHTML("Gender", gender)}
-
-                ${generateHTML("Age", your-age)}
-                ${generateHTML("Mobile Number", mobileNumber)}
-                ${generateHTML("WhatsApp Number", whatsappNumber)}
-                ${generateHTML("Email Address", email)}
-        </div>
-        <div style="width: 50%; vertical-align: top; padding-left: 15px; border-left: 1px solid #eee;">
-            <h3 style="color: #0056b3; margin-bottom: 10px; font-size: 18px;">Parent/Guardian Information</h3>
-                ${generateHTML("Name of Parent", parentName)}
-                ${generateHTML("Relationship with Parent", relationship)}
-                ${generateHTML("Mobile Number of Parent", parentMobile)}
-                ${generateHTML("WhatsApp Number of Parent", parentWhatsapp)}
-        </div>
-    </div>
-
-    <h3 style="color: #0056b3; margin-bottom: 10px; font-size: 18px;">Address</h3>
-                ${generateHTML("", fullAddress)}
-
-    <div style="width: 100%; display: flex; margin-bottom: 20px;">
-        <div style="width: 50%; vertical-align: top; padding-right: 15px;">
-            <h3 style="color: #0056b3; margin-bottom: 10px; font-size: 18px;">Additional Details</h3>
-                ${generateHTML("Education Qualification", education)}
-                ${generateHTML("Selected Course", course)}
-                ${generateHTML("Have any Disability", disabilityStatus)}
-                ${disabilityStatus === "Yes, I have disability" ? `
-                  ${generateHTML("Type of Disability", disabilityType)}
-                  ${generateHTML("Percentage of Disability", disabilityPercentage)}
-                  ${generateHTML("Have Disability Certificate", certificateStatus)}
-                  ${generateHTML("Consent for not having Disability Certificate", agreement)}
-
-        </div>
-    </div>
-
-    <h3 style="color: #0056b3; margin-bottom: 10px; font-size: 18px;">Uploaded Documents</h3>
-    <div style="width: 100%; display: flex; flex-wrap: wrap; justify-content: space-around; margin-bottom: 20px;">
-        <div style="width: 25%; padding: 5px; text-align: center;">
-            ${passportPhoto ? `<img src="${passportPhoto}" alt="Passport Photo" style="max-width: 90%; border: 1px solid #ddd; padding: 5px;">` : ''}
-            <p style="margin-top: 5px;">Passport Photo</p>
-        </div>
-        <div style="width: 25%; padding: 5px; text-align: center;">
-            ${aadhaarFront ? `<img src="${aadhaarFront}" alt="Aadhaar Front" style="max-width: 90%; border: 1px solid #ddd; padding: 5px;">` : ''}
-            <p style="margin-top: 5px;">Aadhaar Front</p>
-        </div>
-        <div style="width: 25%; padding: 5px; text-align: center;">
-            ${aadhaarBack ? `<img src="${aadhaarBack}" alt="Aadhaar Back" style="max-width: 90%; border: 1px solid #ddd; padding: 5px;">` : ''}
-            <p style="margin-top: 5px;">Aadhaar Back</p>
-        </div>
-        <div style="width: 25%; padding: 5px; text-align: center;">
-            ${eduCertificate ? `<img src="${eduCertificate}" alt="Education Certificate" style="max-width: 90%; border: 1px solid #ddd; padding: 5px;">` : ''}
-            <p style="margin-top: 5px;">Education Certificate</p>
-        </div>
-    </div>
-      ${udid ? `<div style="text-align:center;"><img src="${udid}" alt="Disability Certificate" style="max-width: 50%; border: 1px solid #ddd; padding: 5px;">
-                <p style="margin-top: 5px;">Disability Certificate</p></div>` : ''}
-    <div style="width: 100%; display: flex; margin-bottom: 20px;">
-        <div style="width: 50%; vertical-align: top; padding-right: 15px;">
-            <h3 style="color: #0056b3; margin-bottom: 10px; font-size: 18px;">Course Details</h3>
-                ${generateHTML("Course Name", course)}
-            <p>Course Start Date: 01 March 2025</p>
-            <p>Study Mode: Online</p>
-        </div>
-        </div>
-
-    <div style="margin-top: 20px; padding: 15px; border: 1px solid #ddd; background-color: #f9f9f9;">
-        <h3 style="color: #0056b3; margin-bottom: 10px; font-size: 18px;">Consent Agreement</h3>
-        <p>I, <strong>${fullName}</strong>, hereby declare that I will follow all the rules, regulations, and conditions set by <strong>Saint Joseph's Academy</strong>. I understand that maintaining discipline and adhering to the code of conduct is mandatory during my time at the academy.</p>
-
-            <p>I further acknowledge that if I behave indecently, violate the rules, or disrupt the academy's environment in any way, the academy has the full authority to take appropriate action against me, including suspension or cancellation of my admission.</p>
-
-            <p>By accepting this consent, I agree to comply with the terms and conditions of the academy and understand the consequences of failing to do so.</p>
-        <p><strong>Time and Date of Submission:</strong> ${timestamp}</p>
-    </div>
-    <div style="margin-top: 20px; padding: 15px; border: 1px solid #ddd; background-color: #f9f9f9;">
-        <h3 style="color: #0056b3; margin-bottom: 10px; font-size: 18px;">Important Notes:</h3>
-            <ul>
-                <li>You will receive an email with detailed instructions to access the course.</li>
-                <li>Ensure you attend the orientation session (details will be provided).</li>
-                <li>Keep this document for your reference throughout the course.</li>
-                <li>Refund and cancellation policies apply as per the academy's terms.</li>
-            </ul>
-
-        </div>
-    <div style="margin-top: 20px; padding: 15px; border: 1px solid #ddd; background-color: #f9f9f9;">
-        <h3 style="color: #0056b3; margin-bottom: 10px; font-size: 18px;">Disclaimer:</h3>
-            <p>If it is found that you have provided incorrect or false information in the registration form, the academy reserves the right to reject your admission without prior notice. Furthermore, the decision to grant or deny admission is solely at the discretion of the academy and shall be considered final.</p>
-        </div>
-
-    <div style="width: 100%; margin-top: 30px; border-top: 2px solid #ddd; padding-top: 20px; display: flex; justify-content: space-between;">
-        <div style="text-align: left;">
-            <p style="margin: 0; font-size: 12px; color: #777;">&copy; Saint Joseph's Academy</p>
-        </div>
-        <div style="text-align: right;">
-            <p style="margin: 0; font-size: 12px; color: #777;">Email: support@saintjosephsacademy.in<br>
-                            <p style="margin: 0; font-size: 12px; color: #777;">Phone: +91-9693939396<br>
-                            <p style="margin: 0; font-size: 12px; color: #777;">Website: <a href="https://www.saintjosephsacademy.in" style="color: #0056b3; text-decoration: none;">www.saintjosephsacademy.in</a></p>
-        </div>
-    <div style="width: 100%; margin-top: 30px; border-top: 2px solid #ddd; padding-top: 20px; display: flex; justify-content: space-between;">
-            <h3>Social Media and Channels:</h3>
-            <p>Stay updated with the latest news and announcements by following us on our social channels:</p>
-            <ul>
-                <li>WhatsApp: <a href="https://whatsapp.com/channel/0029Va9kzfx8F2p7e8yzIV1t" target="_blank">Follow  Saint Joseph's Academy WhatsApp Channel</a></li>
-                <li>Telegram: <a href="https://t.me/SaintJosephsAcademyOfficial" target="_blank">Join Saint Joseph's Academy Telegram Channel</a></li>
-                <li>Instagram: <a href="https://www.instagram.com/saintjosephsacademy" target="_blank">Follow Saint Joseph's Academy Instagram</a></li>
-                <li>X (formerly Twitter): <a href="https://www.x.com/saintjosephs_91" target="_blank">Follow Saint Joseph's Academy Twitter</a></li>
-            </ul>
-        </div>
-    </div>
-</div>
-    `;
-
-    // Insert the generated HTML into the hidden container
-    document.getElementById("pdfContainer").innerHTML = htmlContent;
-
-    // Wait for DOM update before converting to PDF
-    setTimeout(() => {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF("p", "pt", "a4");
-
-        doc.html(document.getElementById("pdfContainer"), {
-            callback: function (doc) {
-                doc.save("EnrollmentConfirmation.pdf");
-            },
-            x: 20,
-            y: 20,
-            html2canvas: { scale: 0.8 }
-        });
-    }, 500); // Small delay to ensure content is rendered
-}
-
-
-
-
-
-
-
-
-
-
+    fetchPodcasts();
 </script>
+<style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    button {
+      display: block;
+      width: 100%;
+      margin: 10px 0;
+      padding: 15px;
+      font-size: 14px;
+      border: none;
+      border-radius: 5px;
+      background-color: #007BFF;
+      color: white;
+      cursor: pointer;
+      text-align: left;
+    }
+    button:hover {
+      background-color: #0056b3;
+    }
+    .buttonContent {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .buttonContent .info {
+      font-size: 12px;
+      color: #ddd;
+    }
+    #audioPlayerContainer {
+      width: 100%;
+      background-color: #f8f8f8;
+      border-top: 1px solid #ddd;
+      padding: 10px 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1);
+    }
+    .control-button {
+      margin: 0 10px;
+      padding: 10px;
+      font-size: 16px;
+      border: none;
+      border-radius: 50%;
+      background-color: #007BFF;
+      color: white;
+      cursor: pointer;
+      width: 50px;
+      height: 50px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .control-button:hover {
+      background-color: #0056b3;
+    }
+    .hidden {
+      display: none;
+    }
+    #alertBox {
+      display: none;
+      background: #ff9800;
+      color: white;
+      padding: 10px;
+      text-align: center;
+      font-size: 16px;
+      margin: 10px 0;
+    }
+  </style>
+  <div id="audioPlayerContainer" class="hidden" role="region" aria-label="Podcast Player">
+    <button id="prevButton" class="control-button" aria-label="Previous Podcast">⏮</button>
+    <button id="rewindButton" class="control-button" aria-label="Rewind 10 seconds">⏪</button>
+    <button id="playPauseButton" class="control-button" aria-live="assertive" aria-label="Play Podcast">▶️</button>
+    <button id="forwardButton" class="control-button" aria-label="Forward 10 seconds">⏩</button>
+    <button id="nextButton" class="control-button" aria-label="Next Podcast">⏭</button>
+  </div>
+
+  <div id="podcastContainer"></div>
+  <button id="loadMoreButton" class="hidden" onclick="displayPodcasts(10)">Load More Podcasts</button>
+
+  <div id="alertBox">
+    <p id="errorStatus" aria-live="polite"></p>
+  </div>
+        <h2>BBC RSS Feed Disclaimer</h2>
+        <p>Saint Joseph’s Academy Foundation ("we," "our," or "the Academy") is a non-profit educational institution committed to providing students, especially underprivileged and differently-abled learners, with high-quality learning resources. As part of our educational mission, we offer access to the "BBC Dinbhar" program via the official RSS feed from the British Broadcasting Corporation (BBC) to help students stay informed and enhance their educational experience. <a href="/bbc-rss-feed-disclaimer" target="_blank">Read complete Disclaimer</a></p>
